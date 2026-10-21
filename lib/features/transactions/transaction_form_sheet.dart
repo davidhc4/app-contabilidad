@@ -189,7 +189,36 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
                 firstDate: DateTime(2020),
                 lastDate: DateTime.now().add(const Duration(days: 1)),
               );
-              if (picked != null) setState(() => _date = picked);
+              if (picked != null) {
+                setState(() => _date = DateTime(
+                      picked.year,
+                      picked.month,
+                      picked.day,
+                      _date.hour,
+                      _date.minute,
+                    ));
+              }
+            },
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.access_time_rounded),
+            title: Text(Formatters.time.format(_date)),
+            trailing: const Icon(Icons.chevron_right_rounded),
+            onTap: () async {
+              final picked = await showTimePicker(
+                context: context,
+                initialTime: TimeOfDay.fromDateTime(_date),
+              );
+              if (picked != null) {
+                setState(() => _date = DateTime(
+                      _date.year,
+                      _date.month,
+                      _date.day,
+                      picked.hour,
+                      picked.minute,
+                    ));
+              }
             },
           ),
           const SizedBox(height: 12),

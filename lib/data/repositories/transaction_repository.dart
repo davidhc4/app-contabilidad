@@ -130,4 +130,10 @@ class TransactionRepository {
   Future<void> delete(String id) {
     return (db.delete(db.transactions)..where((t) => t.id.equals(id))).go();
   }
+
+  /// Borra TODAS las transacciones. Usado en "Borrar todos los datos" en
+  /// Ajustes, para que el usuario pueda empezar de cero.
+  Future<void> deleteAll() {
+    return db.delete(db.transactions).go();
+  }
 }

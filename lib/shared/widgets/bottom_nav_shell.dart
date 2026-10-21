@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../features/categories/categories_screen.dart';
 import '../../features/dashboard/dashboard_screen.dart';
 import '../../features/settings/settings_screen.dart';
+import '../../features/statistics/statistics_screen.dart';
 import '../../features/transactions/transactions_screen.dart';
 
 /// Pestañas principales de la app con animación direccional: si vas a una
@@ -22,6 +23,7 @@ class _MainTabShellState extends State<MainTabShell> {
 
   static const _screens = [
     DashboardScreen(),
+    StatisticsScreen(),
     TransactionsScreen(),
     CategoriesScreen(),
     SettingsScreen(),
@@ -63,6 +65,11 @@ class _MainTabShellState extends State<MainTabShell> {
             icon: Icon(Icons.pie_chart_outline_rounded),
             selectedIcon: Icon(Icons.pie_chart_rounded),
             label: 'Resumen',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.insights_outlined),
+            selectedIcon: Icon(Icons.insights_rounded),
+            label: 'Estadísticas',
           ),
           NavigationDestination(
             icon: Icon(Icons.receipt_long_outlined),

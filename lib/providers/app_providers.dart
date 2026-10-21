@@ -4,6 +4,7 @@ import '../data/local/database.dart';
 import '../data/repositories/category_repository.dart';
 import '../data/repositories/settings_repository.dart';
 import '../data/repositories/sms_sender_repository.dart';
+import '../data/repositories/statistics_models.dart';
 import '../data/repositories/transaction_repository.dart';
 
 final databaseProvider = Provider<AppDatabase>((ref) {
@@ -59,4 +60,24 @@ final expenseCategoriesProvider = StreamProvider((ref) {
 
 final incomeCategoriesProvider = StreamProvider((ref) {
   return ref.watch(categoryRepositoryProvider).watchByType('income');
+});
+
+/// -------- Pantalla de Estadísticas --------
+
+final statsPeriodProvider = StateProvider<StatsPeriod>((ref) {
+  return StatsPeriod.month;
+});
+
+final statsRangeProvider = Provider<DateRange>((ref) {
+  final period = ref.watch(statsPeriodProvider);
+  return rangeForPeriod(period);
+});
+
+final statsAggregateProvider = StreamProvider((ref) {
+  final period = ref.watch(statsPeriodProvider);
+  final range = ref.watch(statsRangeProvider);
+  return ref
+      .watch(transactionRepositoryProvider)
+      .watchInRange(range.start, range.end)
+      .map((items) => StatsAggregate.build(items, range, period));
 });

@@ -1382,7 +1382,7 @@ class $AppSettingsTable extends AppSettings
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: false,
-    defaultValue: const Constant('USD'),
+    defaultValue: const Constant('COP'),
   );
   static const VerificationMeta _onboardingDoneMeta = const VerificationMeta(
     'onboardingDone',
@@ -1413,6 +1413,17 @@ class $AppSettingsTable extends AppSettings
     ),
     defaultValue: const Constant(false),
   );
+  static const VerificationMeta _monthlyBudgetMeta = const VerificationMeta(
+    'monthlyBudget',
+  );
+  @override
+  late final GeneratedColumn<double> monthlyBudget = GeneratedColumn<double>(
+    'monthly_budget',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -1420,6 +1431,7 @@ class $AppSettingsTable extends AppSettings
     currencyCode,
     onboardingDone,
     smsDetectionEnabled,
+    monthlyBudget,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1469,6 +1481,15 @@ class $AppSettingsTable extends AppSettings
         ),
       );
     }
+    if (data.containsKey('monthly_budget')) {
+      context.handle(
+        _monthlyBudgetMeta,
+        monthlyBudget.isAcceptableOrUnknown(
+          data['monthly_budget']!,
+          _monthlyBudgetMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -1498,6 +1519,10 @@ class $AppSettingsTable extends AppSettings
         DriftSqlType.bool,
         data['${effectivePrefix}sms_detection_enabled'],
       )!,
+      monthlyBudget: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}monthly_budget'],
+      ),
     );
   }
 
@@ -1513,12 +1538,14 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
   final String currencyCode;
   final bool onboardingDone;
   final bool smsDetectionEnabled;
+  final double? monthlyBudget;
   const AppSetting({
     required this.id,
     required this.themeMode,
     required this.currencyCode,
     required this.onboardingDone,
     required this.smsDetectionEnabled,
+    this.monthlyBudget,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1528,6 +1555,9 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
     map['currency_code'] = Variable<String>(currencyCode);
     map['onboarding_done'] = Variable<bool>(onboardingDone);
     map['sms_detection_enabled'] = Variable<bool>(smsDetectionEnabled);
+    if (!nullToAbsent || monthlyBudget != null) {
+      map['monthly_budget'] = Variable<double>(monthlyBudget);
+    }
     return map;
   }
 
@@ -1538,6 +1568,9 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
       currencyCode: Value(currencyCode),
       onboardingDone: Value(onboardingDone),
       smsDetectionEnabled: Value(smsDetectionEnabled),
+      monthlyBudget: monthlyBudget == null && nullToAbsent
+          ? const Value.absent()
+          : Value(monthlyBudget),
     );
   }
 
@@ -1554,6 +1587,7 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
       smsDetectionEnabled: serializer.fromJson<bool>(
         json['smsDetectionEnabled'],
       ),
+      monthlyBudget: serializer.fromJson<double?>(json['monthlyBudget']),
     );
   }
   @override
@@ -1565,6 +1599,7 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
       'currencyCode': serializer.toJson<String>(currencyCode),
       'onboardingDone': serializer.toJson<bool>(onboardingDone),
       'smsDetectionEnabled': serializer.toJson<bool>(smsDetectionEnabled),
+      'monthlyBudget': serializer.toJson<double?>(monthlyBudget),
     };
   }
 
@@ -1574,12 +1609,16 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
     String? currencyCode,
     bool? onboardingDone,
     bool? smsDetectionEnabled,
+    Value<double?> monthlyBudget = const Value.absent(),
   }) => AppSetting(
     id: id ?? this.id,
     themeMode: themeMode ?? this.themeMode,
     currencyCode: currencyCode ?? this.currencyCode,
     onboardingDone: onboardingDone ?? this.onboardingDone,
     smsDetectionEnabled: smsDetectionEnabled ?? this.smsDetectionEnabled,
+    monthlyBudget: monthlyBudget.present
+        ? monthlyBudget.value
+        : this.monthlyBudget,
   );
   AppSetting copyWithCompanion(AppSettingsCompanion data) {
     return AppSetting(
@@ -1594,6 +1633,9 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
       smsDetectionEnabled: data.smsDetectionEnabled.present
           ? data.smsDetectionEnabled.value
           : this.smsDetectionEnabled,
+      monthlyBudget: data.monthlyBudget.present
+          ? data.monthlyBudget.value
+          : this.monthlyBudget,
     );
   }
 
@@ -1604,7 +1646,8 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
           ..write('themeMode: $themeMode, ')
           ..write('currencyCode: $currencyCode, ')
           ..write('onboardingDone: $onboardingDone, ')
-          ..write('smsDetectionEnabled: $smsDetectionEnabled')
+          ..write('smsDetectionEnabled: $smsDetectionEnabled, ')
+          ..write('monthlyBudget: $monthlyBudget')
           ..write(')'))
         .toString();
   }
@@ -1616,6 +1659,7 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
     currencyCode,
     onboardingDone,
     smsDetectionEnabled,
+    monthlyBudget,
   );
   @override
   bool operator ==(Object other) =>
@@ -1625,7 +1669,8 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
           other.themeMode == this.themeMode &&
           other.currencyCode == this.currencyCode &&
           other.onboardingDone == this.onboardingDone &&
-          other.smsDetectionEnabled == this.smsDetectionEnabled);
+          other.smsDetectionEnabled == this.smsDetectionEnabled &&
+          other.monthlyBudget == this.monthlyBudget);
 }
 
 class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
@@ -1634,12 +1679,14 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
   final Value<String> currencyCode;
   final Value<bool> onboardingDone;
   final Value<bool> smsDetectionEnabled;
+  final Value<double?> monthlyBudget;
   const AppSettingsCompanion({
     this.id = const Value.absent(),
     this.themeMode = const Value.absent(),
     this.currencyCode = const Value.absent(),
     this.onboardingDone = const Value.absent(),
     this.smsDetectionEnabled = const Value.absent(),
+    this.monthlyBudget = const Value.absent(),
   });
   AppSettingsCompanion.insert({
     this.id = const Value.absent(),
@@ -1647,6 +1694,7 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
     this.currencyCode = const Value.absent(),
     this.onboardingDone = const Value.absent(),
     this.smsDetectionEnabled = const Value.absent(),
+    this.monthlyBudget = const Value.absent(),
   });
   static Insertable<AppSetting> custom({
     Expression<int>? id,
@@ -1654,6 +1702,7 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
     Expression<String>? currencyCode,
     Expression<bool>? onboardingDone,
     Expression<bool>? smsDetectionEnabled,
+    Expression<double>? monthlyBudget,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1662,6 +1711,7 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
       if (onboardingDone != null) 'onboarding_done': onboardingDone,
       if (smsDetectionEnabled != null)
         'sms_detection_enabled': smsDetectionEnabled,
+      if (monthlyBudget != null) 'monthly_budget': monthlyBudget,
     });
   }
 
@@ -1671,6 +1721,7 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
     Value<String>? currencyCode,
     Value<bool>? onboardingDone,
     Value<bool>? smsDetectionEnabled,
+    Value<double?>? monthlyBudget,
   }) {
     return AppSettingsCompanion(
       id: id ?? this.id,
@@ -1678,6 +1729,7 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
       currencyCode: currencyCode ?? this.currencyCode,
       onboardingDone: onboardingDone ?? this.onboardingDone,
       smsDetectionEnabled: smsDetectionEnabled ?? this.smsDetectionEnabled,
+      monthlyBudget: monthlyBudget ?? this.monthlyBudget,
     );
   }
 
@@ -1699,6 +1751,9 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
     if (smsDetectionEnabled.present) {
       map['sms_detection_enabled'] = Variable<bool>(smsDetectionEnabled.value);
     }
+    if (monthlyBudget.present) {
+      map['monthly_budget'] = Variable<double>(monthlyBudget.value);
+    }
     return map;
   }
 
@@ -1709,7 +1764,8 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
           ..write('themeMode: $themeMode, ')
           ..write('currencyCode: $currencyCode, ')
           ..write('onboardingDone: $onboardingDone, ')
-          ..write('smsDetectionEnabled: $smsDetectionEnabled')
+          ..write('smsDetectionEnabled: $smsDetectionEnabled, ')
+          ..write('monthlyBudget: $monthlyBudget')
           ..write(')'))
         .toString();
   }
@@ -2671,6 +2727,7 @@ typedef $$AppSettingsTableCreateCompanionBuilder =
       Value<String> currencyCode,
       Value<bool> onboardingDone,
       Value<bool> smsDetectionEnabled,
+      Value<double?> monthlyBudget,
     });
 typedef $$AppSettingsTableUpdateCompanionBuilder =
     AppSettingsCompanion Function({
@@ -2679,6 +2736,7 @@ typedef $$AppSettingsTableUpdateCompanionBuilder =
       Value<String> currencyCode,
       Value<bool> onboardingDone,
       Value<bool> smsDetectionEnabled,
+      Value<double?> monthlyBudget,
     });
 
 class $$AppSettingsTableFilterComposer
@@ -2712,6 +2770,11 @@ class $$AppSettingsTableFilterComposer
 
   ColumnFilters<bool> get smsDetectionEnabled => $composableBuilder(
     column: $table.smsDetectionEnabled,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get monthlyBudget => $composableBuilder(
+    column: $table.monthlyBudget,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -2749,6 +2812,11 @@ class $$AppSettingsTableOrderingComposer
     column: $table.smsDetectionEnabled,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<double> get monthlyBudget => $composableBuilder(
+    column: $table.monthlyBudget,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$AppSettingsTableAnnotationComposer
@@ -2778,6 +2846,11 @@ class $$AppSettingsTableAnnotationComposer
 
   GeneratedColumn<bool> get smsDetectionEnabled => $composableBuilder(
     column: $table.smsDetectionEnabled,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get monthlyBudget => $composableBuilder(
+    column: $table.monthlyBudget,
     builder: (column) => column,
   );
 }
@@ -2818,12 +2891,14 @@ class $$AppSettingsTableTableManager
                 Value<String> currencyCode = const Value.absent(),
                 Value<bool> onboardingDone = const Value.absent(),
                 Value<bool> smsDetectionEnabled = const Value.absent(),
+                Value<double?> monthlyBudget = const Value.absent(),
               }) => AppSettingsCompanion(
                 id: id,
                 themeMode: themeMode,
                 currencyCode: currencyCode,
                 onboardingDone: onboardingDone,
                 smsDetectionEnabled: smsDetectionEnabled,
+                monthlyBudget: monthlyBudget,
               ),
           createCompanionCallback:
               ({
@@ -2832,12 +2907,14 @@ class $$AppSettingsTableTableManager
                 Value<String> currencyCode = const Value.absent(),
                 Value<bool> onboardingDone = const Value.absent(),
                 Value<bool> smsDetectionEnabled = const Value.absent(),
+                Value<double?> monthlyBudget = const Value.absent(),
               }) => AppSettingsCompanion.insert(
                 id: id,
                 themeMode: themeMode,
                 currencyCode: currencyCode,
                 onboardingDone: onboardingDone,
                 smsDetectionEnabled: smsDetectionEnabled,
+                monthlyBudget: monthlyBudget,
               ),
           withReferenceMapper: (p0) => p0
               .map(

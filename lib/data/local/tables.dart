@@ -57,11 +57,14 @@ class AppSettings extends Table {
   IntColumn get id => integer().withDefault(const Constant(0))();
   TextColumn get themeMode =>
       text().withDefault(const Constant('dark'))(); // system | light | dark
-  TextColumn get currencyCode => text().withDefault(const Constant('USD'))();
+  TextColumn get currencyCode => text().withDefault(const Constant('COP'))();
   BoolColumn get onboardingDone =>
       boolean().withDefault(const Constant(false))();
   BoolColumn get smsDetectionEnabled =>
       boolean().withDefault(const Constant(false))();
+  // Presupuesto mensual definido por el usuario (en pesos). Nulo = sin
+  // presupuesto configurado.
+  RealColumn get monthlyBudget => real().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};

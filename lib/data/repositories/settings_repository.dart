@@ -36,4 +36,12 @@ class SettingsRepository {
     return (db.update(db.appSettings)..where((s) => s.id.equals(0)))
         .write(const AppSettingsCompanion(onboardingDone: Value(true)));
   }
+
+  /// Guarda el presupuesto mensual definido por el usuario. Pasa `null`
+  /// para quitar el presupuesto configurado.
+  Future<void> setMonthlyBudget(double? amount) {
+    return (db.update(db.appSettings)..where((s) => s.id.equals(0))).write(
+      AppSettingsCompanion(monthlyBudget: Value(amount)),
+    );
+  }
 }
