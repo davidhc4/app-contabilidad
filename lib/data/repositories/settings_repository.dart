@@ -6,9 +6,20 @@ class SettingsRepository {
   final AppDatabase db;
   SettingsRepository(this.db);
 
+  /// Observa la fila única de configuración. Si por alguna condición de
+  /// carrera (ej. primer arranque) todavía no existe, la crea con valores
+  /// por defecto en vez de fallar.
   Stream<AppSetting> watch() {
     return (db.select(db.appSettings)..where((s) => s.id.equals(0)))
-        .watchSingle();
+        .watch()
+        .asyncMap((rows) async {
+      if (rows.isNotEmpty) return rows.single;
+      await db.into(db.appSettings).insertOnConflictUpdate(
+            const AppSettingsCompanion(id: Value(0)),
+          );
+      return (db.select(db.appSettings)..where((s) => s.id.equals(0)))
+          .getSingle();
+    });
   }
 
   Future<void> setThemeMode(String mode) {
