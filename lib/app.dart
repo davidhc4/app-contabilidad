@@ -3,13 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'core/theme/app_theme.dart';
-import 'features/categories/categories_screen.dart';
-import 'features/dashboard/dashboard_screen.dart';
 import 'features/onboarding/onboarding_screen.dart';
-import 'features/settings/settings_screen.dart';
 import 'features/sms_detection/sms_confirm_sheet.dart';
 import 'features/sms_detection/sms_listener_service.dart';
-import 'features/transactions/transactions_screen.dart';
 import 'providers/app_providers.dart';
 import 'shared/widgets/bottom_nav_shell.dart';
 
@@ -17,33 +13,15 @@ final navigatorKey = GlobalKey<NavigatorState>();
 
 final _router = GoRouter(
   navigatorKey: navigatorKey,
-  initialLocation: '/dashboard',
+  initialLocation: '/home',
   routes: [
     GoRoute(
       path: '/onboarding',
       builder: (context, state) => const OnboardingScreen(),
     ),
-    ShellRoute(
-      builder: (context, state, child) =>
-          BottomNavShell(location: state.uri.toString(), child: child),
-      routes: [
-        GoRoute(
-          path: '/dashboard',
-          builder: (context, state) => const DashboardScreen(),
-        ),
-        GoRoute(
-          path: '/transactions',
-          builder: (context, state) => const TransactionsScreen(),
-        ),
-        GoRoute(
-          path: '/categories',
-          builder: (context, state) => const CategoriesScreen(),
-        ),
-        GoRoute(
-          path: '/settings',
-          builder: (context, state) => const SettingsScreen(),
-        ),
-      ],
+    GoRoute(
+      path: '/home',
+      builder: (context, state) => const MainTabShell(),
     ),
   ],
 );

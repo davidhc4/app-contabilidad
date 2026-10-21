@@ -1,26 +1,63 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
-class BottomNavShell extends StatelessWidget {
-  final Widget child;
-  final String location;
+import '../../features/categories/categories_screen.dart';
+import '../../features/dashboard/dashboard_screen.dart';
+import '../../features/settings/settings_screen.dart';
+import '../../features/transactions/transactions_screen.dart';
 
-  const BottomNavShell({super.key, required this.child, required this.location});
+/// Pestañas principales de la app con animación direccional: si vas a una
+/// pestaña a la derecha, el contenido entra deslizándose desde la derecha;
+/// si vas a una a la izquierda, entra desde la izquierda. Igual que en
+/// cualquier app con pestañas en la parte inferior (estilo iOS/Android).
+class MainTabShell extends StatefulWidget {
+  const MainTabShell({super.key});
 
-  static const _tabs = ['/dashboard', '/transactions', '/categories', '/settings'];
+  @override
+  State<MainTabShell> createState() => _MainTabShellState();
+}
 
-  int get _currentIndex {
-    final index = _tabs.indexWhere((t) => location.startsWith(t));
-    return index < 0 ? 0 : index;
+class _MainTabShellState extends State<MainTabShell> {
+  final _pageController = PageController();
+  int _index = 0;
+
+  static const _screens = [
+    DashboardScreen(),
+    TransactionsScreen(),
+    CategoriesScreen(),
+    SettingsScreen(),
+  ];
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _goTo(int index) {
+    if (index == _index) return;
+    setState(() => _index = index);
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 320),
+      curve: Curves.easeInOutCubic,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: child,
+      body: PageView(
+        controller: _pageController,
+        // El usuario cambia de pestaña tocando la barra de abajo, no
+        // deslizando (eso se reserva para gestos dentro de cada pantalla,
+        // como borrar un movimiento deslizando hacia un lado).
+        physics: const NeverScrollableScrollPhysics(),
+        onPageChanged: (i) => setState(() => _index = i),
+        children: _screens,
+      ),
       bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
-        onDestinationSelected: (i) => context.go(_tabs[i]),
+        selectedIndex: _index,
+        onDestinationSelected: _goTo,
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.pie_chart_outline_rounded),

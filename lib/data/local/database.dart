@@ -76,19 +76,4 @@ Future<void> _seed(AppDatabase db) async {
           color: c[2],
         ));
   }
-
-  final defaultSenders = <List<String>>[
-    [
-      'Banco (genérico)',
-      r'(?:USD|S/|\$|COP)?\s*([0-9]{1,3}(?:[.,][0-9]{3})*(?:[.,][0-9]{2})?)',
-    ],
-  ];
-  for (final s in defaultSenders) {
-    await db.into(db.smsBankSenders).insert(SmsBankSendersCompanion.insert(
-          id: uuid.v4(),
-          senderIdOrName: s[0],
-          regexPattern: s[1],
-          isEnabled: const Value(false),
-        ));
-  }
 }

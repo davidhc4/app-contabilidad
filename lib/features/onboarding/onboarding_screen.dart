@@ -55,7 +55,7 @@ class OnboardingScreen extends ConsumerWidget {
                     await repo.setSmsDetectionEnabled(true);
                   }
                   await repo.setOnboardingDone();
-                  if (context.mounted) context.go('/dashboard');
+                  if (context.mounted) context.go('/home');
                 },
                 style: FilledButton.styleFrom(
                   minimumSize: const Size.fromHeight(52),
@@ -66,7 +66,7 @@ class OnboardingScreen extends ConsumerWidget {
               TextButton(
                 onPressed: () async {
                   await ref.read(settingsRepositoryProvider).setOnboardingDone();
-                  if (context.mounted) context.go('/dashboard');
+                  if (context.mounted) context.go('/home');
                 },
                 child: const Text('Prefiero registrar todo manualmente'),
               ),

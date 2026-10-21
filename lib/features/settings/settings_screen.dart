@@ -74,7 +74,9 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                   const Divider(height: 1),
                   ListTile(
-                    title: const Text('Bancos / remitentes monitoreados'),
+                    title: const Text('Bancos monitoreados'),
+                    subtitle: const Text(
+                        'Opcional: mejora la detección para un banco en particular'),
                     trailing: const Icon(Icons.chevron_right_rounded),
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute(
