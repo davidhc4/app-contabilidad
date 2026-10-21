@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 import '../../providers/app_providers.dart';
+import '../sms_detection/sms_permission_helper.dart';
 import 'sms_senders_screen.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -64,8 +64,9 @@ class SettingsScreen extends ConsumerWidget {
                     value: settings.smsDetectionEnabled,
                     onChanged: (v) async {
                       if (v) {
-                        final status = await Permission.sms.request();
-                        if (!status.isGranted) return;
+                        final granted =
+                            await requestSmsPermissionWithGuidance(context);
+                        if (!granted) return;
                       }
                       ref
                           .read(settingsRepositoryProvider)

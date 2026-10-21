@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../providers/app_providers.dart';
+import '../sms_detection/sms_permission_helper.dart';
 
 class OnboardingScreen extends ConsumerWidget {
   const OnboardingScreen({super.key});
@@ -49,9 +49,9 @@ class OnboardingScreen extends ConsumerWidget {
               const Spacer(),
               FilledButton.tonal(
                 onPressed: () async {
-                  final status = await Permission.sms.request();
+                  final granted = await requestSmsPermissionWithGuidance(context);
                   final repo = ref.read(settingsRepositoryProvider);
-                  if (status.isGranted) {
+                  if (granted) {
                     await repo.setSmsDetectionEnabled(true);
                   }
                   await repo.setOnboardingDone();
