@@ -10,13 +10,14 @@ import 'tables.dart';
 
 part 'database.g.dart';
 
-@DriftDatabase(tables: [Categories, Transactions, SmsBankSenders, AppSettings])
+@DriftDatabase(
+    tables: [Categories, Cards, Transactions, SmsBankSenders, AppSettings])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -27,6 +28,10 @@ class AppDatabase extends _$AppDatabase {
         onUpgrade: (m, from, to) async {
           if (from < 2) {
             await m.addColumn(appSettings, appSettings.monthlyBudget);
+          }
+          if (from < 3) {
+            await m.createTable(cards);
+            await m.addColumn(transactions, transactions.cardId);
           }
         },
       );

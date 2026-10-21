@@ -456,6 +456,477 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
   }
 }
 
+class $CardsTable extends Cards with TableInfo<$CardsTable, CardItem> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CardsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lastFourDigitsMeta = const VerificationMeta(
+    'lastFourDigits',
+  );
+  @override
+  late final GeneratedColumn<String> lastFourDigits = GeneratedColumn<String>(
+    'last_four_digits',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _networkMeta = const VerificationMeta(
+    'network',
+  );
+  @override
+  late final GeneratedColumn<String> network = GeneratedColumn<String>(
+    'network',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _colorStartMeta = const VerificationMeta(
+    'colorStart',
+  );
+  @override
+  late final GeneratedColumn<String> colorStart = GeneratedColumn<String>(
+    'color_start',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _colorEndMeta = const VerificationMeta(
+    'colorEnd',
+  );
+  @override
+  late final GeneratedColumn<String> colorEnd = GeneratedColumn<String>(
+    'color_end',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _isArchivedMeta = const VerificationMeta(
+    'isArchived',
+  );
+  @override
+  late final GeneratedColumn<bool> isArchived = GeneratedColumn<bool>(
+    'is_archived',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_archived" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    lastFourDigits,
+    network,
+    colorStart,
+    colorEnd,
+    isArchived,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cards';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CardItem> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('last_four_digits')) {
+      context.handle(
+        _lastFourDigitsMeta,
+        lastFourDigits.isAcceptableOrUnknown(
+          data['last_four_digits']!,
+          _lastFourDigitsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_lastFourDigitsMeta);
+    }
+    if (data.containsKey('network')) {
+      context.handle(
+        _networkMeta,
+        network.isAcceptableOrUnknown(data['network']!, _networkMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_networkMeta);
+    }
+    if (data.containsKey('color_start')) {
+      context.handle(
+        _colorStartMeta,
+        colorStart.isAcceptableOrUnknown(data['color_start']!, _colorStartMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_colorStartMeta);
+    }
+    if (data.containsKey('color_end')) {
+      context.handle(
+        _colorEndMeta,
+        colorEnd.isAcceptableOrUnknown(data['color_end']!, _colorEndMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_colorEndMeta);
+    }
+    if (data.containsKey('is_archived')) {
+      context.handle(
+        _isArchivedMeta,
+        isArchived.isAcceptableOrUnknown(data['is_archived']!, _isArchivedMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CardItem map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CardItem(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      lastFourDigits: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}last_four_digits'],
+      )!,
+      network: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}network'],
+      )!,
+      colorStart: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}color_start'],
+      )!,
+      colorEnd: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}color_end'],
+      )!,
+      isArchived: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_archived'],
+      )!,
+    );
+  }
+
+  @override
+  $CardsTable createAlias(String alias) {
+    return $CardsTable(attachedDatabase, alias);
+  }
+}
+
+class CardItem extends DataClass implements Insertable<CardItem> {
+  final String id;
+  final String name;
+  final String lastFourDigits;
+  final String network;
+  final String colorStart;
+  final String colorEnd;
+  final bool isArchived;
+  const CardItem({
+    required this.id,
+    required this.name,
+    required this.lastFourDigits,
+    required this.network,
+    required this.colorStart,
+    required this.colorEnd,
+    required this.isArchived,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    map['last_four_digits'] = Variable<String>(lastFourDigits);
+    map['network'] = Variable<String>(network);
+    map['color_start'] = Variable<String>(colorStart);
+    map['color_end'] = Variable<String>(colorEnd);
+    map['is_archived'] = Variable<bool>(isArchived);
+    return map;
+  }
+
+  CardsCompanion toCompanion(bool nullToAbsent) {
+    return CardsCompanion(
+      id: Value(id),
+      name: Value(name),
+      lastFourDigits: Value(lastFourDigits),
+      network: Value(network),
+      colorStart: Value(colorStart),
+      colorEnd: Value(colorEnd),
+      isArchived: Value(isArchived),
+    );
+  }
+
+  factory CardItem.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CardItem(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      lastFourDigits: serializer.fromJson<String>(json['lastFourDigits']),
+      network: serializer.fromJson<String>(json['network']),
+      colorStart: serializer.fromJson<String>(json['colorStart']),
+      colorEnd: serializer.fromJson<String>(json['colorEnd']),
+      isArchived: serializer.fromJson<bool>(json['isArchived']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'lastFourDigits': serializer.toJson<String>(lastFourDigits),
+      'network': serializer.toJson<String>(network),
+      'colorStart': serializer.toJson<String>(colorStart),
+      'colorEnd': serializer.toJson<String>(colorEnd),
+      'isArchived': serializer.toJson<bool>(isArchived),
+    };
+  }
+
+  CardItem copyWith({
+    String? id,
+    String? name,
+    String? lastFourDigits,
+    String? network,
+    String? colorStart,
+    String? colorEnd,
+    bool? isArchived,
+  }) => CardItem(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    lastFourDigits: lastFourDigits ?? this.lastFourDigits,
+    network: network ?? this.network,
+    colorStart: colorStart ?? this.colorStart,
+    colorEnd: colorEnd ?? this.colorEnd,
+    isArchived: isArchived ?? this.isArchived,
+  );
+  CardItem copyWithCompanion(CardsCompanion data) {
+    return CardItem(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      lastFourDigits: data.lastFourDigits.present
+          ? data.lastFourDigits.value
+          : this.lastFourDigits,
+      network: data.network.present ? data.network.value : this.network,
+      colorStart: data.colorStart.present
+          ? data.colorStart.value
+          : this.colorStart,
+      colorEnd: data.colorEnd.present ? data.colorEnd.value : this.colorEnd,
+      isArchived: data.isArchived.present
+          ? data.isArchived.value
+          : this.isArchived,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CardItem(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('lastFourDigits: $lastFourDigits, ')
+          ..write('network: $network, ')
+          ..write('colorStart: $colorStart, ')
+          ..write('colorEnd: $colorEnd, ')
+          ..write('isArchived: $isArchived')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    name,
+    lastFourDigits,
+    network,
+    colorStart,
+    colorEnd,
+    isArchived,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CardItem &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.lastFourDigits == this.lastFourDigits &&
+          other.network == this.network &&
+          other.colorStart == this.colorStart &&
+          other.colorEnd == this.colorEnd &&
+          other.isArchived == this.isArchived);
+}
+
+class CardsCompanion extends UpdateCompanion<CardItem> {
+  final Value<String> id;
+  final Value<String> name;
+  final Value<String> lastFourDigits;
+  final Value<String> network;
+  final Value<String> colorStart;
+  final Value<String> colorEnd;
+  final Value<bool> isArchived;
+  final Value<int> rowid;
+  const CardsCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.lastFourDigits = const Value.absent(),
+    this.network = const Value.absent(),
+    this.colorStart = const Value.absent(),
+    this.colorEnd = const Value.absent(),
+    this.isArchived = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CardsCompanion.insert({
+    required String id,
+    required String name,
+    required String lastFourDigits,
+    required String network,
+    required String colorStart,
+    required String colorEnd,
+    this.isArchived = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       name = Value(name),
+       lastFourDigits = Value(lastFourDigits),
+       network = Value(network),
+       colorStart = Value(colorStart),
+       colorEnd = Value(colorEnd);
+  static Insertable<CardItem> custom({
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<String>? lastFourDigits,
+    Expression<String>? network,
+    Expression<String>? colorStart,
+    Expression<String>? colorEnd,
+    Expression<bool>? isArchived,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (lastFourDigits != null) 'last_four_digits': lastFourDigits,
+      if (network != null) 'network': network,
+      if (colorStart != null) 'color_start': colorStart,
+      if (colorEnd != null) 'color_end': colorEnd,
+      if (isArchived != null) 'is_archived': isArchived,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CardsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? name,
+    Value<String>? lastFourDigits,
+    Value<String>? network,
+    Value<String>? colorStart,
+    Value<String>? colorEnd,
+    Value<bool>? isArchived,
+    Value<int>? rowid,
+  }) {
+    return CardsCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      lastFourDigits: lastFourDigits ?? this.lastFourDigits,
+      network: network ?? this.network,
+      colorStart: colorStart ?? this.colorStart,
+      colorEnd: colorEnd ?? this.colorEnd,
+      isArchived: isArchived ?? this.isArchived,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (lastFourDigits.present) {
+      map['last_four_digits'] = Variable<String>(lastFourDigits.value);
+    }
+    if (network.present) {
+      map['network'] = Variable<String>(network.value);
+    }
+    if (colorStart.present) {
+      map['color_start'] = Variable<String>(colorStart.value);
+    }
+    if (colorEnd.present) {
+      map['color_end'] = Variable<String>(colorEnd.value);
+    }
+    if (isArchived.present) {
+      map['is_archived'] = Variable<bool>(isArchived.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CardsCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('lastFourDigits: $lastFourDigits, ')
+          ..write('network: $network, ')
+          ..write('colorStart: $colorStart, ')
+          ..write('colorEnd: $colorEnd, ')
+          ..write('isArchived: $isArchived, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $TransactionsTable extends Transactions
     with TableInfo<$TransactionsTable, Transaction> {
   @override
@@ -557,6 +1028,18 @@ class $TransactionsTable extends Transactions
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _cardIdMeta = const VerificationMeta('cardId');
+  @override
+  late final GeneratedColumn<String> cardId = GeneratedColumn<String>(
+    'card_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES cards (id)',
+    ),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -568,6 +1051,7 @@ class $TransactionsTable extends Transactions
     createdAt,
     source,
     rawSmsBody,
+    cardId,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -648,6 +1132,12 @@ class $TransactionsTable extends Transactions
         ),
       );
     }
+    if (data.containsKey('card_id')) {
+      context.handle(
+        _cardIdMeta,
+        cardId.isAcceptableOrUnknown(data['card_id']!, _cardIdMeta),
+      );
+    }
     return context;
   }
 
@@ -693,6 +1183,10 @@ class $TransactionsTable extends Transactions
         DriftSqlType.string,
         data['${effectivePrefix}raw_sms_body'],
       ),
+      cardId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}card_id'],
+      ),
     );
   }
 
@@ -712,6 +1206,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
   final DateTime createdAt;
   final String source;
   final String? rawSmsBody;
+  final String? cardId;
   const Transaction({
     required this.id,
     required this.type,
@@ -722,6 +1217,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     required this.createdAt,
     required this.source,
     this.rawSmsBody,
+    this.cardId,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -736,6 +1232,9 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     map['source'] = Variable<String>(source);
     if (!nullToAbsent || rawSmsBody != null) {
       map['raw_sms_body'] = Variable<String>(rawSmsBody);
+    }
+    if (!nullToAbsent || cardId != null) {
+      map['card_id'] = Variable<String>(cardId);
     }
     return map;
   }
@@ -753,6 +1252,9 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       rawSmsBody: rawSmsBody == null && nullToAbsent
           ? const Value.absent()
           : Value(rawSmsBody),
+      cardId: cardId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cardId),
     );
   }
 
@@ -771,6 +1273,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       source: serializer.fromJson<String>(json['source']),
       rawSmsBody: serializer.fromJson<String?>(json['rawSmsBody']),
+      cardId: serializer.fromJson<String?>(json['cardId']),
     );
   }
   @override
@@ -786,6 +1289,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'source': serializer.toJson<String>(source),
       'rawSmsBody': serializer.toJson<String?>(rawSmsBody),
+      'cardId': serializer.toJson<String?>(cardId),
     };
   }
 
@@ -799,6 +1303,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     DateTime? createdAt,
     String? source,
     Value<String?> rawSmsBody = const Value.absent(),
+    Value<String?> cardId = const Value.absent(),
   }) => Transaction(
     id: id ?? this.id,
     type: type ?? this.type,
@@ -809,6 +1314,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     createdAt: createdAt ?? this.createdAt,
     source: source ?? this.source,
     rawSmsBody: rawSmsBody.present ? rawSmsBody.value : this.rawSmsBody,
+    cardId: cardId.present ? cardId.value : this.cardId,
   );
   Transaction copyWithCompanion(TransactionsCompanion data) {
     return Transaction(
@@ -827,6 +1333,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       rawSmsBody: data.rawSmsBody.present
           ? data.rawSmsBody.value
           : this.rawSmsBody,
+      cardId: data.cardId.present ? data.cardId.value : this.cardId,
     );
   }
 
@@ -841,7 +1348,8 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           ..write('date: $date, ')
           ..write('createdAt: $createdAt, ')
           ..write('source: $source, ')
-          ..write('rawSmsBody: $rawSmsBody')
+          ..write('rawSmsBody: $rawSmsBody, ')
+          ..write('cardId: $cardId')
           ..write(')'))
         .toString();
   }
@@ -857,6 +1365,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     createdAt,
     source,
     rawSmsBody,
+    cardId,
   );
   @override
   bool operator ==(Object other) =>
@@ -870,7 +1379,8 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           other.date == this.date &&
           other.createdAt == this.createdAt &&
           other.source == this.source &&
-          other.rawSmsBody == this.rawSmsBody);
+          other.rawSmsBody == this.rawSmsBody &&
+          other.cardId == this.cardId);
 }
 
 class TransactionsCompanion extends UpdateCompanion<Transaction> {
@@ -883,6 +1393,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
   final Value<DateTime> createdAt;
   final Value<String> source;
   final Value<String?> rawSmsBody;
+  final Value<String?> cardId;
   final Value<int> rowid;
   const TransactionsCompanion({
     this.id = const Value.absent(),
@@ -894,6 +1405,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     this.createdAt = const Value.absent(),
     this.source = const Value.absent(),
     this.rawSmsBody = const Value.absent(),
+    this.cardId = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   TransactionsCompanion.insert({
@@ -906,6 +1418,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     this.createdAt = const Value.absent(),
     this.source = const Value.absent(),
     this.rawSmsBody = const Value.absent(),
+    this.cardId = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        type = Value(type),
@@ -922,6 +1435,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     Expression<DateTime>? createdAt,
     Expression<String>? source,
     Expression<String>? rawSmsBody,
+    Expression<String>? cardId,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -934,6 +1448,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       if (createdAt != null) 'created_at': createdAt,
       if (source != null) 'source': source,
       if (rawSmsBody != null) 'raw_sms_body': rawSmsBody,
+      if (cardId != null) 'card_id': cardId,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -948,6 +1463,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     Value<DateTime>? createdAt,
     Value<String>? source,
     Value<String?>? rawSmsBody,
+    Value<String?>? cardId,
     Value<int>? rowid,
   }) {
     return TransactionsCompanion(
@@ -960,6 +1476,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       createdAt: createdAt ?? this.createdAt,
       source: source ?? this.source,
       rawSmsBody: rawSmsBody ?? this.rawSmsBody,
+      cardId: cardId ?? this.cardId,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -994,6 +1511,9 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     if (rawSmsBody.present) {
       map['raw_sms_body'] = Variable<String>(rawSmsBody.value);
     }
+    if (cardId.present) {
+      map['card_id'] = Variable<String>(cardId.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -1012,6 +1532,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
           ..write('createdAt: $createdAt, ')
           ..write('source: $source, ')
           ..write('rawSmsBody: $rawSmsBody, ')
+          ..write('cardId: $cardId, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -1775,6 +2296,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $CategoriesTable categories = $CategoriesTable(this);
+  late final $CardsTable cards = $CardsTable(this);
   late final $TransactionsTable transactions = $TransactionsTable(this);
   late final $SmsBankSendersTable smsBankSenders = $SmsBankSendersTable(this);
   late final $AppSettingsTable appSettings = $AppSettingsTable(this);
@@ -1784,6 +2306,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     categories,
+    cards,
     transactions,
     smsBankSenders,
     appSettings,
@@ -2129,6 +2652,347 @@ typedef $$CategoriesTableProcessedTableManager =
       Category,
       PrefetchHooks Function({bool transactionsRefs})
     >;
+typedef $$CardsTableCreateCompanionBuilder = CardsCompanion Function({
+  required String id,
+  required String name,
+  required String lastFourDigits,
+  required String network,
+  required String colorStart,
+  required String colorEnd,
+  Value<bool> isArchived,
+  Value<int> rowid,
+});
+typedef $$CardsTableUpdateCompanionBuilder = CardsCompanion Function({
+  Value<String> id,
+  Value<String> name,
+  Value<String> lastFourDigits,
+  Value<String> network,
+  Value<String> colorStart,
+  Value<String> colorEnd,
+  Value<bool> isArchived,
+  Value<int> rowid,
+});
+
+final class $$CardsTableReferences
+    extends BaseReferences<_$AppDatabase, $CardsTable, CardItem> {
+  $$CardsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$TransactionsTable, List<Transaction>>
+  _transactionsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.transactions,
+    aliasName: 'cards__id__transactions__card_id',
+  );
+
+  $$TransactionsTableProcessedTableManager get transactionsRefs {
+    final manager = $$TransactionsTableTableManager(
+      $_db,
+      $_db.transactions,
+    ).filter((f) => f.cardId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_transactionsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$CardsTableFilterComposer extends Composer<_$AppDatabase, $CardsTable> {
+  $$CardsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lastFourDigits => $composableBuilder(
+    column: $table.lastFourDigits,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get network => $composableBuilder(
+    column: $table.network,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get colorStart => $composableBuilder(
+    column: $table.colorStart,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get colorEnd => $composableBuilder(
+    column: $table.colorEnd,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isArchived => $composableBuilder(
+    column: $table.isArchived,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> transactionsRefs(
+    Expression<bool> Function($$TransactionsTableFilterComposer f) f,
+  ) {
+    final $$TransactionsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.transactions,
+      getReferencedColumn: (t) => t.cardId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TransactionsTableFilterComposer(
+            $db: $db,
+            $table: $db.transactions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$CardsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CardsTable> {
+  $$CardsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lastFourDigits => $composableBuilder(
+    column: $table.lastFourDigits,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get network => $composableBuilder(
+    column: $table.network,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get colorStart => $composableBuilder(
+    column: $table.colorStart,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get colorEnd => $composableBuilder(
+    column: $table.colorEnd,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isArchived => $composableBuilder(
+    column: $table.isArchived,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CardsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CardsTable> {
+  $$CardsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get lastFourDigits => $composableBuilder(
+    column: $table.lastFourDigits,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get network =>
+      $composableBuilder(column: $table.network, builder: (column) => column);
+
+  GeneratedColumn<String> get colorStart => $composableBuilder(
+    column: $table.colorStart,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get colorEnd =>
+      $composableBuilder(column: $table.colorEnd, builder: (column) => column);
+
+  GeneratedColumn<bool> get isArchived => $composableBuilder(
+    column: $table.isArchived,
+    builder: (column) => column,
+  );
+
+  Expression<T> transactionsRefs<T extends Object>(
+    Expression<T> Function($$TransactionsTableAnnotationComposer a) f,
+  ) {
+    final $$TransactionsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.transactions,
+      getReferencedColumn: (t) => t.cardId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TransactionsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.transactions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$CardsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CardsTable,
+          CardItem,
+          $$CardsTableFilterComposer,
+          $$CardsTableOrderingComposer,
+          $$CardsTableAnnotationComposer,
+          $$CardsTableCreateCompanionBuilder,
+          $$CardsTableUpdateCompanionBuilder,
+          (CardItem, $$CardsTableReferences),
+          CardItem,
+          PrefetchHooks Function({bool transactionsRefs})
+        > {
+  $$CardsTableTableManager(_$AppDatabase db, $CardsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CardsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CardsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CardsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> lastFourDigits = const Value.absent(),
+                Value<String> network = const Value.absent(),
+                Value<String> colorStart = const Value.absent(),
+                Value<String> colorEnd = const Value.absent(),
+                Value<bool> isArchived = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CardsCompanion(
+                id: id,
+                name: name,
+                lastFourDigits: lastFourDigits,
+                network: network,
+                colorStart: colorStart,
+                colorEnd: colorEnd,
+                isArchived: isArchived,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String name,
+                required String lastFourDigits,
+                required String network,
+                required String colorStart,
+                required String colorEnd,
+                Value<bool> isArchived = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CardsCompanion.insert(
+                id: id,
+                name: name,
+                lastFourDigits: lastFourDigits,
+                network: network,
+                colorStart: colorStart,
+                colorEnd: colorEnd,
+                isArchived: isArchived,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CardsTable, CardItem>(table),
+                  $$CardsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({transactionsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (transactionsRefs) db.transactions],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (transactionsRefs)
+                    await $_getPrefetchedData<
+                      CardItem,
+                      $CardsTable,
+                      Transaction
+                    >(
+                      currentTable: table,
+                      referencedTable: $$CardsTableReferences
+                          ._transactionsRefsTable(db),
+                      managerFromTypedResult: (p0) => $$CardsTableReferences(
+                        db,
+                        table,
+                        p0,
+                      ).transactionsRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.cardId == item.id),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$CardsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CardsTable,
+      CardItem,
+      $$CardsTableFilterComposer,
+      $$CardsTableOrderingComposer,
+      $$CardsTableAnnotationComposer,
+      $$CardsTableCreateCompanionBuilder,
+      $$CardsTableUpdateCompanionBuilder,
+      (CardItem, $$CardsTableReferences),
+      CardItem,
+      PrefetchHooks Function({bool transactionsRefs})
+    >;
 typedef $$TransactionsTableCreateCompanionBuilder =
     TransactionsCompanion Function({
       required String id,
@@ -2140,6 +3004,7 @@ typedef $$TransactionsTableCreateCompanionBuilder =
       Value<DateTime> createdAt,
       Value<String> source,
       Value<String?> rawSmsBody,
+      Value<String?> cardId,
       Value<int> rowid,
     });
 typedef $$TransactionsTableUpdateCompanionBuilder =
@@ -2153,6 +3018,7 @@ typedef $$TransactionsTableUpdateCompanionBuilder =
       Value<DateTime> createdAt,
       Value<String> source,
       Value<String?> rawSmsBody,
+      Value<String?> cardId,
       Value<int> rowid,
     });
 
@@ -2171,6 +3037,23 @@ final class $$TransactionsTableReferences
       $_db.categories,
     ).filter((f) => f.id.sqlEquals($_column));
     final item = $_typedResult.readTableOrNull(_categoryIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $CardsTable _cardIdTable(_$AppDatabase db) =>
+      db.cards.createAlias('transactions__card_id__cards__id');
+
+  $$CardsTableProcessedTableManager? get cardId {
+    final $_column = $_itemColumn<String>('card_id');
+    if ($_column == null) return null;
+    final manager = $$CardsTableTableManager(
+      $_db,
+      $_db.cards,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_cardIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: [item]),
@@ -2241,6 +3124,29 @@ class $$TransactionsTableFilterComposer
           }) => $$CategoriesTableFilterComposer(
             $db: $db,
             $table: $db.categories,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CardsTableFilterComposer get cardId {
+    final $$CardsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cardId,
+      referencedTable: $db.cards,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CardsTableFilterComposer(
+            $db: $db,
+            $table: $db.cards,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -2322,6 +3228,29 @@ class $$TransactionsTableOrderingComposer
     );
     return composer;
   }
+
+  $$CardsTableOrderingComposer get cardId {
+    final $$CardsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cardId,
+      referencedTable: $db.cards,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CardsTableOrderingComposer(
+            $db: $db,
+            $table: $db.cards,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$TransactionsTableAnnotationComposer
@@ -2383,6 +3312,29 @@ class $$TransactionsTableAnnotationComposer
     );
     return composer;
   }
+
+  $$CardsTableAnnotationComposer get cardId {
+    final $$CardsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cardId,
+      referencedTable: $db.cards,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CardsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.cards,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$TransactionsTableTableManager
@@ -2398,7 +3350,7 @@ class $$TransactionsTableTableManager
           $$TransactionsTableUpdateCompanionBuilder,
           (Transaction, $$TransactionsTableReferences),
           Transaction,
-          PrefetchHooks Function({bool categoryId})
+          PrefetchHooks Function({bool categoryId, bool cardId})
         > {
   $$TransactionsTableTableManager(_$AppDatabase db, $TransactionsTable table)
     : super(
@@ -2422,6 +3374,7 @@ class $$TransactionsTableTableManager
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<String> source = const Value.absent(),
                 Value<String?> rawSmsBody = const Value.absent(),
+                Value<String?> cardId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => TransactionsCompanion(
                 id: id,
@@ -2433,6 +3386,7 @@ class $$TransactionsTableTableManager
                 createdAt: createdAt,
                 source: source,
                 rawSmsBody: rawSmsBody,
+                cardId: cardId,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -2446,6 +3400,7 @@ class $$TransactionsTableTableManager
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<String> source = const Value.absent(),
                 Value<String?> rawSmsBody = const Value.absent(),
+                Value<String?> cardId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => TransactionsCompanion.insert(
                 id: id,
@@ -2457,6 +3412,7 @@ class $$TransactionsTableTableManager
                 createdAt: createdAt,
                 source: source,
                 rawSmsBody: rawSmsBody,
+                cardId: cardId,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -2467,7 +3423,7 @@ class $$TransactionsTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({categoryId = false}) {
+          prefetchHooksCallback: ({categoryId = false, cardId = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [],
@@ -2498,6 +3454,17 @@ class $$TransactionsTableTableManager
                             .id,
                       ) as T;
                     }
+                    if (cardId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.cardId,
+                        referencedTable: $$TransactionsTableReferences
+                            ._cardIdTable(db),
+                        referencedColumn: $$TransactionsTableReferences
+                            ._cardIdTable(db)
+                            .id,
+                      ) as T;
+                    }
 
                     return state;
                   },
@@ -2522,7 +3489,7 @@ typedef $$TransactionsTableProcessedTableManager =
       $$TransactionsTableUpdateCompanionBuilder,
       (Transaction, $$TransactionsTableReferences),
       Transaction,
-      PrefetchHooks Function({bool categoryId})
+      PrefetchHooks Function({bool categoryId, bool cardId})
     >;
 typedef $$SmsBankSendersTableCreateCompanionBuilder =
     SmsBankSendersCompanion Function({
@@ -2956,6 +3923,8 @@ class $AppDatabaseManager {
   $AppDatabaseManager(this._db);
   $$CategoriesTableTableManager get categories =>
       $$CategoriesTableTableManager(_db, _db.categories);
+  $$CardsTableTableManager get cards =>
+      $$CardsTableTableManager(_db, _db.cards);
   $$TransactionsTableTableManager get transactions =>
       $$TransactionsTableTableManager(_db, _db.transactions);
   $$SmsBankSendersTableTableManager get smsBankSenders =>

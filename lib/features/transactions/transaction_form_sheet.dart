@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -68,6 +69,7 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
       widget.editing?.date ?? widget.prefillDate ?? DateTime.now();
   late String? _categoryId = widget.editing?.categoryId;
   late String _type = widget.editing?.type ?? widget.type;
+  late String? _cardId = widget.editing?.cardId;
 
   @override
   void dispose() {
@@ -93,6 +95,7 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
         categoryId: _categoryId!,
         description: _descriptionController.text,
         date: _date,
+        cardId: Value(_cardId),
       ));
     } else {
       await repo.add(
@@ -103,6 +106,7 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
         date: _date,
         source: widget.prefillRawSms != null ? TxSource.sms : TxSource.manual,
         rawSmsBody: widget.prefillRawSms,
+        cardId: _cardId,
       );
     }
 
@@ -115,6 +119,7 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
         ? ref.watch(expenseCategoriesProvider)
         : ref.watch(incomeCategoriesProvider);
     final isExpense = _type == TxType.expense;
+    final cardsAsync = ref.watch(cardsProvider);
 
     return Padding(
       padding: EdgeInsets.only(
@@ -241,6 +246,41 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
             ),
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (e, _) => Text('Error: $e'),
+          ),
+          // El selector de tarjeta es opcional y solo aparece si el usuario
+          // ya tiene al menos una tarjeta creada, para no confundir a quien
+          // no usa esta función.
+          cardsAsync.maybeWhen(
+            data: (cards) {
+              if (cards.isEmpty) return const SizedBox.shrink();
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 16),
+                  Text('Tarjeta (opcional)',
+                      style: Theme.of(context).textTheme.labelLarge),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    children: [
+                      ChoiceChip(
+                        label: const Text('Sin tarjeta'),
+                        selected: _cardId == null,
+                        onSelected: (_) => setState(() => _cardId = null),
+                      ),
+                      ...cards.map((card) => ChoiceChip(
+                            label: Text('${card.name} ••${card.lastFourDigits}'),
+                            selected: _cardId == card.id,
+                            onSelected: (_) =>
+                                setState(() => _cardId = card.id),
+                          )),
+                    ],
+                  ),
+                ],
+              );
+            },
+            orElse: () => const SizedBox.shrink(),
           ),
           const SizedBox(height: 24),
           ElevatedButton(

@@ -66,6 +66,26 @@ class TransactionRepository {
         .toList());
   }
 
+  /// Transacciones asociadas a una tarjeta específica (para la pantalla de
+  /// detalle de la tarjeta).
+  Stream<List<TransactionWithCategory>> watchByCard(String cardId) {
+    final query = db.select(db.transactions).join([
+      innerJoin(
+        db.categories,
+        db.categories.id.equalsExp(db.transactions.categoryId),
+      ),
+    ])
+      ..where(db.transactions.cardId.equals(cardId))
+      ..orderBy([OrderingTerm.desc(db.transactions.date)]);
+
+    return query.watch().map((rows) => rows
+        .map((row) => TransactionWithCategory(
+              row.readTable(db.transactions),
+              row.readTable(db.categories),
+            ))
+        .toList());
+  }
+
   Stream<MonthSummary> watchMonthSummary(DateTime month) {
     final start = DateTime(month.year, month.month, 1);
     final end = DateTime(month.year, month.month + 1, 1);
@@ -110,6 +130,7 @@ class TransactionRepository {
     required DateTime date,
     String source = TxSource.manual,
     String? rawSmsBody,
+    String? cardId,
   }) {
     return db.into(db.transactions).insert(TransactionsCompanion.insert(
           id: _uuid.v4(),
@@ -120,6 +141,7 @@ class TransactionRepository {
           date: date,
           source: Value(source),
           rawSmsBody: Value(rawSmsBody),
+          cardId: Value(cardId),
         ));
   }
 

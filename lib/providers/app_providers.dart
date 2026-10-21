@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/local/database.dart';
+import '../data/repositories/card_repository.dart';
 import '../data/repositories/category_repository.dart';
 import '../data/repositories/settings_repository.dart';
 import '../data/repositories/sms_sender_repository.dart';
@@ -19,6 +20,10 @@ final transactionRepositoryProvider = Provider<TransactionRepository>((ref) {
 
 final categoryRepositoryProvider = Provider<CategoryRepository>((ref) {
   return CategoryRepository(ref.watch(databaseProvider));
+});
+
+final cardRepositoryProvider = Provider<CardRepository>((ref) {
+  return CardRepository(ref.watch(databaseProvider));
 });
 
 final settingsRepositoryProvider = Provider<SettingsRepository>((ref) {
@@ -61,6 +66,21 @@ final expenseCategoriesProvider = StreamProvider((ref) {
 final incomeCategoriesProvider = StreamProvider((ref) {
   return ref.watch(categoryRepositoryProvider).watchByType('income');
 });
+
+/// -------- Tarjetas --------
+
+final cardsProvider = StreamProvider((ref) {
+  return ref.watch(cardRepositoryProvider).watchAll();
+});
+
+/// Transacciones de una tarjeta específica. Se usa `.family` para poder
+/// pedir el stream de cualquier tarjeta por su id.
+final transactionsByCardProvider =
+    StreamProvider.family<List<TransactionWithCategory>, String>(
+  (ref, cardId) {
+    return ref.watch(transactionRepositoryProvider).watchByCard(cardId);
+  },
+);
 
 /// -------- Pantalla de Estadísticas --------
 
