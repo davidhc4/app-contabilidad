@@ -82,12 +82,7 @@ class _ContabilidadAppState extends ConsumerState<ContabilidadApp> {
       }
     };
     _smsService = service;
-
-    final settings = await ref.read(settingsRepositoryProvider).watch().first;
-    if (settings.smsDetectionEnabled) {
-      final granted = await service.requestPermissions();
-      if (granted) service.startListening();
-    }
+    if (mounted) setState(() {});
   }
 
   @override

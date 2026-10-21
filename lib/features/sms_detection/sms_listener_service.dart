@@ -58,6 +58,10 @@ class SmsListenerService {
       const InitializationSettings(android: androidInit),
       onDidReceiveNotificationResponse: _onNotificationTap,
     );
+    await _notifications
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.requestNotificationsPermission();
   }
 
   Future<bool> requestPermissions() async {

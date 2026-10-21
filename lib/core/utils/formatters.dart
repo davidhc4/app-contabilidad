@@ -4,7 +4,7 @@ class Formatters {
   Formatters._();
 
   static final currency = NumberFormat.currency(
-    locale: 'es_CO',
+    locale: 'es',
     symbol: r'$',
     decimalDigits: 0,
   );

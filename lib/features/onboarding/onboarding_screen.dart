@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../core/theme/app_theme.dart';
@@ -48,8 +49,13 @@ class OnboardingScreen extends ConsumerWidget {
               const Spacer(),
               FilledButton.tonal(
                 onPressed: () async {
-                  await Permission.sms.request();
-                  await ref.read(settingsRepositoryProvider).setOnboardingDone();
+                  final status = await Permission.sms.request();
+                  final repo = ref.read(settingsRepositoryProvider);
+                  if (status.isGranted) {
+                    await repo.setSmsDetectionEnabled(true);
+                  }
+                  await repo.setOnboardingDone();
+                  if (context.mounted) context.go('/dashboard');
                 },
                 style: FilledButton.styleFrom(
                   minimumSize: const Size.fromHeight(52),
@@ -58,8 +64,10 @@ class OnboardingScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 12),
               TextButton(
-                onPressed: () =>
-                    ref.read(settingsRepositoryProvider).setOnboardingDone(),
+                onPressed: () async {
+                  await ref.read(settingsRepositoryProvider).setOnboardingDone();
+                  if (context.mounted) context.go('/dashboard');
+                },
                 child: const Text('Prefiero registrar todo manualmente'),
               ),
             ],
