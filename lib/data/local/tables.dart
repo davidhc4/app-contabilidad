@@ -5,6 +5,18 @@ class TxType {
   TxType._();
   static const income = 'income';
   static const expense = 'expense';
+
+  /// Transferencia entre tarjetas/cuentas: mueve dinero de un lugar a otro
+  /// sin contar como ingreso ni gasto. Cada transferencia son dos filas:
+  /// una que sale de la cuenta de origen y otra que entra a la de destino.
+  static const transferOut = 'transfer_out';
+  static const transferIn = 'transfer_in';
+
+  /// Tipo de la categoría oculta "Transferencia".
+  static const transfer = 'transfer';
+
+  static bool isTransfer(String type) =>
+      type == transferOut || type == transferIn;
 }
 
 /// Origen de la transacción: creada a mano o confirmada desde un SMS.
@@ -12,6 +24,7 @@ class TxSource {
   TxSource._();
   static const manual = 'manual';
   static const sms = 'sms';
+  static const transfer = 'transfer';
 }
 
 /// Red de la tarjeta, solo para mostrar el logo/texto correspondiente.

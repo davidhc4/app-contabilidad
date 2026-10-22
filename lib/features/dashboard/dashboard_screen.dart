@@ -10,6 +10,7 @@ import '../../data/repositories/transaction_repository.dart';
 import '../../providers/app_providers.dart';
 import '../../shared/widgets/soft_fab.dart';
 import '../budget/budget_dialog.dart';
+import '../cards/transfer_sheet.dart';
 import '../savings/savings_section.dart';
 import '../transactions/transaction_form_sheet.dart';
 
@@ -475,6 +476,16 @@ class _AddMenuFab extends StatelessWidget {
               onTap: () {
                 Navigator.pop(context);
                 showTransactionForm(context, type: TxType.expense);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.swap_horiz_rounded, color: AppColors.seed),
+              title: const Text('Transferir entre tarjetas'),
+              subtitle: const Text(
+                  'Mueve dinero de una tarjeta a otra sin contarlo como ingreso ni gasto'),
+              onTap: () {
+                Navigator.pop(context);
+                showTransferSheet(context);
               },
             ),
             ListTile(

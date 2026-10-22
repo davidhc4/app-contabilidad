@@ -8,7 +8,10 @@ import '../../providers/app_providers.dart';
 import '../../shared/widgets/amount_text.dart';
 import '../../shared/widgets/bank_card_widget.dart';
 import '../../shared/widgets/category_icon.dart';
+import 'account_balances.dart';
 import 'card_form_sheet.dart';
+import 'card_style.dart';
+import 'transfer_sheet.dart';
 import 'cards_screen.dart';
 
 /// Pantalla de detalle de una tarjeta: la tarjeta grande arriba y debajo
@@ -27,6 +30,11 @@ class CardDetailScreen extends ConsumerWidget {
       if (c.id == initialCard.id) card = c;
     }
     final txsAsync = ref.watch(transactionsByCardProvider(card.id));
+    final balance = cardBalance(
+      card.id,
+      ref.watch(accountMovementsProvider),
+      ref.watch(cardStylesProvider),
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -82,6 +90,34 @@ class CardDetailScreen extends ConsumerWidget {
                     ],
                   ),
                 ),
+              ),
+              const SizedBox(height: 12),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Saldo de esta tarjeta',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      Text(
+                        Formatters.money(balance),
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w700),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: () => showTransferSheet(context),
+                icon: const Icon(Icons.swap_horiz_rounded),
+                label: const Text('Transferir dinero'),
               ),
               const SizedBox(height: 20),
               Text(

@@ -6,7 +6,10 @@ import '../../providers/app_providers.dart';
 import '../../shared/widgets/bank_card_widget.dart';
 import '../../shared/widgets/confirm_dialog.dart';
 import '../../shared/widgets/soft_fab.dart';
+import '../../core/utils/formatters.dart';
+import 'account_balances.dart';
 import 'card_style.dart';
+import 'transfer_sheet.dart';
 import 'card_detail_screen.dart';
 import 'card_form_sheet.dart';
 
@@ -55,10 +58,11 @@ class CardsScreen extends ConsumerWidget {
 
           return ListView.separated(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
-            itemCount: cards.length,
+            itemCount: cards.length + 1,
             separatorBuilder: (_, __) => const SizedBox(height: 20),
             itemBuilder: (context, i) {
-              final card = cards[i];
+              if (i == 0) return _BalancesSummary(cards: cards);
+              final card = cards[i - 1];
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -118,4 +122,80 @@ Future<bool> deleteCardWithConfirm(
   await ref.read(cardRepositoryProvider).delete(card.id);
   await ref.read(cardStylesProvider.notifier).remove(card.id);
   return true;
+}
+
+/// Resumen de cuánto dinero hay en cada tarjeta/cuenta y botón para
+/// transferir entre ellas.
+class _BalancesSummary extends ConsumerWidget {
+  final List<CardItem> cards;
+  const _BalancesSummary({required this.cards});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final movements = ref.watch(accountMovementsProvider);
+    final styles = ref.watch(cardStylesProvider);
+
+    final rows = <MapEntry<String, double>>[
+      MapEntry('Efectivo / sin tarjeta', cardBalance(null, movements, styles)),
+      for (final c in cards)
+        MapEntry('${c.name} ••${c.lastFourDigits}',
+            cardBalance(c.id, movements, styles)),
+    ];
+    final total = rows.fold<double>(0, (sum, r) => sum + r.value);
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('¿Dónde está tu dinero?',
+                style: theme.textTheme.titleMedium
+                    ?.copyWith(fontWeight: FontWeight.w700)),
+            const SizedBox(height: 4),
+            Text(
+              'Saldo de cada tarjeta según tus ingresos, gastos y '
+              'transferencias.',
+              style: theme.textTheme.bodySmall,
+            ),
+            const SizedBox(height: 12),
+            for (final r in rows)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 3),
+                child: Row(
+                  children: [
+                    Expanded(child: Text(r.key)),
+                    Text(
+                      Formatters.money(r.value),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: r.value < 0 ? theme.colorScheme.error : null,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            const Divider(height: 20),
+            Row(
+              children: [
+                const Expanded(
+                  child: Text('Total',
+                      style: TextStyle(fontWeight: FontWeight.w700)),
+                ),
+                Text(Formatters.money(total),
+                    style: const TextStyle(fontWeight: FontWeight.w800)),
+              ],
+            ),
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: () => showTransferSheet(context),
+              icon: const Icon(Icons.swap_horiz_rounded),
+              label: const Text('Transferir entre tarjetas'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

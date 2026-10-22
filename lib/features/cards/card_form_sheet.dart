@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../core/platform/gallery_permission.dart';
 import '../../core/utils/icon_map.dart';
+import '../../core/utils/thousands_formatter.dart';
 import '../../data/local/database.dart';
 import '../../data/local/tables.dart';
 import '../../providers/app_providers.dart';
@@ -51,6 +52,7 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
   late String _network = widget.editing?.network ?? CardNetwork.visa;
   late List<String> _gradient = _initialGradient();
 
+  late final _balanceController = TextEditingController();
   String? _photoPath;
   String? _sticker;
   // Foto elegida en esta sesión que todavía no se guardó (se borra si el
@@ -77,6 +79,10 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
       _photoPath = style.photoPath;
       _sticker = style.sticker;
       _stickersMujer = !kStickersHombre.contains(style.sticker);
+      final initial = style.initialBalance;
+      if (initial != null && initial > 0) {
+        _balanceController.text = formatThousands(initial.round().toString());
+      }
     }
   }
 
@@ -88,6 +94,7 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
     }
     _nameController.dispose();
     _digitsController.dispose();
+    _balanceController.dispose();
     super.dispose();
   }
 
@@ -168,7 +175,11 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
 
       await styles.setStyle(
         cardId,
-        CardStyle(photoPath: _photoPath, sticker: _sticker),
+        CardStyle(
+          photoPath: _photoPath,
+          sticker: _sticker,
+          initialBalance: parseThousands(_balanceController.text)?.toDouble(),
+        ),
       );
       _saved = true;
       if (mounted) Navigator.of(context).pop();
@@ -218,6 +229,8 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
               colorStart: _gradient[0],
               colorEnd: _gradient[1],
               style: CardStyle(photoPath: _photoPath, sticker: _sticker),
+              balance: parseThousands(_balanceController.text)?.toDouble() ??
+                  (widget.editing == null ? 0.0 : null),
             ),
             const SizedBox(height: 16),
             TextField(
@@ -239,6 +252,20 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
                 labelText: 'Últimos 4 dígitos',
                 hintText: 'Ej. 1234',
                 counterText: '',
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _balanceController,
+              onChanged: (_) => setState(() {}),
+              keyboardType: TextInputType.number,
+              inputFormatters: const [ThousandsInputFormatter()],
+              decoration: const InputDecoration(
+                labelText: 'Dinero que ya tiene (opcional)',
+                prefixText: r'$ ',
+                helperText: 'Para que el saldo de la tarjeta sea el real. '
+                    'Déjalo vacío si empieza en cero.',
+                helperMaxLines: 2,
               ),
             ),
             const SizedBox(height: 16),

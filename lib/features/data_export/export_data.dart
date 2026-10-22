@@ -30,12 +30,21 @@ Future<List<List<Object>>> buildExportRows(WidgetRef ref) async {
       [
         dateFormat.format(item.transaction.date),
         timeFormat.format(item.transaction.date),
-        item.transaction.type == TxType.income ? 'Ingreso' : 'Gasto',
+        switch (item.transaction.type) {
+          TxType.income => 'Ingreso',
+          TxType.transferOut => 'Transferencia (sale)',
+          TxType.transferIn => 'Transferencia (entra)',
+          _ => 'Gasto',
+        },
         item.category.name,
         item.transaction.amount.round(),
         item.transaction.description,
         cardNames[item.transaction.cardId] ?? '',
-        item.transaction.source == TxSource.sms ? 'SMS' : 'Manual',
+        switch (item.transaction.source) {
+          TxSource.sms => 'SMS',
+          TxSource.transfer => 'Transferencia',
+          _ => 'Manual',
+        },
         item.transaction.id,
       ],
   ];

@@ -72,6 +72,22 @@ class TutorialScreen extends StatelessWidget {
           'gastado con ella este mes.',
     ),
     _Topic(
+      icon: Icons.swap_horiz_rounded,
+      title: 'Transferir dinero entre tarjetas',
+      body: 'Si repartes tu dinero en varios lugares (una tarjeta, Nequi, '
+          'efectivo, otra app), puedes moverlo de uno a otro sin que cuente '
+          'como ingreso ni como gasto.\n\n'
+          '1. En Tarjetas (o en el botón "Agregar" de Resumen) toca '
+          '"Transferir entre tarjetas".\n'
+          '2. Elige de dónde sale el dinero y a dónde llega.\n'
+          '3. Escribe el monto y toca "Transferir".\n\n'
+          'Cada tarjeta muestra su saldo. Si ya tenía dinero antes de usar '
+          'la app, ponlo en "Dinero que ya tiene" al personalizar la '
+          'tarjeta. Las transferencias no cambian tus gráficas ni tu '
+          'presupuesto; las ves en Historial → "Traslados". Para deshacer '
+          'una, arrástrala hacia la izquierda en el Historial.',
+    ),
+    _Topic(
       icon: Icons.insights_rounded,
       title: 'Gráficas',
       body: 'Muestra en qué se va tu dinero: gráficas por categoría y por '

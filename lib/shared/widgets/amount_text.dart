@@ -20,8 +20,11 @@ class AmountText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isIncome = type == TxType.income;
-    final color = isIncome ? AppColors.income : AppColors.expense;
+    final isTransfer = TxType.isTransfer(type);
+    final isIncome = type == TxType.income || type == TxType.transferIn;
+    final color = isTransfer
+        ? AppColors.seed
+        : (isIncome ? AppColors.income : AppColors.expense);
     final sign = withSign ? (isIncome ? '+ ' : '- ') : '';
     return Text(
       '$sign${Formatters.money(amount)}',

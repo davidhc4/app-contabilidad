@@ -3,13 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/utils/formatters.dart';
 import '../../data/local/tables.dart';
+import '../../data/repositories/transaction_repository.dart';
 import '../../providers/app_providers.dart';
 import '../../shared/widgets/amount_text.dart';
 import '../../shared/widgets/category_icon.dart';
 import '../../shared/widgets/confirm_dialog.dart';
 import 'transaction_form_sheet.dart';
 
-enum _Filter { all, income, expense }
+enum _Filter { all, income, expense, transfer }
 
 class TransactionsScreen extends ConsumerStatefulWidget {
   const TransactionsScreen({super.key});
@@ -49,7 +50,14 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                     ButtonSegment(value: _Filter.all, label: Text('Todo')),
                     ButtonSegment(value: _Filter.income, label: Text('Ingresos')),
                     ButtonSegment(value: _Filter.expense, label: Text('Gastos')),
+                    ButtonSegment(value: _Filter.transfer, label: Text('Traslados')),
                   ],
+                  showSelectedIcon: false,
+                  style: const ButtonStyle(
+                    visualDensity: VisualDensity.compact,
+                    padding: WidgetStatePropertyAll(
+                        EdgeInsets.symmetric(horizontal: 6)),
+                  ),
                   selected: {_filter},
                   onSelectionChanged: (s) => setState(() => _filter = s.first),
                 ),
@@ -67,6 +75,12 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
             child: txsAsync.when(
               data: (items) {
                 final filtered = items.where((t) {
+                  // Cada transferencia son dos filas; en la lista general
+                  // se muestra una sola (la que sale).
+                  if (t.transaction.type == TxType.transferIn) return false;
+                  if (_filter == _Filter.transfer) {
+                    return t.transaction.type == TxType.transferOut;
+                  }
                   if (_filter == _Filter.income && t.transaction.type != TxType.income) {
                     return false;
                   }
@@ -91,6 +105,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                   separatorBuilder: (_, __) => const SizedBox(height: 10),
                   itemBuilder: (context, i) {
                     final item = filtered[i];
+                    final isTransfer = TxType.isTransfer(item.transaction.type);
                     return Dismissible(
                       key: ValueKey(item.transaction.id),
                       background: Container(
@@ -105,20 +120,45 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                       direction: DismissDirection.endToStart,
                       confirmDismiss: (_) => confirmDialog(
                         context,
-                        title: 'Eliminar movimiento',
-                        message: 'Este movimiento se borrará y no se puede '
-                            'deshacer.',
+                        title: isTransfer
+                            ? 'Eliminar transferencia'
+                            : 'Eliminar movimiento',
+                        message: isTransfer
+                            ? 'Se borrará la transferencia y el dinero '
+                                'volverá a la tarjeta de origen.'
+                            : 'Este movimiento se borrará y no se puede '
+                                'deshacer.',
                       ),
-                      onDismissed: (_) => ref
-                          .read(transactionRepositoryProvider)
-                          .delete(item.transaction.id),
+                      onDismissed: (_) {
+                        final repo = ref.read(transactionRepositoryProvider);
+                        final group = transferGroupOf(item.transaction);
+                        if (group != null) {
+                          repo.deleteTransfer(group);
+                        } else {
+                          repo.delete(item.transaction.id);
+                        }
+                      },
                       child: Card(
                         child: ListTile(
-                          onTap: () => showTransactionForm(
-                            context,
-                            type: item.transaction.type,
-                            editing: item.transaction,
-                          ),
+                          onTap: () {
+                            if (isTransfer) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Para cambiar una transferencia, '
+                                    'elimínala (arrástrala a la izquierda) '
+                                    'y créala de nuevo.',
+                                  ),
+                                ),
+                              );
+                              return;
+                            }
+                            showTransactionForm(
+                              context,
+                              type: item.transaction.type,
+                              editing: item.transaction,
+                            );
+                          },
                           contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 8),
                           leading: CategoryIcon(
@@ -131,11 +171,12 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                                 : item.transaction.description,
                           ),
                           subtitle: Text(
-                            '${item.category.name} · ${Formatters.shortDate.format(item.transaction.date)}',
+                            '${isTransfer ? 'Transferencia' : item.category.name} · ${Formatters.shortDate.format(item.transaction.date)}',
                           ),
                           trailing: AmountText(
                             amount: item.transaction.amount,
                             type: item.transaction.type,
+                            withSign: !isTransfer,
                           ),
                         ),
                       ),

@@ -94,7 +94,7 @@ class TransactionRepository {
       for (final item in items) {
         if (item.transaction.type == TxType.income) {
           income += item.transaction.amount;
-        } else {
+        } else if (item.transaction.type == TxType.expense) {
           expense += item.transaction.amount;
         }
       }
@@ -145,6 +145,68 @@ class TransactionRepository {
         ));
   }
 
+  /// Mueve dinero de una cuenta a otra. `null` significa "Efectivo / sin
+  /// tarjeta". No cuenta como ingreso ni como gasto: se guardan dos filas
+  /// (sale / entra) unidas por un código en `rawSmsBody` ("transfer:<id>").
+  Future<void> addTransfer({
+    required String? fromCardId,
+    required String? toCardId,
+    required double amount,
+    required DateTime date,
+    required String description,
+  }) async {
+    final categoryId = await _transferCategoryId();
+    final group = _uuid.v4();
+    await db.transaction(() async {
+      await db.into(db.transactions).insert(TransactionsCompanion.insert(
+            id: _uuid.v4(),
+            type: TxType.transferOut,
+            amount: amount,
+            categoryId: categoryId,
+            description: Value(description),
+            date: date,
+            source: const Value(TxSource.transfer),
+            rawSmsBody: Value('transfer:$group'),
+            cardId: Value(fromCardId),
+          ));
+      await db.into(db.transactions).insert(TransactionsCompanion.insert(
+            id: _uuid.v4(),
+            type: TxType.transferIn,
+            amount: amount,
+            categoryId: categoryId,
+            description: Value(description),
+            date: date,
+            source: const Value(TxSource.transfer),
+            rawSmsBody: Value('transfer:$group'),
+            cardId: Value(toCardId),
+          ));
+    });
+  }
+
+  /// Borra una transferencia completa (las dos filas).
+  Future<void> deleteTransfer(String group) {
+    return (db.delete(db.transactions)
+          ..where((t) => t.rawSmsBody.equals('transfer:$group')))
+        .go();
+  }
+
+  Future<String> _transferCategoryId() async {
+    final existing = await (db.select(db.categories)
+          ..where((c) => c.type.equals(TxType.transfer)))
+        .get();
+    if (existing.isNotEmpty) return existing.first.id;
+    final id = _uuid.v4();
+    await db.into(db.categories).insert(CategoriesCompanion.insert(
+          id: id,
+          name: 'Transferencia',
+          type: TxType.transfer,
+          icon: 'swap_horiz',
+          color: 'FF0A84FF',
+          isArchived: const Value(true),
+        ));
+    return id;
+  }
+
   Future<void> update(Transaction tx) {
     return db.update(db.transactions).replace(tx);
   }
@@ -158,4 +220,14 @@ class TransactionRepository {
   Future<void> deleteAll() {
     return db.delete(db.transactions).go();
   }
+}
+
+/// Código de la transferencia a la que pertenece un movimiento, o null si
+/// no es una transferencia.
+String? transferGroupOf(Transaction tx) {
+  final raw = tx.rawSmsBody;
+  if (raw != null && raw.startsWith('transfer:')) {
+    return raw.substring('transfer:'.length);
+  }
+  return null;
 }

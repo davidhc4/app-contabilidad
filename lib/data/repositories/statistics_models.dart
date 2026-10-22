@@ -156,6 +156,8 @@ class StatsAggregate {
 
     for (final item in items) {
       final tx = item.transaction;
+      // Las transferencias entre tarjetas no son ingresos ni gastos.
+      if (TxType.isTransfer(tx.type)) continue;
       if (tx.type == TxType.income) {
         income += tx.amount;
       } else {

@@ -23,6 +23,7 @@ const Map<String, IconData> kCategoryIcons = {
   'savings': Icons.savings_rounded,
   'phone_iphone': Icons.phone_iphone_rounded,
   'celebration': Icons.celebration_rounded,
+  'swap_horiz': Icons.swap_horiz_rounded,
 };
 
 IconData iconFor(String key) => kCategoryIcons[key] ?? Icons.category_rounded;

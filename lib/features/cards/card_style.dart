@@ -28,25 +28,35 @@ class CardStyle {
   final String? photoPath;
   final String? sticker;
 
-  const CardStyle({this.photoPath, this.sticker});
+  /// Dinero que ya tenía la tarjeta/cuenta antes de usar la app.
+  final double? initialBalance;
+
+  const CardStyle({this.photoPath, this.sticker, this.initialBalance});
 
   static const empty = CardStyle();
 
-  bool get isEmpty => photoPath == null && sticker == null;
+  bool get isEmpty =>
+      photoPath == null && sticker == null && initialBalance == null;
 
   CardStyle copyWith({
     String? photoPath,
     String? sticker,
+    double? initialBalance,
     bool clearPhoto = false,
     bool clearSticker = false,
   }) {
     return CardStyle(
       photoPath: clearPhoto ? null : (photoPath ?? this.photoPath),
       sticker: clearSticker ? null : (sticker ?? this.sticker),
+      initialBalance: initialBalance ?? this.initialBalance,
     );
   }
 
-  String toJson() => jsonEncode({'photo': photoPath, 'sticker': sticker});
+  String toJson() => jsonEncode({
+        'photo': photoPath,
+        'sticker': sticker,
+        'initial': initialBalance,
+      });
 
   static CardStyle fromJson(String raw) {
     try {
@@ -54,6 +64,7 @@ class CardStyle {
       return CardStyle(
         photoPath: map['photo'] as String?,
         sticker: map['sticker'] as String?,
+        initialBalance: (map['initial'] as num?)?.toDouble(),
       );
     } catch (_) {
       return CardStyle.empty;

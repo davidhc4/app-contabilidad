@@ -6,7 +6,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/utils/icon_map.dart';
 import '../../data/local/database.dart';
 import '../../data/local/tables.dart';
+import '../../features/cards/account_balances.dart';
 import '../../features/cards/card_style.dart';
+import '../../core/utils/formatters.dart';
 
 /// Tarjeta visual de una tarjeta guardada: toma la foto/sticker que el
 /// usuario eligió para ella (si hay).
@@ -19,7 +21,9 @@ class BankCardWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final style = ref.watch(cardStylesProvider)[card.id] ?? CardStyle.empty;
+    final movements = ref.watch(accountMovementsProvider);
     return BankCardView(
+      balance: cardBalance(card.id, movements, {card.id: style}),
       name: card.name,
       lastFourDigits: card.lastFourDigits,
       network: card.network,
@@ -45,6 +49,9 @@ class BankCardView extends StatelessWidget {
   final CardStyle style;
   final double aspectRatio;
 
+  /// Saldo a mostrar en la tarjeta (null = no mostrar).
+  final double? balance;
+
   const BankCardView({
     super.key,
     required this.name,
@@ -54,6 +61,7 @@ class BankCardView extends StatelessWidget {
     required this.colorEnd,
     this.style = CardStyle.empty,
     this.aspectRatio = 1.6,
+    this.balance,
   });
 
   @override
@@ -137,6 +145,25 @@ class BankCardView extends StatelessWidget {
                             color: Colors.white70, size: 22),
                       ],
                     ),
+                    if (balance != null)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Saldo',
+                              style: TextStyle(
+                                  color: Colors.white70, fontSize: 11)),
+                          Text(
+                            Formatters.money(balance!),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 22,
+                            ),
+                          ),
+                        ],
+                      )
+                    else
+                      const SizedBox.shrink(),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.end,
