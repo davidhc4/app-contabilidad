@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../core/platform/gallery_permission.dart';
 import '../../core/utils/icon_map.dart';
 import '../../data/local/database.dart';
 import '../../data/local/tables.dart';
@@ -52,7 +53,11 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
 
   String? _photoPath;
   String? _sticker;
-  bool _photoChanged = false;
+  // Foto elegida en esta sesión que todavía no se guardó (se borra si el
+  // usuario la cambia o cierra sin guardar).
+  String? _pendingPhoto;
+  bool _saved = false;
+  late final CardStylesNotifier _styles;
   bool _stickersMujer = true;
   bool _saving = false;
 
@@ -65,6 +70,7 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
   @override
   void initState() {
     super.initState();
+    _styles = ref.read(cardStylesProvider.notifier);
     final e = widget.editing;
     if (e != null) {
       final style = ref.read(cardStylesProvider)[e.id] ?? CardStyle.empty;
@@ -76,12 +82,22 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
 
   @override
   void dispose() {
+    final pending = _pendingPhoto;
+    if (!_saved && pending != null) {
+      _styles.discardPhoto(pending);
+    }
     _nameController.dispose();
     _digitsController.dispose();
     super.dispose();
   }
 
   Future<void> _pickPhoto() async {
+    // 1) Permiso de acceso a las fotos (sin él no se puede continuar).
+    final allowed = await ensureGalleryPermission(context);
+    if (!allowed || !mounted) return;
+
+    final styles = ref.read(cardStylesProvider.notifier);
+    final messenger = ScaffoldMessenger.of(context);
     try {
       final picked = await ImagePicker().pickImage(
         source: ImageSource.gallery,
@@ -89,14 +105,23 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
         imageQuality: 85,
       );
       if (picked == null || !mounted) return;
-      setState(() {
-        _photoPath = picked.path;
-        _photoChanged = true;
-      });
-    } catch (_) {
+
+      // 2) Se guarda de una vez en la carpeta de la app para que la foto
+      // siga existiendo cuando se toque "Guardar".
+      final saved = await styles.savePickedPhoto(
+        picked,
+        widget.editing?.id ?? 'nueva',
+      );
+      final previousPending = _pendingPhoto;
+      if (previousPending != null) await styles.discardPhoto(previousPending);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No se pudo abrir la galería')),
+      setState(() {
+        _photoPath = saved;
+        _pendingPhoto = saved;
+      });
+    } catch (e) {
+      messenger.showSnackBar(
+        SnackBar(content: Text('No se pudo cargar la foto: $e')),
       );
     }
   }
@@ -117,39 +142,42 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
     final repo = ref.read(cardRepositoryProvider);
     final styles = ref.read(cardStylesProvider.notifier);
     final editing = widget.editing;
+    final messenger = ScaffoldMessenger.of(context);
 
-    final String cardId;
-    if (editing == null) {
-      cardId = await repo.addCard(
-        name: name,
-        lastFourDigits: digits,
-        network: _network,
-        colorStart: _gradient[0],
-        colorEnd: _gradient[1],
+    try {
+      final String cardId;
+      if (editing == null) {
+        cardId = await repo.addCard(
+          name: name,
+          lastFourDigits: digits,
+          network: _network,
+          colorStart: _gradient[0],
+          colorEnd: _gradient[1],
+        );
+      } else {
+        cardId = editing.id;
+        await repo.updateCard(
+          id: cardId,
+          name: name,
+          lastFourDigits: digits,
+          network: _network,
+          colorStart: _gradient[0],
+          colorEnd: _gradient[1],
+        );
+      }
+
+      await styles.setStyle(
+        cardId,
+        CardStyle(photoPath: _photoPath, sticker: _sticker),
       );
-    } else {
-      cardId = editing.id;
-      await repo.updateCard(
-        id: cardId,
-        name: name,
-        lastFourDigits: digits,
-        network: _network,
-        colorStart: _gradient[0],
-        colorEnd: _gradient[1],
+      _saved = true;
+      if (mounted) Navigator.of(context).pop();
+    } catch (e) {
+      messenger.showSnackBar(
+        SnackBar(content: Text('No se pudo guardar la tarjeta: $e')),
       );
+      if (mounted) setState(() => _saving = false);
     }
-
-    // Foto: solo se copia al almacenamiento de la app si es una nueva.
-    String? finalPhoto = _photoPath;
-    if (_photoChanged && _photoPath != null) {
-      finalPhoto = await styles.persistPhoto(_photoPath!, cardId);
-    }
-    await styles.setStyle(
-      cardId,
-      CardStyle(photoPath: finalPhoto, sticker: _sticker),
-    );
-
-    if (mounted) Navigator.of(context).pop();
   }
 
   @override
@@ -274,10 +302,16 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
                 if (_photoPath != null) ...[
                   const SizedBox(width: 8),
                   OutlinedButton.icon(
-                    onPressed: () => setState(() {
-                      _photoPath = null;
-                      _photoChanged = false;
-                    }),
+                    onPressed: () {
+                      final pending = _pendingPhoto;
+                      if (pending != null) {
+                        ref.read(cardStylesProvider.notifier).discardPhoto(pending);
+                      }
+                      setState(() {
+                        _photoPath = null;
+                        _pendingPhoto = null;
+                      });
+                    },
                     icon: const Icon(Icons.hide_image_outlined),
                     label: const Text('Quitar'),
                   ),

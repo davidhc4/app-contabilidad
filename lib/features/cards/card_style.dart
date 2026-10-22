@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -81,20 +82,27 @@ class CardStylesNotifier extends Notifier<Map<String, CardStyle>> {
     state = {...loaded, ...state};
   }
 
-  /// Copia la foto elegida a la carpeta privada de la app (la ruta que da
-  /// el selector es temporal y el sistema puede borrarla).
-  Future<String> persistPhoto(String sourcePath, String cardId) async {
+  /// Guarda la foto elegida en la carpeta privada de la app en el momento
+  /// de elegirla (la ruta temporal del selector puede desaparecer antes de
+  /// que el usuario toque "Guardar"). Devuelve la ruta definitiva.
+  Future<String> savePickedPhoto(XFile picked, String prefix) async {
     final dir = await getApplicationDocumentsDirectory();
     final folder = Directory(p.join(dir.path, 'card_photos'));
     if (!await folder.exists()) await folder.create(recursive: true);
-    final ext = p.extension(sourcePath).isEmpty ? '.jpg' : p.extension(sourcePath);
     final target = p.join(
       folder.path,
-      '${cardId}_${DateTime.now().millisecondsSinceEpoch}$ext',
+      '${prefix}_${DateTime.now().millisecondsSinceEpoch}.jpg',
     );
-    await File(sourcePath).copy(target);
+    final bytes = await picked.readAsBytes();
+    await File(target).writeAsBytes(bytes, flush: true);
+    if (!await File(target).exists()) {
+      throw const FileSystemException('No se pudo guardar la foto');
+    }
     return target;
   }
+
+  /// Borra un archivo de foto que ya no se usa.
+  Future<void> discardPhoto(String path) => _deleteFile(path);
 
   Future<void> setStyle(String cardId, CardStyle style) async {
     final prefs = await SharedPreferences.getInstance();
