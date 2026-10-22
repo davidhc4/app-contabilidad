@@ -35,7 +35,13 @@ jobs:
         run: flutter pub get
 
       - name: Analizar código
-        run: flutter analyze
+        run: |
+          set +e
+          flutter analyze > analyze.txt 2>&1
+          code=$?
+          grep -E "^\s*(error|warning|info) " analyze.txt | while IFS= read -r line; do echo "::error::$line"; done
+          cat analyze.txt
+          exit $code
 
       - name: Correr tests
         run: flutter test
