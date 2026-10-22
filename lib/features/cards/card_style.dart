@@ -5,7 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../core/storage/local_store.dart';
 
 /// Stickers disponibles para decorar una tarjeta. Son emojis, así que no
 /// dependen de ninguna imagen con derechos de autor y se ven en cualquier
@@ -71,14 +72,11 @@ class CardStylesNotifier extends Notifier<Map<String, CardStyle>> {
   }
 
   Future<void> _load() async {
-    final prefs = await SharedPreferences.getInstance();
-    final loaded = <String, CardStyle>{};
-    for (final key in prefs.getKeys()) {
-      if (!key.startsWith(_prefix)) continue;
-      final raw = prefs.getString(key);
-      if (raw == null) continue;
-      loaded[key.substring(_prefix.length)] = CardStyle.fromJson(raw);
-    }
+    final saved = await LocalStore.allWithPrefix(_prefix);
+    final loaded = <String, CardStyle>{
+      for (final e in saved.entries)
+        e.key.substring(_prefix.length): CardStyle.fromJson(e.value),
+    };
     state = {...loaded, ...state};
   }
 
@@ -105,14 +103,13 @@ class CardStylesNotifier extends Notifier<Map<String, CardStyle>> {
   Future<void> discardPhoto(String path) => _deleteFile(path);
 
   Future<void> setStyle(String cardId, CardStyle style) async {
-    final prefs = await SharedPreferences.getInstance();
     final previous = state[cardId];
     if (style.isEmpty) {
-      await prefs.remove('$_prefix$cardId');
+      await LocalStore.remove('$_prefix$cardId');
       final next = {...state}..remove(cardId);
       state = next;
     } else {
-      await prefs.setString('$_prefix$cardId', style.toJson());
+      await LocalStore.setString('$_prefix$cardId', style.toJson());
       state = {...state, cardId: style};
     }
     // Si se cambió o quitó la foto, borra el archivo anterior.

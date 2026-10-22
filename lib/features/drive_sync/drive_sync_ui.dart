@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
-
-import '../../data/local/tables.dart';
-import '../../providers/app_providers.dart';
+import '../../shared/widgets/progress_dialog.dart';
+import '../data_export/export_data.dart';
 import 'drive_sync_service.dart';
 
 /// Envía todos los movimientos a la hoja de la carpeta FINANZAS de Google
-/// Drive. Si todavía no hay conexión configurada, la pide primero.
+/// Drive, mostrando una barra de carga. Si todavía no hay conexión
+/// configurada, la pide primero.
 Future<void> syncToDrive(BuildContext context, WidgetRef ref) async {
   var config = await DriveSyncConfig.load();
   if (config == null) {
@@ -18,50 +17,19 @@ Future<void> syncToDrive(BuildContext context, WidgetRef ref) async {
   if (!context.mounted) return;
 
   final messenger = ScaffoldMessenger.of(context);
-  messenger.showSnackBar(
-    const SnackBar(
-      content: Text('Enviando datos a Google Drive…'),
-      duration: Duration(seconds: 30),
-    ),
-  );
-
+  final activeConfig = config;
   try {
-    final items = await ref.read(transactionRepositoryProvider).watchAll().first;
-    final cards = await ref.read(cardRepositoryProvider).watchAll().first;
-    final cardNames = {
-      for (final c in cards) c.id: '${c.name} •••• ${c.lastFourDigits}',
-    };
-    final dateFormat = DateFormat('yyyy-MM-dd');
-    final timeFormat = DateFormat('HH:mm');
-
-    // Orden cronológico: lo más antiguo primero.
-    final rows = <List<Object>>[
-      for (final item in items.reversed)
-        [
-          dateFormat.format(item.transaction.date),
-          timeFormat.format(item.transaction.date),
-          item.transaction.type == TxType.income ? 'Ingreso' : 'Gasto',
-          item.category.name,
-          item.transaction.amount.round(),
-          item.transaction.description,
-          cardNames[item.transaction.cardId] ?? '',
-          item.transaction.source == TxSource.sms ? 'SMS' : 'Manual',
-          item.transaction.id,
-        ],
-    ];
-
-    final count = await sendRowsToDrive(config, rows);
-    messenger.hideCurrentSnackBar();
+    final count = await runWithProgress(
+      context,
+      'Enviando tus movimientos a Google Drive…',
+      () async => sendRowsToDrive(activeConfig, await buildExportRows(ref)),
+    );
     messenger.showSnackBar(
       SnackBar(
         content: Text('Listo: $count movimientos enviados a Google Drive'),
       ),
     );
-  } on DriveSyncException catch (e) {
-    messenger.hideCurrentSnackBar();
-    messenger.showSnackBar(SnackBar(content: Text('No se pudo enviar: $e')));
   } catch (e) {
-    messenger.hideCurrentSnackBar();
     messenger.showSnackBar(SnackBar(content: Text('No se pudo enviar: $e')));
   }
 }

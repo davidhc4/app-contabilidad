@@ -42,8 +42,7 @@ function doPost(e) {
 }
 
 function obtenerHoja() {
-  const carpetas = DriveApp.getFoldersByName(CARPETA);
-  const carpeta = carpetas.hasNext() ? carpetas.next() : DriveApp.createFolder(CARPETA);
+  const carpeta = buscarCarpeta() || DriveApp.createFolder(CARPETA);
 
   const archivos = carpeta.getFilesByName(ARCHIVO);
   let libro;
@@ -56,6 +55,17 @@ function obtenerHoja() {
     DriveApp.getRootFolder().removeFile(archivo);
   }
   return libro.getSheetByName(HOJA) || libro.getSheets()[0].setName(HOJA);
+}
+
+// Busca la carpeta ignorando mayúsculas y espacios sobrantes en el nombre
+// (por ejemplo "FINANZAS " con un espacio al final).
+function buscarCarpeta() {
+  const carpetas = DriveApp.getFolders();
+  while (carpetas.hasNext()) {
+    const c = carpetas.next();
+    if (c.getName().trim().toUpperCase() === CARPETA) return c;
+  }
+  return null;
 }
 
 function salida(objeto) {

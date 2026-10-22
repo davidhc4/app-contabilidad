@@ -121,7 +121,7 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
       });
     } catch (e) {
       messenger.showSnackBar(
-        SnackBar(content: Text('No se pudo cargar la foto: $e')),
+        SnackBar(content: Text('No se pudo cargar la foto: ${_short(e)}')),
       );
     }
   }
@@ -174,7 +174,7 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
       messenger.showSnackBar(
-        SnackBar(content: Text('No se pudo guardar la tarjeta: $e')),
+        SnackBar(content: Text('No se pudo guardar la tarjeta: ${_short(e)}')),
       );
       if (mounted) setState(() => _saving = false);
     }
@@ -405,4 +405,10 @@ class _StickerOption extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Recorta mensajes de error muy largos para que quepan en pantalla.
+String _short(Object e) {
+  final text = e.toString();
+  return text.length > 120 ? '${text.substring(0, 120)}…' : text;
 }

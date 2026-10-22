@@ -4,9 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/formatters.dart';
 import '../../providers/app_providers.dart';
+import '../../shared/widgets/progress_dialog.dart';
 import '../budget/budget_dialog.dart';
+import '../data_export/export_data.dart';
 import '../drive_sync/drive_sync_service.dart';
 import '../drive_sync/drive_sync_ui.dart';
+import '../help/tutorial_screen.dart';
 import '../sms_detection/sms_permission_helper.dart';
 import 'sms_senders_screen.dart';
 
@@ -101,27 +104,14 @@ class SettingsScreen extends ConsumerWidget {
                 title: const Text('Presupuesto mensual'),
                 subtitle: Text(
                   settings.monthlyBudget == null
-                      ? 'No configurado. Tócalo para definir cuánto planeas gastar al mes.'
-                      : 'Tope de gasto: ${Formatters.money(settings.monthlyBudget!)} al mes. '
-                          'Cada gasto que registres se resta de este monto; '
-                          'míralo en la pestaña Resumen.',
+                      ? 'No configurado. Es el dinero con el que cuentas cada mes; '
+                          'tócalo para definirlo.'
+                      : 'Presupuesto: ${Formatters.money(settings.monthlyBudget!)} al mes. '
+                          'Los gastos se descuentan de este monto y lo que '
+                          'sobra es lo que puedes ahorrar (mira Resumen).',
                 ),
                 trailing: const Icon(Icons.chevron_right_rounded),
                 onTap: () => showBudgetDialog(context, ref, settings.monthlyBudget),
-              ),
-            ),
-            const _SectionTitle('Acceso rápido'),
-            const Card(
-              margin: EdgeInsets.symmetric(horizontal: 20),
-              child: ListTile(
-                leading: Icon(Icons.bolt_rounded),
-                title: Text('Registrar desde el panel de tu celular'),
-                subtitle: Text(
-                  'Desliza hacia abajo desde arriba de la pantalla, abre '
-                  '"Editar y ordenar" y agrega los botones "Agregar gasto" '
-                  'y "Agregar ingreso". Así registras un movimiento sin '
-                  'abrir la app.',
-                ),
               ),
             ),
             const _SectionTitle('Tus datos'),
@@ -131,18 +121,21 @@ class SettingsScreen extends ConsumerWidget {
                 children: [
                   ListTile(
                     leading: const Icon(Icons.cloud_upload_outlined),
-                    title: const Text('Enviar datos a Google Drive'),
+                    title: const Text('Enviar a Google Drive'),
                     subtitle: const Text(
-                        'Sube todos tus ingresos y gastos a la hoja '
-                        '"Finanzas App" de la carpeta FINANZAS de tu Drive'),
+                        'Copia todos tus movimientos a la hoja "Finanzas App" '
+                        'de tu carpeta FINANZAS en Drive. Cada envío '
+                        'actualiza la hoja completa, sin duplicar filas.'),
                     onTap: () => syncToDrive(context, ref),
                   ),
                   const Divider(height: 1),
                   ListTile(
                     leading: const Icon(Icons.link_rounded),
-                    title: const Text('Conexión con Google Drive'),
+                    title: const Text('Conectar con Google Drive'),
                     subtitle: const Text(
-                        'Pega la dirección de tu script y la clave'),
+                        'Se hace una sola vez y es necesario para el botón '
+                        'de arriba. Pega la dirección de tu script y la '
+                        'clave.'),
                     onTap: () async {
                       final current = await DriveSyncConfig.load();
                       if (!context.mounted) return;
@@ -151,23 +144,53 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                   const Divider(height: 1),
                   ListTile(
+                    leading: const Icon(Icons.ios_share_rounded),
+                    title: const Text('Compartir copia en CSV'),
+                    subtitle: const Text(
+                        'Crea un archivo CSV (se abre en Excel) y te deja '
+                        'mandarlo por correo, Drive, OneDrive, WhatsApp u '
+                        'otra app.'),
+                    onTap: () => _shareCsv(context, ref),
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
                     leading: const Icon(Icons.delete_forever_rounded,
                         color: AppColors.expense),
                     title: const Text('Borrar todos los datos',
                         style: TextStyle(color: AppColors.expense)),
                     subtitle: const Text(
-                        'Elimina todos tus movimientos para empezar de cero'),
+                        'Elimina todos tus movimientos. No se puede '
+                        'deshacer: antes de borrar, guarda una copia.'),
                     onTap: () => _confirmDeleteAll(context, ref),
                   ),
                 ],
               ),
             ),
-            const _SectionTitle('Acerca de'),
-            const Card(
-              margin: EdgeInsets.symmetric(horizontal: 20),
-              child: ListTile(
-                title: Text('Contabilidad personal'),
-                subtitle: Text('Versión 1.0.2 · 100% local, sin nube · COP'),
+            const _SectionTitle('Ayuda y acerca de'),
+            Card(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.help_outline_rounded),
+                    title: const Text('Cómo usar la app'),
+                    subtitle: const Text(
+                        'Mini tutorial: qué hace cada sección y cada botón'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const TutorialScreen(),
+                      ),
+                    ),
+                  ),
+                  const Divider(height: 1),
+                  const ListTile(
+                    title: Text('Contabilidad personal'),
+                    subtitle: Text(
+                        'Versión 1.1.0 · Tus datos se guardan en tu celular '
+                        'y solo salen de él cuando tú los envías · COP'),
+                  ),
+                ],
               ),
             ),
           ],
@@ -176,6 +199,26 @@ class SettingsScreen extends ConsumerWidget {
         error: (e, _) => Center(child: Text('Error: $e')),
       ),
     );
+  }
+
+  Future<void> _shareCsv(BuildContext context, WidgetRef ref) async {
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final result = await runWithProgress(
+        context,
+        'Creando el archivo CSV…',
+        () => createCsvFile(ref),
+      );
+      if (result.count == 0) {
+        messenger.showSnackBar(
+          const SnackBar(content: Text('Aún no tienes movimientos para exportar')),
+        );
+        return;
+      }
+      await shareCsvFile(result.file);
+    } catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text('No se pudo crear el CSV: $e')));
+    }
   }
 
   Future<void> _confirmDeleteAll(BuildContext context, WidgetRef ref) async {
@@ -200,8 +243,12 @@ class SettingsScreen extends ConsumerWidget {
       ),
     );
 
-    if (confirmed != true) return;
-    await ref.read(transactionRepositoryProvider).deleteAll();
+    if (confirmed != true || !context.mounted) return;
+    await runWithProgress(
+      context,
+      'Borrando tus movimientos…',
+      () => ref.read(transactionRepositoryProvider).deleteAll(),
+    );
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Todos los movimientos fueron borrados')),

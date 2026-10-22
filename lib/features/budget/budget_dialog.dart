@@ -22,9 +22,10 @@ Future<void> showBudgetDialog(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Es el máximo que planeas gastar cada mes. Cada gasto que '
-            'registres se resta de este monto y en Resumen verás cuánto te '
-            'queda disponible.',
+            'Es el dinero con el que cuentas cada mes. Los gastos que '
+            'registres se descuentan de este monto y lo que sobre es lo que '
+            'podrías ahorrar. En Resumen → "Ahorro proyectado" verás cuánto '
+            'acumularías si ahorras ese sobrante mes tras mes.',
           ),
           const SizedBox(height: 16),
           TextField(

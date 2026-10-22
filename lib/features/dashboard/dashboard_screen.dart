@@ -9,7 +9,11 @@ import '../../data/local/tables.dart';
 import '../../data/repositories/transaction_repository.dart';
 import '../../providers/app_providers.dart';
 import '../budget/budget_dialog.dart';
+import '../savings/savings_section.dart';
 import '../transactions/transaction_form_sheet.dart';
+
+/// Sección visible en Resumen: 0 = el mes, 1 = ahorro proyectado.
+final dashboardSectionProvider = StateProvider<int>((ref) => 0);
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -19,6 +23,7 @@ class DashboardScreen extends ConsumerWidget {
     final month = ref.watch(selectedMonthProvider);
     final summaryAsync = ref.watch(monthSummaryProvider);
     final byCategoryAsync = ref.watch(expenseByCategoryProvider);
+    final section = ref.watch(dashboardSectionProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -48,6 +53,37 @@ class DashboardScreen extends ConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 100),
           children: [
+            SegmentedButton<int>(
+              segments: const [
+                ButtonSegment(
+                  value: 0,
+                  label: Text('Este mes'),
+                  icon: Icon(Icons.calendar_month_rounded),
+                ),
+                ButtonSegment(
+                  value: 1,
+                  label: Text('Ahorro proyectado'),
+                  icon: Icon(Icons.savings_outlined),
+                ),
+              ],
+              selected: {section},
+              onSelectionChanged: (s) =>
+                  ref.read(dashboardSectionProvider.notifier).state = s.first,
+            ),
+            const SizedBox(height: 16),
+            if (section == 1)
+              summaryAsync.when(
+                data: (summary) => SavingsSection(
+                  month: month,
+                  expense: summary.expense,
+                  income: summary.income,
+                ),
+                loading: () => const SizedBox(
+                    height: 140,
+                    child: Center(child: CircularProgressIndicator())),
+                error: (e, _) => Text('Error: $e'),
+              )
+            else ...[
             summaryAsync.when(
               data: (summary) => Column(
                 children: [
@@ -74,6 +110,7 @@ class DashboardScreen extends ConsumerWidget {
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) => Text('Error: $e'),
             ),
+            ],
           ],
         ),
       ),
@@ -165,8 +202,9 @@ class _BudgetCard extends ConsumerWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'Define cuánto planeas gastar al mes. Cada gasto que '
-                'registres se resta de ese monto y verás cuánto te queda.',
+                'Define el dinero con el que cuentas cada mes. Cada gasto que '
+                'registres se descuenta de ese monto y lo que sobre es lo que '
+                'podrías ahorrar.',
                 style: theme.textTheme.bodyMedium,
               ),
               const SizedBox(height: 12),
@@ -227,7 +265,7 @@ class _BudgetCard extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 8),
-            Text(over ? 'Te pasaste por' : 'Te queda disponible',
+            Text(over ? 'Te pasaste por' : 'Te sobra este mes',
                 style: theme.textTheme.labelLarge),
             Text(
               Formatters.money(remaining.abs()),
@@ -258,10 +296,17 @@ class _BudgetCard extends ConsumerWidget {
             ],
             const SizedBox(height: 10),
             Text(
-              'Cada gasto que registres se resta de tu presupuesto. '
-              'Los ingresos no lo afectan.',
+              'Presupuesto − gastos = lo que sobra. Los ingresos que '
+              'registres no cambian el presupuesto.',
               style: theme.textTheme.bodySmall
                   ?.copyWith(color: theme.colorScheme.outline),
+            ),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              onPressed: () =>
+                  ref.read(dashboardSectionProvider.notifier).state = 1,
+              icon: const Icon(Icons.trending_up_rounded),
+              label: const Text('Ver cuánto ahorraría'),
             ),
           ],
         ),

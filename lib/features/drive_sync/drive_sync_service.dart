@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/storage/local_store.dart';
 
 /// Datos de conexión con el script de Google (Apps Script) que escribe en
 /// la hoja de la carpeta FINANZAS del Drive del usuario.
@@ -20,23 +20,20 @@ class DriveSyncConfig {
       url.startsWith('https://script.google.com/');
 
   static Future<DriveSyncConfig?> load() async {
-    final prefs = await SharedPreferences.getInstance();
-    final url = prefs.getString(_urlKey);
-    final token = prefs.getString(_tokenKey);
+    final url = await LocalStore.getString(_urlKey);
+    final token = await LocalStore.getString(_tokenKey);
     if (url == null || token == null || !isValidUrl(url)) return null;
     return DriveSyncConfig(url: url, token: token);
   }
 
   Future<void> save() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_urlKey, url);
-    await prefs.setString(_tokenKey, token);
+    await LocalStore.setString(_urlKey, url);
+    await LocalStore.setString(_tokenKey, token);
   }
 
   static Future<void> clear() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_urlKey);
-    await prefs.remove(_tokenKey);
+    await LocalStore.remove(_urlKey);
+    await LocalStore.remove(_tokenKey);
   }
 }
 
