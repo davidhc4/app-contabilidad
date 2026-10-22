@@ -8,6 +8,7 @@ import '../../core/utils/icon_map.dart';
 import '../../data/local/tables.dart';
 import '../../data/repositories/transaction_repository.dart';
 import '../../providers/app_providers.dart';
+import '../../shared/widgets/soft_fab.dart';
 import '../budget/budget_dialog.dart';
 import '../savings/savings_section.dart';
 import '../transactions/transaction_form_sheet.dart';
@@ -454,10 +455,10 @@ class _EmptyState extends StatelessWidget {
 class _AddMenuFab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return FloatingActionButton.extended(
+    return SoftFab(
+      icon: Icons.add_rounded,
+      label: 'Agregar',
       onPressed: () => _openMenu(context),
-      icon: const Icon(Icons.add_rounded),
-      label: const Text('Agregar'),
     );
   }
 

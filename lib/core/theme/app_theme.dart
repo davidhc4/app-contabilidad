@@ -110,10 +110,21 @@ class AppTheme {
           foregroundColor: Colors.white,
           elevation: 0,
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
+          shape: const StadiumBorder(),
           textStyle: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          shape: const StadiumBorder(),
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 22),
+          textStyle: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          shape: const StadiumBorder(),
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
         ),
       ),
       bottomSheetTheme: BottomSheetThemeData(

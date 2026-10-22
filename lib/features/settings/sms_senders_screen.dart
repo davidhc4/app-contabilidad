@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../shared/widgets/soft_fab.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/app_providers.dart';
@@ -12,10 +14,10 @@ class SmsSendersScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Bancos monitoreados')),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: SoftFab(
+        icon: Icons.add_rounded,
+        label: 'Agregar banco',
         onPressed: () => _showAddSenderSheet(context, ref),
-        icon: const Icon(Icons.add_rounded),
-        label: const Text('Agregar banco'),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

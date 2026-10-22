@@ -67,7 +67,8 @@ class _CategoryFormSheetState extends ConsumerState<CategoryFormSheet> {
         top: 20,
         bottom: 20 + MediaQuery.of(context).viewInsets.bottom,
       ),
-      child: Column(
+      child: SingleChildScrollView(
+        child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -134,6 +135,7 @@ class _CategoryFormSheetState extends ConsumerState<CategoryFormSheet> {
           const SizedBox(height: 24),
           ElevatedButton(onPressed: _submit, child: const Text('Crear')),
         ],
+      ),
       ),
     );
   }

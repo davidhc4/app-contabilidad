@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/app_version.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/formatters.dart';
 import '../../providers/app_providers.dart';
@@ -166,31 +167,28 @@ class SettingsScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            const _SectionTitle('Ayuda y acerca de'),
+            const _SectionTitle('Ayuda'),
             Card(
               margin: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                children: [
-                  ListTile(
-                    leading: const Icon(Icons.help_outline_rounded),
-                    title: const Text('Cómo usar la app'),
-                    subtitle: const Text(
-                        'Mini tutorial: qué hace cada sección y cada botón'),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const TutorialScreen(),
-                      ),
-                    ),
+              child: ListTile(
+                leading: const Icon(Icons.help_outline_rounded),
+                title: const Text('Cómo usar la app'),
+                subtitle: const Text(
+                    'Mini tutorial: qué hace cada sección y cada botón'),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const TutorialScreen(),
                   ),
-                  const Divider(height: 1),
-                  const ListTile(
-                    title: Text('Contabilidad personal'),
-                    subtitle: Text(
-                        'Versión 1.1.0 · Tus datos se guardan en tu celular '
-                        'y solo salen de él cuando tú los envías · COP'),
-                  ),
-                ],
+                ),
+              ),
+            ),
+            const _SectionTitle('Acerca de'),
+            const Card(
+              margin: EdgeInsets.symmetric(horizontal: 20),
+              child: ListTile(
+                title: Text(kAppName),
+                subtitle: Text('Versión $kAppVersion'),
               ),
             ),
           ],

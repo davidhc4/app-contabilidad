@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/formatters.dart';
+import '../../core/utils/thousands_formatter.dart';
 import '../../providers/app_providers.dart';
 import '../budget/budget_dialog.dart';
 
@@ -39,11 +40,7 @@ class _SavingsSectionState extends ConsumerState<SavingsSection> {
     super.dispose();
   }
 
-  double? _parseMoney(String text) {
-    final cleaned = text.trim().replaceAll('.', '').replaceAll(',', '.');
-    if (cleaned.isEmpty) return null;
-    return double.tryParse(cleaned);
-  }
+  double? _parseMoney(String text) => parseThousands(text)?.toDouble();
 
   String _plural(int n, String one, String many) => n == 1 ? one : many;
 
@@ -205,8 +202,8 @@ class _SavingsSectionState extends ConsumerState<SavingsSection> {
                 TextField(
                   controller: _amountController,
                   onChanged: (_) => setState(() {}),
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: const [ThousandsInputFormatter()],
                   decoration: InputDecoration(
                     labelText: 'Ahorro por mes (opcional)',
                     prefixText: r'$ ',

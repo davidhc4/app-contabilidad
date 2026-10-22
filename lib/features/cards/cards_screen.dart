@@ -5,6 +5,7 @@ import '../../data/local/database.dart';
 import '../../providers/app_providers.dart';
 import '../../shared/widgets/bank_card_widget.dart';
 import '../../shared/widgets/confirm_dialog.dart';
+import '../../shared/widgets/soft_fab.dart';
 import 'card_style.dart';
 import 'card_detail_screen.dart';
 import 'card_form_sheet.dart';
@@ -18,10 +19,10 @@ class CardsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Tarjetas')),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: SoftFab(
+        icon: Icons.add_card_rounded,
+        label: 'Nueva tarjeta',
         onPressed: () => showCardFormSheet(context),
-        icon: const Icon(Icons.add_card_rounded),
-        label: const Text('Nueva tarjeta'),
       ),
       body: cardsAsync.when(
         data: (cards) {

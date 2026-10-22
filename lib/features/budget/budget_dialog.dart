@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/utils/thousands_formatter.dart';
 import '../../providers/app_providers.dart';
 
 /// Diálogo para definir, cambiar o quitar el presupuesto mensual.
@@ -11,7 +12,7 @@ Future<void> showBudgetDialog(
   double? current,
 ) async {
   final controller = TextEditingController(
-    text: current == null ? '' : current.toStringAsFixed(0),
+    text: current == null ? '' : formatThousands(current.round().toString()),
   );
   final result = await showDialog<_BudgetDialogResult>(
     context: context,
@@ -31,7 +32,8 @@ Future<void> showBudgetDialog(
           TextField(
             controller: controller,
             autofocus: true,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            keyboardType: TextInputType.number,
+            inputFormatters: const [ThousandsInputFormatter()],
             decoration: const InputDecoration(
               prefixText: r'$ ',
               hintText: 'Ej. 1.000.000',
@@ -52,8 +54,8 @@ Future<void> showBudgetDialog(
         ),
         FilledButton(
           onPressed: () {
-            final amount = double.tryParse(
-                controller.text.replaceAll('.', '').replaceAll(',', '.'));
+            final amount = parseThousands(controller.text)?.toDouble();
+            if (amount == null || amount <= 0) return;
             Navigator.of(dialogContext).pop(_BudgetDialogResult.save(amount));
           },
           child: const Text('Guardar'),

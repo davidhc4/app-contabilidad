@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/utils/formatters.dart';
+import '../../core/utils/thousands_formatter.dart';
 import '../../data/local/database.dart';
 import '../../data/local/tables.dart';
 import '../../providers/app_providers.dart';
@@ -60,7 +61,13 @@ class TransactionFormSheet extends ConsumerStatefulWidget {
 
 class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
   late final _amountController = TextEditingController(
-    text: (widget.editing?.amount ?? widget.prefillAmount)?.toStringAsFixed(0) ?? '',
+    text: formatThousands(
+      ((widget.editing?.amount ?? widget.prefillAmount) ?? 0) > 0
+          ? (widget.editing?.amount ?? widget.prefillAmount)!
+              .round()
+              .toString()
+          : '',
+    ),
   );
   late final _descriptionController = TextEditingController(
     text: widget.editing?.description ?? widget.prefillDescription ?? '',
@@ -79,7 +86,7 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
   }
 
   Future<void> _submit() async {
-    final amount = double.tryParse(_amountController.text.replaceAll(',', ''));
+    final amount = parseThousands(_amountController.text)?.toDouble();
     if (amount == null || amount <= 0 || _categoryId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Completa el monto y la categoría')),
@@ -128,7 +135,8 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
         top: 20,
         bottom: 20 + MediaQuery.of(context).viewInsets.bottom,
       ),
-      child: Column(
+      child: SingleChildScrollView(
+        child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -169,7 +177,8 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
           const SizedBox(height: 16),
           TextField(
             controller: _amountController,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            keyboardType: TextInputType.number,
+            inputFormatters: const [ThousandsInputFormatter()],
             style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w700),
             decoration: const InputDecoration(
               prefixText: r'$ ',
@@ -191,7 +200,7 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
               final picked = await showDatePicker(
                 context: context,
                 initialDate: _date,
-                firstDate: DateTime(2020),
+                firstDate: DateTime(2000),
                 lastDate: DateTime.now().add(const Duration(days: 1)),
               );
               if (picked != null) {
@@ -288,6 +297,7 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
             child: Text(widget.editing != null ? 'Guardar cambios' : 'Agregar'),
           ),
         ],
+      ),
       ),
     );
   }

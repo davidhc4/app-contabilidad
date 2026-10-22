@@ -25,6 +25,12 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Verificar que la versión de la app coincide con pubspec.yaml
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//')
+          grep -q "kAppVersion = '$VERSION'" lib/core/app_version.dart || {
+            echo "kAppVersion no coincide con la versión de pubspec.yaml ($VERSION)"; exit 1; }
+
       - name: Instalar dependencias
         run: flutter pub get
 
@@ -48,11 +54,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG="apk-${GITHUB_REF_NAME}"
-          cp build/app/outputs/flutter-apk/app-release.apk app-contabilidad.apk
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//')
+          TAG="v${VERSION}"
+          cp build/app/outputs/flutter-apk/app-release.apk "contabilidad-${TAG}.apk"
           gh release delete "$TAG" --cleanup-tag --yes || true
-          gh release create "$TAG" app-contabilidad.apk \
-            --prerelease \
+          gh release create "$TAG" "contabilidad-${TAG}.apk" \
             --target "$GITHUB_SHA" \
-            --title "APK más reciente (${GITHUB_REF_NAME})" \
-            --notes "APK compilado automáticamente desde la rama ${GITHUB_REF_NAME}."
+            --title "Contabilidad ${TAG}" \
+            --notes "APK de Contabilidad personal versión ${VERSION}, compilado desde la rama ${GITHUB_REF_NAME}."
