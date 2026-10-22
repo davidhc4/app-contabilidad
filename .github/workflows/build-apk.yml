@@ -5,6 +5,9 @@ on:
     branches: [main, mejoras-ux]
   workflow_dispatch: {}
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -40,3 +43,16 @@ jobs:
           name: app-contabilidad-apk
           path: build/app/outputs/flutter-apk/app-release.apk
           retention-days: 30
+
+      - name: Publicar APK en Releases (para descargarlo directo desde el celular)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="apk-${GITHUB_REF_NAME}"
+          cp build/app/outputs/flutter-apk/app-release.apk app-contabilidad.apk
+          gh release delete "$TAG" --cleanup-tag --yes || true
+          gh release create "$TAG" app-contabilidad.apk \
+            --prerelease \
+            --target "$GITHUB_SHA" \
+            --title "APK más reciente (${GITHUB_REF_NAME})" \
+            --notes "APK compilado automáticamente desde la rama ${GITHUB_REF_NAME}."
