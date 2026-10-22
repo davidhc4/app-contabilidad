@@ -147,7 +147,7 @@ class TransactionRepository {
 
   /// Mueve dinero de una cuenta a otra. `null` significa "Efectivo / sin
   /// tarjeta". No cuenta como ingreso ni como gasto: se guardan dos filas
-  /// (sale / entra) unidas por un código en `rawSmsBody` ("transfer:<id>").
+  /// (sale / entra) unidas por un código en `rawSmsBody` ("transfer:" más un código).
   Future<void> addTransfer({
     required String? fromCardId,
     required String? toCardId,
