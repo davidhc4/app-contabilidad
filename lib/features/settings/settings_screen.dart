@@ -1,16 +1,13 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/formatters.dart';
 import '../../data/local/tables.dart';
 import '../../providers/app_providers.dart';
 import '../budget/budget_dialog.dart';
+import '../drive_sync/drive_sync_service.dart';
+import '../drive_sync/drive_sync_ui.dart';
 import '../sms_detection/sms_permission_helper.dart';
 import 'sms_senders_screen.dart';
 
@@ -134,11 +131,24 @@ class SettingsScreen extends ConsumerWidget {
               child: Column(
                 children: [
                   ListTile(
-                    leading: const Icon(Icons.ios_share_rounded),
-                    title: const Text('Exportar movimientos (CSV)'),
+                    leading: const Icon(Icons.cloud_upload_outlined),
+                    title: const Text('Enviar datos a Google Drive'),
                     subtitle: const Text(
-                        'Genera un respaldo de todos tus ingresos y gastos'),
-                    onTap: () => _exportCsv(context, ref),
+                        'Sube todos tus ingresos y gastos a la hoja '
+                        '"Finanzas App" de la carpeta FINANZAS de tu Drive'),
+                    onTap: () => syncToDrive(context, ref),
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.link_rounded),
+                    title: const Text('Conexión con Google Drive'),
+                    subtitle: const Text(
+                        'Pega la dirección de tu script y la clave'),
+                    onTap: () async {
+                      final current = await DriveSyncConfig.load();
+                      if (!context.mounted) return;
+                      await showDriveConfigDialog(context, current);
+                    },
                   ),
                   const Divider(height: 1),
                   ListTile(
@@ -167,41 +177,6 @@ class SettingsScreen extends ConsumerWidget {
         error: (e, _) => Center(child: Text('Error: $e')),
       ),
     );
-  }
-
-  Future<void> _exportCsv(BuildContext context, WidgetRef ref) async {
-    final repo = ref.read(transactionRepositoryProvider);
-    final items = await repo.watchAll().first;
-
-    final buffer = StringBuffer()
-      ..writeln('Fecha,Hora,Tipo,Categoría,Monto,Descripción');
-    for (final item in items) {
-      final tx = item.transaction;
-      final fecha = Formatters.fullDate.format(tx.date);
-      final hora = Formatters.time.format(tx.date);
-      final tipo = tx.type == TxType.income ? 'Ingreso' : 'Gasto';
-      final categoria = _csvEscape(item.category.name);
-      final monto = tx.amount.toStringAsFixed(0);
-      final descripcion = _csvEscape(tx.description);
-      buffer.writeln('$fecha,$hora,$tipo,$categoria,$monto,$descripcion');
-    }
-
-    final dir = await getTemporaryDirectory();
-    final file = File(p.join(dir.path, 'movimientos.csv'));
-    await file.writeAsString(buffer.toString());
-
-    if (!context.mounted) return;
-    await Share.shareXFiles(
-      [XFile(file.path)],
-      text: 'Respaldo de movimientos - Contabilidad personal',
-    );
-  }
-
-  String _csvEscape(String value) {
-    if (value.contains(',') || value.contains('"') || value.contains('\n')) {
-      return '"${value.replaceAll('"', '""')}"';
-    }
-    return value;
   }
 
   Future<void> _confirmDeleteAll(BuildContext context, WidgetRef ref) async {
