@@ -10,6 +10,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/utils/formatters.dart';
 import '../../data/local/tables.dart';
 import '../../providers/app_providers.dart';
+import '../budget/budget_dialog.dart';
 import '../sms_detection/sms_permission_helper.dart';
 import 'sms_senders_screen.dart';
 
@@ -104,11 +105,27 @@ class SettingsScreen extends ConsumerWidget {
                 title: const Text('Presupuesto mensual'),
                 subtitle: Text(
                   settings.monthlyBudget == null
-                      ? 'No configurado. Tócalo para definir uno.'
-                      : 'Actualmente: ${Formatters.money(settings.monthlyBudget!)} al mes',
+                      ? 'No configurado. Tócalo para definir cuánto planeas gastar al mes.'
+                      : 'Tope de gasto: ${Formatters.money(settings.monthlyBudget!)} al mes. '
+                          'Cada gasto que registres se resta de este monto; '
+                          'míralo en la pestaña Resumen.',
                 ),
                 trailing: const Icon(Icons.chevron_right_rounded),
-                onTap: () => _editMonthlyBudget(context, ref, settings.monthlyBudget),
+                onTap: () => showBudgetDialog(context, ref, settings.monthlyBudget),
+              ),
+            ),
+            const _SectionTitle('Acceso rápido'),
+            const Card(
+              margin: EdgeInsets.symmetric(horizontal: 20),
+              child: ListTile(
+                leading: Icon(Icons.bolt_rounded),
+                title: Text('Registrar desde el panel de tu celular'),
+                subtitle: Text(
+                  'Desliza hacia abajo desde arriba de la pantalla, abre '
+                  '"Editar y ordenar" y agrega los botones "Agregar gasto" '
+                  'y "Agregar ingreso". Así registras un movimiento sin '
+                  'abrir la app.',
+                ),
               ),
             ),
             const _SectionTitle('Tus datos'),
@@ -150,57 +167,6 @@ class SettingsScreen extends ConsumerWidget {
         error: (e, _) => Center(child: Text('Error: $e')),
       ),
     );
-  }
-
-  Future<void> _editMonthlyBudget(
-      BuildContext context, WidgetRef ref, double? current) async {
-    final controller = TextEditingController(
-      text: current == null ? '' : current.toStringAsFixed(0),
-    );
-    final result = await showDialog<_BudgetDialogResult>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Presupuesto mensual'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          decoration: const InputDecoration(
-            prefixText: r'$ ',
-            hintText: 'Ej. 2.000.000',
-          ),
-        ),
-        actions: [
-          if (current != null)
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext)
-                  .pop(_BudgetDialogResult.remove()),
-              child: const Text('Quitar'),
-            ),
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () {
-              final amount =
-                  double.tryParse(controller.text.replaceAll('.', '').replaceAll(',', '.'));
-              Navigator.of(dialogContext)
-                  .pop(_BudgetDialogResult.save(amount));
-            },
-            child: const Text('Guardar'),
-          ),
-        ],
-      ),
-    );
-
-    if (result == null) return;
-    final repo = ref.read(settingsRepositoryProvider);
-    if (result.remove) {
-      await repo.setMonthlyBudget(null);
-    } else if (result.amount != null && result.amount! > 0) {
-      await repo.setMonthlyBudget(result.amount);
-    }
   }
 
   Future<void> _exportCsv(BuildContext context, WidgetRef ref) async {
@@ -268,15 +234,6 @@ class SettingsScreen extends ConsumerWidget {
       );
     }
   }
-}
-
-class _BudgetDialogResult {
-  final double? amount;
-  final bool remove;
-  _BudgetDialogResult.save(this.amount) : remove = false;
-  _BudgetDialogResult.remove()
-      : amount = null,
-        remove = true;
 }
 
 class _SectionTitle extends StatelessWidget {

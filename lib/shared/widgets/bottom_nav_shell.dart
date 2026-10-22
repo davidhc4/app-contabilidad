@@ -7,10 +7,8 @@ import '../../features/settings/settings_screen.dart';
 import '../../features/statistics/statistics_screen.dart';
 import '../../features/transactions/transactions_screen.dart';
 
-/// Pestañas principales de la app con animación direccional: si vas a una
-/// pestaña a la derecha, el contenido entra deslizándose desde la derecha;
-/// si vas a una a la izquierda, entra desde la izquierda. Igual que en
-/// cualquier app con pestañas en la parte inferior (estilo iOS/Android).
+/// Pestañas principales de la app. Se puede cambiar de sección tocando la
+/// barra de abajo o deslizando el dedo hacia los lados sobre la pantalla.
 class MainTabShell extends StatefulWidget {
   const MainTabShell({super.key});
 
@@ -52,20 +50,22 @@ class _MainTabShellState extends State<MainTabShell> {
     return Scaffold(
       body: PageView(
         controller: _pageController,
-        // El usuario cambia de pestaña tocando la barra de abajo, no
-        // deslizando (eso se reserva para gestos dentro de cada pantalla,
-        // como borrar un movimiento deslizando hacia un lado).
-        physics: const NeverScrollableScrollPhysics(),
+        // Se puede deslizar hacia los lados para cambiar de sección.
         onPageChanged: (i) => setState(() => _index = i),
         children: _screens,
       ),
-      // Con 6 pestañas, mostrar siempre todas las etiquetas se ve
-      // abarrotado, así que solo se muestra la etiqueta de la pestaña
-      // seleccionada (como en apps con muchas secciones en la barra
-      // inferior).
+      // Todas las pestañas muestran su nombre para que se entienda a qué
+      // sección lleva cada ícono (letra pequeña para que quepan las 6).
       bottomNavigationBar: NavigationBarTheme(
         data: NavigationBarTheme.of(context).copyWith(
-          labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+          labelTextStyle: WidgetStatePropertyAll(
+            Theme.of(context)
+                    .textTheme
+                    .labelSmall
+                    ?.copyWith(fontSize: 10.5, fontWeight: FontWeight.w600) ??
+                const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600),
+          ),
         ),
         child: NavigationBar(
           selectedIndex: _index,
@@ -84,12 +84,12 @@ class _MainTabShellState extends State<MainTabShell> {
             NavigationDestination(
               icon: Icon(Icons.insights_outlined),
               selectedIcon: Icon(Icons.insights_rounded),
-              label: 'Estadísticas',
+              label: 'Gráficas',
             ),
             NavigationDestination(
               icon: Icon(Icons.receipt_long_outlined),
               selectedIcon: Icon(Icons.receipt_long_rounded),
-              label: 'Movimientos',
+              label: 'Historial',
             ),
             NavigationDestination(
               icon: Icon(Icons.category_outlined),

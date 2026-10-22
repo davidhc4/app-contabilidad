@@ -6,6 +6,7 @@ import '../../data/local/tables.dart';
 import '../../providers/app_providers.dart';
 import '../../shared/widgets/amount_text.dart';
 import '../../shared/widgets/category_icon.dart';
+import '../../shared/widgets/confirm_dialog.dart';
 import 'transaction_form_sheet.dart';
 
 enum _Filter { all, income, expense }
@@ -27,7 +28,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Movimientos'),
+        title: const Text('Historial de movimientos'),
       ),
       body: Column(
         children: [
@@ -51,6 +52,13 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                   ],
                   selected: {_filter},
                   onSelectionChanged: (s) => setState(() => _filter = s.first),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Toca un movimiento para editarlo. Para borrarlo, '
+                  'arrástralo hacia la izquierda.',
+                  style: Theme.of(context).textTheme.bodySmall,
+                  textAlign: TextAlign.center,
                 ),
               ],
             ),
@@ -95,6 +103,12 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                         child: const Icon(Icons.delete_outline_rounded),
                       ),
                       direction: DismissDirection.endToStart,
+                      confirmDismiss: (_) => confirmDialog(
+                        context,
+                        title: 'Eliminar movimiento',
+                        message: 'Este movimiento se borrará y no se puede '
+                            'deshacer.',
+                      ),
                       onDismissed: (_) => ref
                           .read(transactionRepositoryProvider)
                           .delete(item.transaction.id),

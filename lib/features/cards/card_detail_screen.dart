@@ -8,20 +8,45 @@ import '../../providers/app_providers.dart';
 import '../../shared/widgets/amount_text.dart';
 import '../../shared/widgets/bank_card_widget.dart';
 import '../../shared/widgets/category_icon.dart';
+import 'card_form_sheet.dart';
+import 'cards_screen.dart';
 
 /// Pantalla de detalle de una tarjeta: la tarjeta grande arriba y debajo
 /// la lista de movimientos asociados a ella (al estilo de las capturas de
 /// Lemon/Nu que mandó el usuario).
 class CardDetailScreen extends ConsumerWidget {
-  final CardItem card;
-  const CardDetailScreen({super.key, required this.card});
+  final CardItem initialCard;
+  const CardDetailScreen({super.key, required CardItem card})
+      : initialCard = card;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Usa la versión más reciente de la tarjeta (por si se acaba de editar).
+    CardItem card = initialCard;
+    for (final c in ref.watch(cardsProvider).valueOrNull ?? const <CardItem>[]) {
+      if (c.id == initialCard.id) card = c;
+    }
     final txsAsync = ref.watch(transactionsByCardProvider(card.id));
 
     return Scaffold(
-      appBar: AppBar(title: Text(card.name)),
+      appBar: AppBar(
+        title: Text(card.name),
+        actions: [
+          IconButton(
+            tooltip: 'Personalizar tarjeta',
+            icon: const Icon(Icons.palette_outlined),
+            onPressed: () => showCardFormSheet(context, editing: card),
+          ),
+          IconButton(
+            tooltip: 'Eliminar tarjeta',
+            icon: const Icon(Icons.delete_outline_rounded),
+            onPressed: () async {
+              final deleted = await deleteCardWithConfirm(context, ref, card);
+              if (deleted && context.mounted) Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
       body: txsAsync.when(
         data: (items) {
           final now = DateTime.now();

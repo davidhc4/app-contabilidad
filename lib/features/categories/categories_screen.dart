@@ -14,38 +14,46 @@ class CategoriesScreen extends ConsumerStatefulWidget {
   ConsumerState<CategoriesScreen> createState() => _CategoriesScreenState();
 }
 
-class _CategoriesScreenState extends ConsumerState<CategoriesScreen>
-    with SingleTickerProviderStateMixin {
-  late final _tabController = TabController(length: 2, vsync: this);
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
+class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
+  String _type = TxType.expense;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Categorías'),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [Tab(text: 'Gastos'), Tab(text: 'Ingresos')],
-        ),
+      appBar: AppBar(title: const Text('Categorías')),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => showCategoryFormSheet(context, type: _type),
+        icon: const Icon(Icons.add_rounded),
+        label: const Text('Nueva categoría'),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => showCategoryFormSheet(
-          context,
-          type: _tabController.index == 0 ? TxType.expense : TxType.income,
-        ),
-        child: const Icon(Icons.add_rounded),
-      ),
-      body: TabBarView(
-        controller: _tabController,
+      body: Column(
         children: [
-          _CategoryGrid(provider: expenseCategoriesProvider),
-          _CategoryGrid(provider: incomeCategoriesProvider),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
+            child: SegmentedButton<String>(
+              segments: const [
+                ButtonSegment(
+                  value: TxType.expense,
+                  label: Text('Gastos'),
+                  icon: Icon(Icons.arrow_upward_rounded),
+                ),
+                ButtonSegment(
+                  value: TxType.income,
+                  label: Text('Ingresos'),
+                  icon: Icon(Icons.arrow_downward_rounded),
+                ),
+              ],
+              selected: {_type},
+              onSelectionChanged: (s) => setState(() => _type = s.first),
+            ),
+          ),
+          Expanded(
+            child: _CategoryGrid(
+              provider: _type == TxType.expense
+                  ? expenseCategoriesProvider
+                  : incomeCategoriesProvider,
+            ),
+          ),
         ],
       ),
     );

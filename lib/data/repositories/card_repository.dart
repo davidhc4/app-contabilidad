@@ -39,4 +39,34 @@ class CardRepository {
     return (db.update(db.cards)..where((c) => c.id.equals(id)))
         .write(const CardsCompanion(isArchived: Value(true)));
   }
+
+  /// Edita los datos de una tarjeta existente.
+  Future<void> updateCard({
+    required String id,
+    required String name,
+    required String lastFourDigits,
+    required String network,
+    required String colorStart,
+    required String colorEnd,
+  }) {
+    return (db.update(db.cards)..where((c) => c.id.equals(id))).write(
+      CardsCompanion(
+        name: Value(name),
+        lastFourDigits: Value(lastFourDigits),
+        network: Value(network),
+        colorStart: Value(colorStart),
+        colorEnd: Value(colorEnd),
+      ),
+    );
+  }
+
+  /// Elimina la tarjeta. Sus movimientos NO se borran: quedan como
+  /// "sin tarjeta" para no perder el historial de gastos.
+  Future<void> delete(String id) {
+    return db.transaction(() async {
+      await (db.update(db.transactions)..where((t) => t.cardId.equals(id)))
+          .write(const TransactionsCompanion(cardId: Value<String?>(null)));
+      await (db.delete(db.cards)..where((c) => c.id.equals(id))).go();
+    });
+  }
 }

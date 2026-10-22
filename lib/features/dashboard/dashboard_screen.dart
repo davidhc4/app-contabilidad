@@ -8,6 +8,7 @@ import '../../core/utils/icon_map.dart';
 import '../../data/local/tables.dart';
 import '../../data/repositories/transaction_repository.dart';
 import '../../providers/app_providers.dart';
+import '../budget/budget_dialog.dart';
 import '../transactions/transaction_form_sheet.dart';
 
 class DashboardScreen extends ConsumerWidget {
@@ -24,6 +25,7 @@ class DashboardScreen extends ConsumerWidget {
         title: const Text('Resumen'),
         actions: [
           IconButton(
+            tooltip: 'Mes anterior',
             icon: const Icon(Icons.chevron_left_rounded),
             onPressed: () => ref.read(selectedMonthProvider.notifier).state =
                 DateTime(month.year, month.month - 1),
@@ -33,6 +35,7 @@ class DashboardScreen extends ConsumerWidget {
             child: Text(Formatters.monthYear.format(month)),
           ),
           IconButton(
+            tooltip: 'Mes siguiente',
             icon: const Icon(Icons.chevron_right_rounded),
             onPressed: () => ref.read(selectedMonthProvider.notifier).state =
                 DateTime(month.year, month.month + 1),
@@ -46,7 +49,13 @@ class DashboardScreen extends ConsumerWidget {
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 100),
           children: [
             summaryAsync.when(
-              data: (summary) => _BalanceCard(summary: summary),
+              data: (summary) => Column(
+                children: [
+                  _BalanceCard(summary: summary),
+                  const SizedBox(height: 16),
+                  _BudgetCard(spent: summary.expense, month: month),
+                ],
+              ),
               loading: () => const SizedBox(
                   height: 140, child: Center(child: CircularProgressIndicator())),
               error: (e, _) => Text('Error: $e'),
@@ -86,6 +95,8 @@ class _BalanceCard extends StatelessWidget {
           children: [
             Text('Balance del mes',
                 style: Theme.of(context).textTheme.labelLarge),
+            Text('Lo que ganaste menos lo que gastaste',
+                style: Theme.of(context).textTheme.bodySmall),
             const SizedBox(height: 4),
             Text(
               Formatters.money(summary.net),
@@ -115,6 +126,142 @@ class _BalanceCard extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Presupuesto mensual: muestra cuánto del tope se ha gastado y cuánto
+/// queda disponible. Cada gasto registrado en el mes seleccionado se resta
+/// automáticamente; los ingresos no afectan el presupuesto.
+class _BudgetCard extends ConsumerWidget {
+  final double spent;
+  final DateTime month;
+  const _BudgetCard({required this.spent, required this.month});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final budget = ref.watch(settingsStreamProvider).valueOrNull?.monthlyBudget;
+    final theme = Theme.of(context);
+
+    if (budget == null) {
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.savings_outlined),
+                  const SizedBox(width: 8),
+                  Text('Presupuesto mensual',
+                      style: theme.textTheme.titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w700)),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Define cuánto planeas gastar al mes. Cada gasto que '
+                'registres se resta de ese monto y verás cuánto te queda.',
+                style: theme.textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 12),
+              FilledButton.icon(
+                onPressed: () => showBudgetDialog(context, ref, null),
+                icon: const Icon(Icons.edit_rounded),
+                label: const Text('Definir presupuesto'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final remaining = budget - spent;
+    final over = remaining < 0;
+    final ratio = budget <= 0 ? 0.0 : (spent / budget);
+    final percent = (ratio * 100).round();
+    final barColor = over
+        ? AppColors.expense
+        : ratio >= 0.8
+            ? const Color(0xFFFF9F0A)
+            : AppColors.income;
+
+    final now = DateTime.now();
+    final isCurrentMonth = month.year == now.year && month.month == now.month;
+    final daysInMonth = DateTime(month.year, month.month + 1, 0).day;
+    final daysLeft = daysInMonth - now.day + 1;
+
+    String? tip;
+    if (over) {
+      tip = 'Superaste tu presupuesto este mes.';
+    } else if (isCurrentMonth && daysLeft > 0) {
+      tip = 'Puedes gastar unos ${Formatters.money(remaining / daysLeft)} '
+          'por día durante los $daysLeft días que quedan del mes.';
+    }
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.savings_outlined),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text('Presupuesto del mes',
+                      style: theme.textTheme.titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w700)),
+                ),
+                TextButton.icon(
+                  onPressed: () => showBudgetDialog(context, ref, budget),
+                  icon: const Icon(Icons.edit_rounded, size: 18),
+                  label: const Text('Editar'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(over ? 'Te pasaste por' : 'Te queda disponible',
+                style: theme.textTheme.labelLarge),
+            Text(
+              Formatters.money(remaining.abs()),
+              style: theme.textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.w800,
+                color: over ? AppColors.expense : null,
+              ),
+            ),
+            const SizedBox(height: 12),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: LinearProgressIndicator(
+                value: ratio.clamp(0.0, 1.0),
+                minHeight: 10,
+                color: barColor,
+                backgroundColor: barColor.withValues(alpha: 0.18),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Gastado ${Formatters.money(spent)} de '
+              '${Formatters.money(budget)} ($percent%)',
+              style: theme.textTheme.bodySmall,
+            ),
+            if (tip != null) ...[
+              const SizedBox(height: 6),
+              Text(tip, style: theme.textTheme.bodySmall),
+            ],
+            const SizedBox(height: 10),
+            Text(
+              'Cada gasto que registres se resta de tu presupuesto. '
+              'Los ingresos no lo afectan.',
+              style: theme.textTheme.bodySmall
+                  ?.copyWith(color: theme.colorScheme.outline),
             ),
           ],
         ),
@@ -262,9 +409,10 @@ class _EmptyState extends StatelessWidget {
 class _AddMenuFab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return FloatingActionButton(
+    return FloatingActionButton.extended(
       onPressed: () => _openMenu(context),
-      child: const Icon(Icons.add_rounded),
+      icon: const Icon(Icons.add_rounded),
+      label: const Text('Agregar'),
     );
   }
 
@@ -277,6 +425,7 @@ class _AddMenuFab extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.remove_circle_outline_rounded, color: AppColors.expense),
               title: const Text('Agregar gasto'),
+              subtitle: const Text('Dinero que sale: compras, pagos, servicios'),
               onTap: () {
                 Navigator.pop(context);
                 showTransactionForm(context, type: TxType.expense);
@@ -285,6 +434,7 @@ class _AddMenuFab extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.add_circle_outline_rounded, color: AppColors.income),
               title: const Text('Agregar ingreso'),
+              subtitle: const Text('Dinero que entra: salario, ventas, regalos'),
               onTap: () {
                 Navigator.pop(context);
                 showTransactionForm(context, type: TxType.income);
