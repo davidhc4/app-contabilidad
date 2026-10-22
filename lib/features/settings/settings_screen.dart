@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/formatters.dart';
-import '../../data/local/tables.dart';
 import '../../providers/app_providers.dart';
 import '../budget/budget_dialog.dart';
 import '../drive_sync/drive_sync_service.dart';
