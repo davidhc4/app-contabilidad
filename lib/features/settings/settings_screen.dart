@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -8,6 +11,7 @@ import '../../providers/app_providers.dart';
 import '../../shared/widgets/progress_dialog.dart';
 import '../budget/budget_dialog.dart';
 import '../data_export/export_data.dart';
+import '../data_export/import_data.dart';
 import '../help/tutorial_screen.dart';
 import '../sms_detection/sms_permission_helper.dart';
 import 'sms_senders_screen.dart';
@@ -129,6 +133,16 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                   const Divider(height: 1),
                   ListTile(
+                    leading: const Icon(Icons.download_rounded),
+                    title: const Text('Importar copia CSV'),
+                    subtitle: const Text(
+                        'Recupera tus movimientos desde un archivo que '
+                        'guardaste con "Compartir copia en CSV". No duplica '
+                        'lo que ya tengas.'),
+                    onTap: () => _importCsv(context, ref),
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
                     leading: const Icon(Icons.delete_forever_rounded,
                         color: AppColors.expense),
                     title: const Text('Borrar todos los datos',
@@ -190,6 +204,38 @@ class SettingsScreen extends ConsumerWidget {
       await shareCsvFile(result.file);
     } catch (e) {
       messenger.showSnackBar(SnackBar(content: Text('No se pudo crear el CSV: $e')));
+    }
+  }
+
+  Future<void> _importCsv(BuildContext context, WidgetRef ref) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final picked = await FilePicker.platform.pickFiles(type: FileType.any);
+    final path = picked?.files.single.path;
+    if (path == null || !context.mounted) return;
+    try {
+      final result = await runWithProgress(
+        context,
+        'Importando tus movimientos…',
+        () => importCsvFile(ref, File(path)),
+      );
+      final extra = [
+        if (result.newCards > 0) '${result.newCards} tarjeta(s) nueva(s)',
+        if (result.newCategories > 0)
+          '${result.newCategories} categoría(s) nueva(s)',
+      ].join(', ');
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            'Listo: ${result.added} movimientos importados'
+            '${result.skipped > 0 ? ', ${result.skipped} omitidos (ya estaban o no se pudieron leer)' : ''}'
+            '${extra.isEmpty ? '' : '. Se crearon $extra'}.',
+          ),
+        ),
+      );
+    } on FormatException catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(e.message)));
+    } catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text('No se pudo importar: $e')));
     }
   }
 

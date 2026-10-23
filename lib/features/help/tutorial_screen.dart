@@ -145,9 +145,11 @@ class _TutorialScreenState extends State<TutorialScreen> {
     ),
     _Topic(
       icon: Icons.ios_share_rounded,
-      title: 'Tus datos: copia en CSV y borrar',
+      title: 'Tus datos: copia, importar y borrar',
       body: '• Compartir copia en CSV: crea un archivo que se abre en Excel '
           'y te deja mandarlo por correo, Drive, OneDrive, WhatsApp, etc.\n'
+          '• Importar copia CSV: vuelve a cargar los movimientos de un '
+          'archivo que guardaste antes. Si ya tienes alguno, no lo duplica.\n'
           '• Borrar todos los datos: elimina todos tus movimientos. No se '
           'puede deshacer, así que primero guarda una copia.',
     ),

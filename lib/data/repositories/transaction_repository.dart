@@ -123,6 +123,7 @@ class TransactionRepository {
   }
 
   Future<void> add({
+    String? id,
     required String type,
     required double amount,
     required String categoryId,
@@ -133,7 +134,7 @@ class TransactionRepository {
     String? cardId,
   }) {
     return db.into(db.transactions).insert(TransactionsCompanion.insert(
-          id: _uuid.v4(),
+          id: id ?? _uuid.v4(),
           type: type,
           amount: amount,
           categoryId: categoryId,
@@ -149,6 +150,8 @@ class TransactionRepository {
   /// tarjeta". No cuenta como ingreso ni como gasto: se guardan dos filas
   /// (sale / entra) unidas por un código en `rawSmsBody` ("transfer:" más un código).
   Future<void> addTransfer({
+    String? outId,
+    String? inId,
     required String? fromCardId,
     required String? toCardId,
     required double amount,
@@ -159,7 +162,7 @@ class TransactionRepository {
     final group = _uuid.v4();
     await db.transaction(() async {
       await db.into(db.transactions).insert(TransactionsCompanion.insert(
-            id: _uuid.v4(),
+            id: outId ?? _uuid.v4(),
             type: TxType.transferOut,
             amount: amount,
             categoryId: categoryId,
@@ -170,7 +173,7 @@ class TransactionRepository {
             cardId: Value(fromCardId),
           ));
       await db.into(db.transactions).insert(TransactionsCompanion.insert(
-            id: _uuid.v4(),
+            id: inId ?? _uuid.v4(),
             type: TxType.transferIn,
             amount: amount,
             categoryId: categoryId,

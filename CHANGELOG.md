@@ -1,5 +1,8 @@
 # Cambios
 
+## 1.7.0
+- Nuevo botón "Importar copia CSV" en Ajustes para recuperar movimientos de una copia.
+
 ## 1.6.1
 - Firma estable del APK: las próximas versiones se podrán instalar encima de la anterior sin perder datos.
 
