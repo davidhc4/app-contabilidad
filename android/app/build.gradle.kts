@@ -31,11 +31,27 @@ android {
         versionName = flutter.versionName
     }
 
+    // Firma estable: si el flujo de GitHub entrega la llave, todas las versiones
+    // se firman igual y Android permite actualizar sin perder datos.
+    val keystorePath: String? = System.getenv("BOLSILLO_KEYSTORE")
+    signingConfigs {
+        create("release") {
+            if (keystorePath != null) {
+                storeFile = file(keystorePath)
+                storePassword = System.getenv("BOLSILLO_KEYSTORE_PASSWORD")
+                keyAlias = "bolsillo"
+                keyPassword = System.getenv("BOLSILLO_KEYSTORE_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = if (keystorePath != null) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
     }
 }

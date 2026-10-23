@@ -46,6 +46,20 @@ jobs:
       - name: Correr tests
         run: flutter test
 
+      - name: Preparar llave de firma
+        env:
+          KS_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KS_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+          if [ -n "$KS_BASE64" ] && [ -n "$KS_PASSWORD" ]; then
+            echo "$KS_BASE64" | base64 -d > "$RUNNER_TEMP/bolsillo.p12"
+            echo "BOLSILLO_KEYSTORE=$RUNNER_TEMP/bolsillo.p12" >> "$GITHUB_ENV"
+            echo "BOLSILLO_KEYSTORE_PASSWORD=$KS_PASSWORD" >> "$GITHUB_ENV"
+            echo "Firma estable activada"
+          else
+            echo "Sin llave propia: se firma con llave de pruebas (no permite actualizar sobre otra versión)"
+          fi
+
       - name: Compilar APK (release, sin firmar con keystore propio)
         run: flutter build apk --release
 

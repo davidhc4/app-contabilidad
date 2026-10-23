@@ -1,5 +1,8 @@
 # Cambios
 
+## 1.6.1
+- Firma estable del APK: las próximas versiones se podrán instalar encima de la anterior sin perder datos.
+
 ## 1.6.0
 - La app pasa a llamarse Bolsillo y tiene icono nuevo.
 - Se quita el envío a Google Drive y el permiso de internet.
