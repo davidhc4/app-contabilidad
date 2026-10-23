@@ -61,7 +61,13 @@ jobs:
           fi
 
       - name: Compilar APK (release, sin firmar con keystore propio)
-        run: flutter build apk --release
+        run: |
+          set +e
+          flutter build apk --release > build.txt 2>&1
+          code=$?
+          grep -iE "error|what went wrong|failed|could not|incompatible|unsupported" build.txt | head -15 | while IFS= read -r line; do echo "::error::$line"; done
+          tail -40 build.txt
+          exit $code
 
       - name: Subir APK como artefacto
         uses: actions/upload-artifact@v4
