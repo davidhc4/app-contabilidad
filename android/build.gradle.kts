@@ -35,6 +35,9 @@ subprojects {
         afterEvaluate {
             extensions.findByName("android")?.let { androidExt ->
                 if (androidExt is com.android.build.gradle.BaseExtension) {
+                    // Algunos plugins (p.ej. file_picker) compilan con un SDK menor
+                    // al que exigen sus dependencias; se unifica en 36.
+                    androidExt.compileSdkVersion(36)
                     androidExt.compileOptions {
                         sourceCompatibility = JavaVersion.VERSION_17
                         targetCompatibility = JavaVersion.VERSION_17
