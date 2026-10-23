@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
 
 /// Mini tutorial: explica con calma para qué sirve cada parte de la app.
-class TutorialScreen extends StatelessWidget {
+class TutorialScreen extends StatefulWidget {
   const TutorialScreen({super.key});
+
+  @override
+  State<TutorialScreen> createState() => _TutorialScreenState();
+}
+
+class _TutorialScreenState extends State<TutorialScreen> {
+  /// Tema abierto (solo uno a la vez).
+  int? _open = 0;
 
   static const _topics = <_Topic>[
     _Topic(
       icon: Icons.waving_hand_outlined,
       title: 'Para qué sirve esta app',
-      body: 'Es tu contabilidad personal: anotas el dinero que entra '
+      body: 'Es tu control de dinero personal: anotas el dinero que entra '
           '(ingresos) y el que sale (gastos), y la app te muestra en qué te '
           'lo gastas, cuánto te sobra cada mes y cuánto podrías ahorrar.\n\n'
           'Tus datos se guardan en tu celular. Solo salen de él cuando tú '
@@ -136,13 +144,9 @@ class TutorialScreen extends StatelessWidget {
           'Es opcional y necesita el permiso de SMS.',
     ),
     _Topic(
-      icon: Icons.cloud_upload_outlined,
-      title: 'Tus datos: Drive, CSV y borrar',
-      body: '• Enviar a Google Drive: copia todos tus movimientos a una '
-          'hoja de cálculo en tu carpeta FINANZAS de Drive. Hay que '
-          'conectarlo una sola vez con "Conectar con Google Drive". Cada '
-          'envío actualiza la hoja completa, sin duplicar filas.\n'
-          '• Compartir copia en CSV: crea un archivo que se abre en Excel '
+      icon: Icons.ios_share_rounded,
+      title: 'Tus datos: copia en CSV y borrar',
+      body: '• Compartir copia en CSV: crea un archivo que se abre en Excel '
           'y te deja mandarlo por correo, Drive, OneDrive, WhatsApp, etc.\n'
           '• Borrar todos los datos: elimina todos tus movimientos. No se '
           'puede deshacer, así que primero guarda una copia.',
@@ -165,18 +169,35 @@ class TutorialScreen extends StatelessWidget {
           ),
           for (var i = 0; i < _topics.length; i++)
             Card(
-              child: Theme(
-                data: Theme.of(context)
-                    .copyWith(dividerColor: Colors.transparent),
-                child: ExpansionTile(
-                  initiallyExpanded: i == 0,
-                  leading: Icon(_topics[i].icon),
-                  title: Text(_topics[i].title,
-                      style: const TextStyle(fontWeight: FontWeight.w600)),
-                  childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                  expandedCrossAxisAlignment: CrossAxisAlignment.start,
-                  children: [Text(_topics[i].body, style: const TextStyle(height: 1.45))],
-                ),
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: Icon(_topics[i].icon),
+                    title: Text(_topics[i].title,
+                        style: const TextStyle(fontWeight: FontWeight.w600)),
+                    trailing: AnimatedRotation(
+                      turns: _open == i ? 0.5 : 0,
+                      duration: const Duration(milliseconds: 200),
+                      child: const Icon(Icons.expand_more_rounded),
+                    ),
+                    onTap: () => setState(() => _open = _open == i ? null : i),
+                  ),
+                  AnimatedSize(
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.easeOut,
+                    alignment: Alignment.topCenter,
+                    child: _open == i
+                        ? Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: Text(_topics[i].body,
+                                  style: const TextStyle(height: 1.45)),
+                            ),
+                          )
+                        : const SizedBox(width: double.infinity),
+                  ),
+                ],
               ),
             ),
         ],

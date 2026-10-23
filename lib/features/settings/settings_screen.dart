@@ -8,8 +8,6 @@ import '../../providers/app_providers.dart';
 import '../../shared/widgets/progress_dialog.dart';
 import '../budget/budget_dialog.dart';
 import '../data_export/export_data.dart';
-import '../drive_sync/drive_sync_service.dart';
-import '../drive_sync/drive_sync_ui.dart';
 import '../help/tutorial_screen.dart';
 import '../sms_detection/sms_permission_helper.dart';
 import 'sms_senders_screen.dart';
@@ -121,36 +119,12 @@ class SettingsScreen extends ConsumerWidget {
               child: Column(
                 children: [
                   ListTile(
-                    leading: const Icon(Icons.cloud_upload_outlined),
-                    title: const Text('Enviar a Google Drive'),
-                    subtitle: const Text(
-                        'Copia todos tus movimientos a la hoja "Finanzas App" '
-                        'de tu carpeta FINANZAS en Drive. Cada envío '
-                        'actualiza la hoja completa, sin duplicar filas.'),
-                    onTap: () => syncToDrive(context, ref),
-                  ),
-                  const Divider(height: 1),
-                  ListTile(
-                    leading: const Icon(Icons.link_rounded),
-                    title: const Text('Conectar con Google Drive'),
-                    subtitle: const Text(
-                        'Se hace una sola vez y es necesario para el botón '
-                        'de arriba. Pega la dirección de tu script y la '
-                        'clave.'),
-                    onTap: () async {
-                      final current = await DriveSyncConfig.load();
-                      if (!context.mounted) return;
-                      await showDriveConfigDialog(context, current);
-                    },
-                  ),
-                  const Divider(height: 1),
-                  ListTile(
                     leading: const Icon(Icons.ios_share_rounded),
                     title: const Text('Compartir copia en CSV'),
                     subtitle: const Text(
                         'Crea un archivo CSV (se abre en Excel) y te deja '
                         'mandarlo por correo, Drive, OneDrive, WhatsApp u '
-                        'otra app.'),
+                        'otra app. Tus datos salen solo cuando tú lo decides.'),
                     onTap: () => _shareCsv(context, ref),
                   ),
                   const Divider(height: 1),

@@ -17,7 +17,7 @@ Future<bool> requestSmsPermissionWithGuidance(BuildContext context) async {
       content: const Text(
         'Por seguridad, Android bloquea este permiso para apps instaladas '
         'fuera de la Play Store, como esta. Para activarlo:\n\n'
-        '1. Ve a Ajustes del celular → Apps → App Contabilidad.\n'
+        '1. Ve a Ajustes del celular → Apps → Bolsillo.\n'
         '2. Toca el menú ⋮ (arriba a la derecha).\n'
         '3. Toca "Permitir ajustes restringidos".\n'
         '4. Vuelve aquí e inténtalo de nuevo.',

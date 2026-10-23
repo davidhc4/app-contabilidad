@@ -1,35 +1,57 @@
 <p align="center">
-  <img src="docs/icono.png" width="120" alt="Icono de Contabilidad">
+  <img src="docs/icono.png" width="112" alt="Icono de Bolsillo">
 </p>
 
-# Contabilidad
+<h1 align="center">Bolsillo</h1>
 
-App gratuita y sin anuncios para llevar tus finanzas personales desde el celular. Todo se guarda en tu teléfono: no pide cuenta, no necesita internet y no comparte tus datos.
+<p align="center">
+  Control de gastos personal para Android. Gratis, sin anuncios, sin cuentas y sin internet.
+</p>
 
-## Qué incluye
+---
 
-- **Ingresos y gastos** con categorías personalizables y descripción de cada una.
-- **Presupuesto mensual** que te muestra cuánto te sobra y cuánto podrías ahorrar en 3 meses, 6 meses, 1 año o los años que elijas.
-- **Tarjetas y cuentas** (banco, billetera, efectivo) con foto o sticker, saldo propio y movimientos por separado.
-- **Transferencias** entre tarjetas sin que cuenten como ingreso ni gasto, solo con el dinero que ya registraste.
-- **Estadísticas**: gastos por categoría, por día de la semana y por hora, tendencia mensual y mayores gastos.
-- **Accesos rápidos** desde el panel del celular para anotar un gasto o un ingreso en segundos.
-- **Copia de tus datos** en CSV para compartir o guardar donde quieras.
-- Tutorial dentro de la app y diseño suave, solo vertical.
+Bolsillo te ayuda a ver en qué se va tu dinero. Anotas lo que entra y lo que sale, defines cuánto quieres gastar al mes y la app te dice cuánto te sobra y cuánto tendrías ahorrado si lo mantienes.
 
-## Instalación
+Todo vive en tu teléfono. La app ni siquiera tiene permiso de internet, así que sus datos no pueden salir de tu celular a menos que tú los compartas.
 
-1. Entra a la sección [Releases](../../releases) y descarga el archivo `contabilidad-vX.Y.Z.apk` de la versión más reciente.
-2. Ábrelo en tu Android y permite instalar desde esa fuente si el sistema lo pide.
+## Funciones
+
+- **Ingresos y gastos** con categorías que puedes crear y editar.
+- **Presupuesto mensual** con la cuenta de lo que te sobra y una proyección de ahorro a 3 meses, 6 meses, 1 año o los años que elijas.
+- **Tarjetas y cuentas** (banco, billetera, efectivo) con su propio saldo, foto o sticker.
+- **Transferencias** entre tarjetas, solo con el dinero que ya tienes registrado. No cuentan como ingreso ni como gasto.
+- **Estadísticas**: gasto por categoría, por día de la semana y por franja horaria, y tendencia mensual.
+- **Accesos rápidos** en el panel de ajustes rápidos del celular para anotar un gasto o un ingreso.
+- **Copia de seguridad en CSV** que abres en Excel o guardas donde prefieras.
+- **Detección de pagos por SMS** (opcional): si la activas, te sugiere anotar como gasto los mensajes de tu banco.
+
+## Privacidad
+
+- Sin permiso de internet, sin rastreadores, sin publicidad y sin registro.
+- Los datos se guardan en una base de datos local y no se incluyen en las copias de seguridad automáticas de Android.
+- Los permisos de SMS y de fotos se piden solo cuando usas esas funciones, y la app funciona sin ellos.
+
+Si encuentras un problema de seguridad, lee [SECURITY.md](SECURITY.md).
+
+## Instalar
+
+1. Abre [Releases](../../releases) y descarga el archivo `bolsillo-vX.Y.Z.apk` de la versión más reciente.
+2. Ábrelo en tu Android. Si el sistema lo pide, permite instalar desde esa fuente.
+
+Como la app no se distribuye por Google Play, Android puede mostrar un aviso de app de origen desconocido. Es normal con cualquier APK descargado fuera de la tienda; el código completo está aquí para que lo revises.
 
 ## Compilar desde el código
 
-Requiere [Flutter](https://docs.flutter.dev/get-started/install).
+Necesitas [Flutter](https://docs.flutter.dev/get-started/install).
 
 ```bash
 flutter pub get
-flutter run
+flutter test
 flutter build apk --release
 ```
 
-Hecha con Flutter, Riverpod y SQLite (drift). Cada cambio en la rama principal compila el APK automáticamente con GitHub Actions.
+Está hecha con Flutter, Riverpod y SQLite (drift). El APK de cada versión se compila con GitHub Actions.
+
+## Licencia
+
+[MIT](LICENSE)

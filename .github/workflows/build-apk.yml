@@ -52,7 +52,7 @@ jobs:
       - name: Subir APK como artefacto
         uses: actions/upload-artifact@v4
         with:
-          name: app-contabilidad-apk
+          name: bolsillo-apk
           path: build/app/outputs/flutter-apk/app-release.apk
           retention-days: 30
 
@@ -62,9 +62,9 @@ jobs:
         run: |
           VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//')
           TAG="v${VERSION}"
-          cp build/app/outputs/flutter-apk/app-release.apk "contabilidad-${TAG}.apk"
+          cp build/app/outputs/flutter-apk/app-release.apk "bolsillo-${TAG}.apk"
           gh release delete "$TAG" --cleanup-tag --yes || true
-          gh release create "$TAG" "contabilidad-${TAG}.apk" \
+          gh release create "$TAG" "bolsillo-${TAG}.apk" \
             --target "$GITHUB_SHA" \
-            --title "Contabilidad ${TAG}" \
-            --notes "APK de Contabilidad personal versión ${VERSION}, compilado desde la rama ${GITHUB_REF_NAME}."
+            --title "Bolsillo ${TAG}" \
+            --notes "APK de Bolsillo versión ${VERSION}, compilado desde la rama ${GITHUB_REF_NAME}."

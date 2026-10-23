@@ -11,5 +11,5 @@ Future<void> main() async {
   await SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp]);
   await initializeDateFormatting('es');
-  runApp(const ProviderScope(child: ContabilidadApp()));
+  runApp(const ProviderScope(child: BolsilloApp()));
 }

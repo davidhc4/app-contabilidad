@@ -29,14 +29,14 @@ final _router = GoRouter(
   ],
 );
 
-class ContabilidadApp extends ConsumerStatefulWidget {
-  const ContabilidadApp({super.key});
+class BolsilloApp extends ConsumerStatefulWidget {
+  const BolsilloApp({super.key});
 
   @override
-  ConsumerState<ContabilidadApp> createState() => _ContabilidadAppState();
+  ConsumerState<BolsilloApp> createState() => _BolsilloAppState();
 }
 
-class _ContabilidadAppState extends ConsumerState<ContabilidadApp>
+class _BolsilloAppState extends ConsumerState<BolsilloApp>
     with WidgetsBindingObserver {
   SmsListenerService? _smsService;
   bool _redirectedToOnboarding = false;
@@ -125,7 +125,7 @@ class _ContabilidadAppState extends ConsumerState<ContabilidadApp>
         };
 
         return MaterialApp.router(
-          title: 'Contabilidad',
+          title: 'Bolsillo',
           debugShowCheckedModeBanner: false,
           themeMode: themeMode,
           theme: AppTheme.light,

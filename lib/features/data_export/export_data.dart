@@ -79,7 +79,7 @@ Future<({File file, int count})> createCsvFile(WidgetRef ref) async {
 Future<void> shareCsvFile(File file) {
   return Share.shareXFiles(
     [XFile(file.path, mimeType: 'text/csv')],
-    subject: 'Movimientos - Contabilidad personal',
+    subject: 'Movimientos - Bolsillo',
     text: 'Copia de mis movimientos (abre el archivo con Excel o Google Sheets).',
   );
 }
