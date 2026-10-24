@@ -1,5 +1,8 @@
 # Cambios
 
+## 1.8.1
+- Ya se puede donar con PayPal desde "Apoyar Bolsillo".
+
 ## 1.8.0
 - Pantalla "Apoyar Bolsillo" para donar de forma voluntaria; el pago se hace en la página segura del proveedor.
 

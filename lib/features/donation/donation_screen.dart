@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/donation.dart';
-import '../../core/utils/formatters.dart';
 import '../../core/utils/thousands_formatter.dart';
 
 /// Pantalla para apoyar la app con una donación voluntaria.
@@ -14,8 +13,6 @@ class DonationScreen extends StatefulWidget {
 }
 
 class _DonationScreenState extends State<DonationScreen> {
-  static const _presets = <int>[5000, 10000, 20000, 50000];
-
   final _customController = TextEditingController();
   int? _preset;
   int _linkIndex = 0;
@@ -58,6 +55,7 @@ class _DonationScreenState extends State<DonationScreen> {
     final theme = Theme.of(context);
     final links = kDonationLinks;
     final amount = _amount;
+    final link = links.isEmpty ? null : links[_linkIndex.clamp(0, links.length - 1)];
 
     return Scaffold(
       appBar: AppBar(title: const Text('Apoyar Bolsillo')),
@@ -106,7 +104,7 @@ class _DonationScreenState extends State<DonationScreen> {
             ),
           ),
           const SizedBox(height: 20),
-          if (links.isEmpty)
+          if (link == null)
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -124,9 +122,9 @@ class _DonationScreenState extends State<DonationScreen> {
               spacing: 10,
               runSpacing: 10,
               children: [
-                for (final v in _presets)
+                for (final v in link.presets)
                   ChoiceChip(
-                    label: Text(Formatters.money(v.toDouble())),
+                    label: Text('${link.currency} $v'),
                     selected: _preset == v && _customController.text.isEmpty,
                     onSelected: (_) => setState(() {
                       _preset = v;
@@ -141,9 +139,9 @@ class _DonationScreenState extends State<DonationScreen> {
               keyboardType: TextInputType.number,
               inputFormatters: const [ThousandsInputFormatter()],
               onChanged: (_) => setState(() {}),
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Otro monto',
-                prefixText: r'$ ',
+                prefixText: '${link.currency} ',
               ),
             ),
             const SizedBox(height: 20),
@@ -157,16 +155,20 @@ class _DonationScreenState extends State<DonationScreen> {
                       : Icons.radio_button_unchecked_rounded),
                   title: Text(links[i].name),
                   subtitle: Text(links[i].description),
-                  onTap: () => setState(() => _linkIndex = i),
+                  onTap: () => setState(() {
+                    _linkIndex = i;
+                    _preset = null;
+                    _customController.clear();
+                  }),
                 ),
               ),
             const SizedBox(height: 16),
             ElevatedButton.icon(
-              onPressed: () => _donate(links[_linkIndex.clamp(0, links.length - 1)]),
+              onPressed: () => _donate(link),
               icon: const Icon(Icons.favorite_rounded),
               label: Text(amount == null || amount <= 0
                   ? 'Donar'
-                  : 'Donar ${Formatters.money(amount.toDouble())}'),
+                  : 'Donar ${link.currency} $amount'),
             ),
           ],
         ],
