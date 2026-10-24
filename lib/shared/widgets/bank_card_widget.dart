@@ -8,6 +8,7 @@ import '../../data/local/database.dart';
 import '../../data/local/tables.dart';
 import '../../features/cards/account_balances.dart';
 import '../../features/cards/card_style.dart';
+import '../../features/rewards/skins.dart';
 import '../../core/utils/formatters.dart';
 
 /// Tarjeta visual de una tarjeta guardada: toma la foto/sticker que el
@@ -69,6 +70,16 @@ class BankCardView extends StatelessWidget {
     final radius = BorderRadius.circular(22);
     final photoPath = style.photoPath;
     final hasPhoto = photoPath != null && File(photoPath).existsSync();
+    final skin = skinById(style.skin);
+    if (skin != null && skin.image) {
+      return _PictureFace(
+        name: name,
+        aspectRatio: aspectRatio,
+        radius: radius,
+      );
+    }
+    final start = skin?.a ?? colorFromHex(colorStart);
+    final end = skin?.b ?? colorFromHex(colorEnd);
 
     return AspectRatio(
       aspectRatio: aspectRatio,
@@ -78,11 +89,11 @@ class BankCardView extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [colorFromHex(colorStart), colorFromHex(colorEnd)],
+            colors: [start, end],
           ),
           boxShadow: [
             BoxShadow(
-              color: colorFromHex(colorEnd).withValues(alpha: 0.35),
+              color: end.withValues(alpha: 0.35),
               blurRadius: 16,
               offset: const Offset(0, 8),
             ),
@@ -237,6 +248,71 @@ class _NetworkBadge extends StatelessWidget {
         fontWeight: FontWeight.w800,
         fontStyle: FontStyle.italic,
         fontSize: 16,
+      ),
+    );
+  }
+}
+
+/// Aspecto de imagen: una foto arriba y un texto abajo.
+class _PictureFace extends StatelessWidget {
+  final String name;
+  final double aspectRatio;
+  final BorderRadius radius;
+  const _PictureFace({
+    required this.name,
+    required this.aspectRatio,
+    required this.radius,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AspectRatio(
+      aspectRatio: aspectRatio,
+      child: ClipRRect(
+        borderRadius: radius,
+        child: ColoredBox(
+          color: Colors.black,
+          child: Column(
+            children: [
+              Expanded(
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.asset('assets/img/m.jpg', fit: BoxFit.cover),
+                    Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            shadows: [Shadow(blurRadius: 6)],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                child: Text(
+                  'como alguien pierde tiempo con esto 🥀😭',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

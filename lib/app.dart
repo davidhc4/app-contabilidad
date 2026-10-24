@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'core/platform/quick_action.dart';
 import 'core/theme/app_theme.dart';
 import 'features/onboarding/onboarding_screen.dart';
+import 'features/rewards/rewards_state.dart';
 import 'features/theme/halloween.dart';
 import 'features/theme/halloween_overlay.dart';
 import 'features/sms_detection/sms_confirm_sheet.dart';
@@ -60,6 +61,9 @@ class _BolsilloAppState extends ConsumerState<BolsilloApp>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    ref
+        .read(usageProvider.notifier)
+        .setForeground(state == AppLifecycleState.resumed);
     if (state == AppLifecycleState.resumed) _checkQuickAction();
   }
 
@@ -106,6 +110,7 @@ class _BolsilloAppState extends ConsumerState<BolsilloApp>
   Widget build(BuildContext context) {
     final settingsAsync = ref.watch(settingsStreamProvider);
     final halloween = ref.watch(halloweenProvider);
+    ref.watch(usageProvider);
 
     return settingsAsync.when(
       data: (settings) {

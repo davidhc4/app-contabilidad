@@ -36,17 +36,29 @@ class CardStyle {
   /// Dinero que ya tenía la tarjeta/cuenta antes de usar la app.
   final double? initialBalance;
 
-  const CardStyle({this.photoPath, this.sticker, this.initialBalance});
+  /// Identificador del aspecto especial elegido (ver recompensas).
+  final String? skin;
+
+  const CardStyle({
+    this.photoPath,
+    this.sticker,
+    this.initialBalance,
+    this.skin,
+  });
 
   static const empty = CardStyle();
 
   bool get isEmpty =>
-      photoPath == null && sticker == null && initialBalance == null;
+      photoPath == null &&
+      sticker == null &&
+      initialBalance == null &&
+      skin == null;
 
   CardStyle copyWith({
     String? photoPath,
     String? sticker,
     double? initialBalance,
+    String? skin,
     bool clearPhoto = false,
     bool clearSticker = false,
   }) {
@@ -54,6 +66,7 @@ class CardStyle {
       photoPath: clearPhoto ? null : (photoPath ?? this.photoPath),
       sticker: clearSticker ? null : (sticker ?? this.sticker),
       initialBalance: initialBalance ?? this.initialBalance,
+      skin: skin ?? this.skin,
     );
   }
 
@@ -61,6 +74,7 @@ class CardStyle {
         'photo': photoPath,
         'sticker': sticker,
         'initial': initialBalance,
+        'skin': skin,
       });
 
   static CardStyle fromJson(String raw) {
@@ -70,6 +84,7 @@ class CardStyle {
         photoPath: map['photo'] as String?,
         sticker: map['sticker'] as String?,
         initialBalance: (map['initial'] as num?)?.toDouble(),
+        skin: map['skin'] as String?,
       );
     } catch (_) {
       return CardStyle.empty;

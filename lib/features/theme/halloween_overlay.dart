@@ -2,8 +2,11 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../rewards/rewards_state.dart';
+import 'fx_state.dart';
 import 'halloween.dart';
 
 /// Capa que va encima de toda la app: telarañas con arañas que pasean
@@ -64,6 +67,18 @@ class _ThemeFxLayerState extends ConsumerState<ThemeFxLayer>
     });
   }
 
+  Future<void> _poke() async {
+    HapticFeedback.selectionClick();
+    final id = await fxTick();
+    if (id == null || !mounted) return;
+    final isNew = await ref.read(rewardsProvider.notifier).grant(id);
+    if (isNew && mounted) {
+      ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+        const SnackBar(content: Text('Algo cayó de la telaraña… 🕷️')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     ref.listen<ThemeSwitchEvent?>(themeSwitchEventProvider, (previous, next) {
@@ -90,20 +105,42 @@ class _ThemeFxLayerState extends ConsumerState<ThemeFxLayer>
             ),
           ),
           Positioned.fill(
-            child: IgnorePointer(
-              child: AnimatedBuilder(
-                animation: _spiders,
-                builder: (context, _) {
-                  if (!_spiders.isAnimating) return const SizedBox.shrink();
-                  return CustomPaint(
-                    painter: _SpiderPainter(
+            child: LayoutBuilder(
+              builder: (context, c) {
+                final size = Size(c.maxWidth, c.maxHeight);
+                return AnimatedBuilder(
+                  animation: _spiders,
+                  builder: (context, _) {
+                    if (!_spiders.isAnimating) return const SizedBox.shrink();
+                    final painter = _SpiderPainter(
                       t: _spiders.value,
                       scenario: _scenario,
                       topRight: _topRight,
-                    ),
-                  );
-                },
-              ),
+                    );
+                    return Stack(
+                      children: [
+                        Positioned.fill(
+                          child: IgnorePointer(
+                            child: CustomPaint(painter: painter),
+                          ),
+                        ),
+                        for (final pose in painter.poses(size))
+                          Positioned(
+                            left: pose.pos.dx - 24,
+                            top: pose.pos.dy - 24,
+                            width: 48,
+                            height: 48,
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: _poke,
+                              child: const SizedBox.expand(),
+                            ),
+                          ),
+                      ],
+                    );
+                  },
+                );
+              },
             ),
           ),
         ],
@@ -214,6 +251,8 @@ class _SpiderPainter extends CustomPainter {
     final p2 = g.at(s + dir * 0.01, off);
     return _Pose(p1, math.atan2(p2.dy - p1.dy, p2.dx - p1.dx), mood);
   }
+
+  List<_Pose> poses(Size size) => _poses(_WebGeo.of(size, topRight));
 
   List<_Pose> _poses(_WebGeo g) {
     switch (scenario) {

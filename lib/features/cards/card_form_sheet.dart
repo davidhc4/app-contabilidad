@@ -9,6 +9,8 @@ import '../../core/utils/thousands_formatter.dart';
 import '../../data/local/database.dart';
 import '../../data/local/tables.dart';
 import '../../providers/app_providers.dart';
+import '../rewards/rewards_state.dart';
+import '../rewards/skins.dart';
 import '../theme/halloween.dart';
 import '../../shared/widgets/bank_card_widget.dart';
 import 'card_style.dart';
@@ -56,6 +58,7 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
   late final _balanceController = TextEditingController();
   String? _photoPath;
   String? _sticker;
+  String? _skin;
   // Foto elegida en esta sesión que todavía no se guardó (se borra si el
   // usuario la cambia o cierra sin guardar).
   String? _pendingPhoto;
@@ -80,6 +83,7 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
       final style = ref.read(cardStylesProvider)[e.id] ?? CardStyle.empty;
       _photoPath = style.photoPath;
       _sticker = style.sticker;
+      _skin = style.skin;
       _stickerSet = kStickersHalloween.contains(style.sticker)
           ? 2
           : (kStickersHombre.contains(style.sticker) ? 1 : 0);
@@ -182,6 +186,7 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
         CardStyle(
           photoPath: _photoPath,
           sticker: _sticker,
+          skin: _skin,
           initialBalance: parseThousands(_balanceController.text)?.toDouble(),
         ),
       );
@@ -238,7 +243,7 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
               network: _network,
               colorStart: _gradient[0],
               colorEnd: _gradient[1],
-              style: CardStyle(photoPath: _photoPath, sticker: _sticker),
+              style: CardStyle(photoPath: _photoPath, sticker: _sticker, skin: _skin),
               balance: parseThousands(_balanceController.text)?.toDouble() ??
                   (widget.editing == null ? 0.0 : null),
             ),
@@ -318,6 +323,32 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
                   ),
                 );
               }).toList(),
+            ),
+            const SizedBox(height: 20),
+            Text('Aspectos especiales', style: labelStyle),
+            const SizedBox(height: 2),
+            Text(
+              'Los ganas abriendo cajas en Ajustes → Recompensas.',
+              style: hintStyle,
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: [
+                _SkinOption(
+                  skin: null,
+                  selected: _skin == null,
+                  onTap: () => setState(() => _skin = null),
+                ),
+                for (final k in [...kSkins, ...kExtraSkins])
+                  if (ref.watch(rewardsProvider).owned.contains(k.id))
+                    _SkinOption(
+                      skin: k,
+                      selected: _skin == k.id,
+                      onTap: () => setState(() => _skin = k.id),
+                    ),
+              ],
             ),
             const SizedBox(height: 20),
             Text('Foto de fondo', style: labelStyle),
@@ -454,4 +485,74 @@ class _StickerOption extends StatelessWidget {
 String _short(Object e) {
   final text = e.toString();
   return text.length > 120 ? '${text.substring(0, 120)}…' : text;
+}
+
+class _SkinOption extends StatelessWidget {
+  final Skin? skin;
+  final bool selected;
+  final VoidCallback onTap;
+  const _SkinOption({
+    required this.skin,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final k = skin;
+    return GestureDetector(
+      onTap: onTap,
+      child: SizedBox(
+        width: 84,
+        child: Column(
+          children: [
+            Container(
+              width: 84,
+              height: 46,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                gradient: k == null || k.image
+                    ? null
+                    : LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [k.a, k.b],
+                      ),
+                color: k == null
+                    ? Theme.of(context).colorScheme.surfaceContainerHighest
+                    : (k.image ? Colors.black : null),
+                border: Border.all(
+                  color: selected
+                      ? Theme.of(context).colorScheme.primary
+                      : Colors.transparent,
+                  width: 3,
+                ),
+              ),
+              child: k == null
+                  ? const Icon(Icons.block_rounded, size: 20)
+                  : (k.image
+                      ? const Icon(Icons.image_rounded, color: Colors.white70)
+                      : null),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              k?.name ?? 'Ninguno',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+            ),
+            if (k != null)
+              Text(
+                k.rarity.label,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: k.rarity.color,
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
 }

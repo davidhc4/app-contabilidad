@@ -14,6 +14,7 @@ import '../data_export/export_data.dart';
 import '../data_export/import_data.dart';
 import '../donation/donation_screen.dart';
 import '../help/tutorial_screen.dart';
+import '../rewards/rewards_screen.dart';
 import '../theme/halloween.dart';
 import '../sms_detection/sms_permission_helper.dart';
 import 'sms_senders_screen.dart';
@@ -149,6 +150,21 @@ class SettingsScreen extends ConsumerWidget {
                         'tarjetas.'),
                   ),
                 ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            Card(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              child: ListTile(
+                leading: const Icon(Icons.card_giftcard_rounded),
+                title: const Text('Recompensas'),
+                subtitle: const Text(
+                    'Gana cajas con aspectos para tus tarjetas por el tiempo '
+                    'que usas la app.'),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const RewardsScreen()),
+                ),
               ),
             ),
             const _SectionTitle('Presupuesto'),

@@ -1,5 +1,9 @@
 # Cambios
 
+## 1.10.0
+- Recompensas: cada 10 minutos dentro de la app se gana una caja con un aspecto para las tarjetas, con distintas rarezas.
+- Aspectos especiales al personalizar una tarjeta.
+
 ## 1.9.0
 - Tema de Halloween: telarañas en las esquinas, arañas que pasean, murciélagos al cambiar de tema y pegatinas nuevas.
 - Sección Apariencia en Ajustes (oscuro, claro, automático y Halloween).
