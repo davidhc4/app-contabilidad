@@ -49,6 +49,8 @@ class _BolsilloAppState extends ConsumerState<BolsilloApp>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // Empieza a contar el tiempo dentro de la app (recompensas).
+    ref.read(usageProvider);
     _initSms();
     _checkQuickAction();
   }
@@ -110,7 +112,6 @@ class _BolsilloAppState extends ConsumerState<BolsilloApp>
   Widget build(BuildContext context) {
     final settingsAsync = ref.watch(settingsStreamProvider);
     final halloween = ref.watch(halloweenProvider);
-    ref.watch(usageProvider);
 
     return settingsAsync.when(
       data: (settings) {

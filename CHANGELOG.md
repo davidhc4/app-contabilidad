@@ -1,5 +1,8 @@
 # Cambios
 
+## 1.10.1
+- Corrección interna: el contador de tiempo ya no redibuja toda la app cada segundo.
+
 ## 1.10.0
 - Recompensas: cada 10 minutos dentro de la app se gana una caja con un aspecto para las tarjetas, con distintas rarezas.
 - Aspectos especiales al personalizar una tarjeta.
