@@ -1,5 +1,8 @@
 # Cambios
 
+## 1.8.0
+- Pantalla "Apoyar Bolsillo" para donar de forma voluntaria; el pago se hace en la página segura del proveedor.
+
 ## 1.7.0
 - Nuevo botón "Importar copia CSV" en Ajustes para recuperar movimientos de una copia.
 

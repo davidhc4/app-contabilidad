@@ -12,6 +12,7 @@ import '../../shared/widgets/progress_dialog.dart';
 import '../budget/budget_dialog.dart';
 import '../data_export/export_data.dart';
 import '../data_export/import_data.dart';
+import '../donation/donation_screen.dart';
 import '../help/tutorial_screen.dart';
 import '../sms_detection/sms_permission_helper.dart';
 import 'sms_senders_screen.dart';
@@ -168,6 +169,21 @@ class SettingsScreen extends ConsumerWidget {
                   MaterialPageRoute(
                     builder: (_) => const TutorialScreen(),
                   ),
+                ),
+              ),
+            ),
+            const _SectionTitle('Apoyo'),
+            Card(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              child: ListTile(
+                leading: const Icon(Icons.favorite_border_rounded),
+                title: const Text('Apoyar Bolsillo'),
+                subtitle: const Text(
+                    'La app es gratis. Si quieres, puedes donar el monto que '
+                    'prefieras para ayudar a mejorarla.'),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const DonationScreen()),
                 ),
               ),
             ),
