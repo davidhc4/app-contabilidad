@@ -9,6 +9,7 @@ import '../../core/utils/thousands_formatter.dart';
 import '../../data/local/database.dart';
 import '../../data/local/tables.dart';
 import '../../providers/app_providers.dart';
+import '../theme/halloween.dart';
 import '../../shared/widgets/bank_card_widget.dart';
 import 'card_style.dart';
 
@@ -60,7 +61,8 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
   String? _pendingPhoto;
   bool _saved = false;
   late final CardStylesNotifier _styles;
-  bool _stickersMujer = true;
+  // 0 = mujer, 1 = hombre, 2 = Halloween
+  int _stickerSet = 0;
   bool _saving = false;
 
   List<String> _initialGradient() {
@@ -78,7 +80,9 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
       final style = ref.read(cardStylesProvider)[e.id] ?? CardStyle.empty;
       _photoPath = style.photoPath;
       _sticker = style.sticker;
-      _stickersMujer = !kStickersHombre.contains(style.sticker);
+      _stickerSet = kStickersHalloween.contains(style.sticker)
+          ? 2
+          : (kStickersHombre.contains(style.sticker) ? 1 : 0);
       final initial = style.initialBalance;
       if (initial != null && initial > 0) {
         _balanceController.text = formatThousands(initial.round().toString());
@@ -194,7 +198,13 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.editing != null;
-    final stickers = _stickersMujer ? kStickersMujer : kStickersHombre;
+    final halloween = ref.watch(halloweenProvider);
+    final set = (_stickerSet == 2 && !halloween) ? 0 : _stickerSet;
+    final stickers = switch (set) {
+      2 => kStickersHalloween,
+      1 => kStickersHombre,
+      _ => kStickersMujer,
+    };
     final labelStyle = Theme.of(context).textTheme.labelLarge;
     final hintStyle = Theme.of(context).textTheme.bodySmall;
 
@@ -350,22 +360,28 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
             const SizedBox(height: 2),
             Text('Elige una pegatina para decorar la tarjeta.', style: hintStyle),
             const SizedBox(height: 8),
-            SegmentedButton<bool>(
-              segments: const [
-                ButtonSegment(
-                  value: true,
+            SegmentedButton<int>(
+              showSelectedIcon: false,
+              segments: [
+                const ButtonSegment(
+                  value: 0,
                   label: Text('Mujer'),
                   icon: Icon(Icons.female_rounded),
                 ),
-                ButtonSegment(
-                  value: false,
+                const ButtonSegment(
+                  value: 1,
                   label: Text('Hombre'),
                   icon: Icon(Icons.male_rounded),
                 ),
+                if (halloween)
+                  const ButtonSegment(
+                    value: 2,
+                    label: Text('Halloween'),
+                    icon: Icon(Icons.pest_control_rounded),
+                  ),
               ],
-              selected: {_stickersMujer},
-              onSelectionChanged: (s) =>
-                  setState(() => _stickersMujer = s.first),
+              selected: {set},
+              onSelectionChanged: (s) => setState(() => _stickerSet = s.first),
             ),
             const SizedBox(height: 12),
             Wrap(

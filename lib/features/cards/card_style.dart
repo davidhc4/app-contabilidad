@@ -21,6 +21,11 @@ const kStickersHombre = <String>[
   '🐺', '🎮', '🦅', '🌵', '🎸', '🏀', '💎', '🦈',
 ];
 
+const kStickersHalloween = <String>[
+  '🎃', '👻', '🦇', '🕷️', '🕸️', '💀', '🧙', '🍬', //
+  '🧛', '🧟', '🌙', '🔮', '🪦', '🍭', '😈', '🐈‍⬛',
+];
+
 /// Decoración opcional de una tarjeta: una foto del celular de fondo y/o un
 /// sticker encima. Se guarda aparte de la base de datos (en preferencias)
 /// para no tener que cambiar el esquema de la base de datos.

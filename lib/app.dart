@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'core/platform/quick_action.dart';
 import 'core/theme/app_theme.dart';
 import 'features/onboarding/onboarding_screen.dart';
+import 'features/theme/halloween.dart';
+import 'features/theme/halloween_overlay.dart';
 import 'features/sms_detection/sms_confirm_sheet.dart';
 import 'features/sms_detection/sms_listener_service.dart';
 import 'features/transactions/transaction_form_sheet.dart';
@@ -103,6 +105,7 @@ class _BolsilloAppState extends ConsumerState<BolsilloApp>
   @override
   Widget build(BuildContext context) {
     final settingsAsync = ref.watch(settingsStreamProvider);
+    final halloween = ref.watch(halloweenProvider);
 
     return settingsAsync.when(
       data: (settings) {
@@ -127,10 +130,12 @@ class _BolsilloAppState extends ConsumerState<BolsilloApp>
         return MaterialApp.router(
           title: 'Bolsillo',
           debugShowCheckedModeBanner: false,
-          themeMode: themeMode,
+          themeMode: halloween ? ThemeMode.dark : themeMode,
           theme: AppTheme.light,
-          darkTheme: AppTheme.dark,
+          darkTheme: halloween ? AppTheme.halloween : AppTheme.dark,
           routerConfig: _router,
+          builder: (context, child) =>
+              ThemeFxLayer(child: child ?? const SizedBox.shrink()),
         );
       },
       loading: () => const MaterialApp(

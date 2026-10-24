@@ -14,6 +14,7 @@ import '../data_export/export_data.dart';
 import '../data_export/import_data.dart';
 import '../donation/donation_screen.dart';
 import '../help/tutorial_screen.dart';
+import '../theme/halloween.dart';
 import '../sms_detection/sms_permission_helper.dart';
 import 'sms_senders_screen.dart';
 
@@ -96,6 +97,56 @@ class SettingsScreen extends ConsumerWidget {
                         builder: (_) => const SmsSendersScreen(),
                       ),
                     ),
+                  ),
+                ],
+              ),
+            ),
+            const _SectionTitle('Apariencia'),
+            Card(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+                    child: SegmentedButton<String>(
+                      showSelectedIcon: false,
+                      segments: const [
+                        ButtonSegment(value: 'dark', label: Text('Oscuro')),
+                        ButtonSegment(value: 'light', label: Text('Claro')),
+                        ButtonSegment(value: 'system', label: Text('Automático')),
+                      ],
+                      selected: {settings.themeMode},
+                      onSelectionChanged: (v) => ref
+                          .read(settingsRepositoryProvider)
+                          .setThemeMode(v.first),
+                    ),
+                  ),
+                  const Divider(height: 1),
+                  SwitchListTile(
+                    value: ref.watch(halloweenProvider),
+                    onChanged: (v) =>
+                        ref.read(halloweenProvider.notifier).set(v),
+                    secondary: const Icon(Icons.pest_control_rounded),
+                    title: ShaderMask(
+                      shaderCallback: (rect) => const LinearGradient(
+                        colors: [
+                          Color(0xFFFFE27A),
+                          Color(0xFFFFB300),
+                          Color(0xFFFFF1B8),
+                        ],
+                      ).createShader(rect),
+                      child: const Text(
+                        'Halloween ✨',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    subtitle: const Text(
+                        'Edición especial: telarañas, arañas que pasean, '
+                        'murciélagos y pegatinas de Halloween para tus '
+                        'tarjetas.'),
                   ),
                 ],
               ),

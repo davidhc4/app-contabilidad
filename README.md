@@ -5,7 +5,8 @@
 <h1 align="center">Bolsillo</h1>
 
 <p align="center">
-  Control de gastos personal para Android. Gratis, sin anuncios, sin cuentas y sin internet.
+  Control de gastos personal para Android.<br>
+  Gratis, <b>código abierto</b>, sin anuncios, sin cuentas y sin internet.
 </p>
 
 ---
@@ -13,6 +14,10 @@
 Bolsillo te ayuda a ver en qué se va tu dinero. Anotas lo que entra y lo que sale, defines cuánto quieres gastar al mes y la app te dice cuánto te sobra y cuánto tendrías ahorrado si lo mantienes.
 
 Todo vive en tu teléfono. La app ni siquiera tiene permiso de internet, así que sus datos no pueden salir de tu celular a menos que tú los compartas.
+
+## Código abierto
+
+Bolsillo es software libre bajo la licencia [MIT](LICENSE): puedes leer todo el código, usarlo, modificarlo y compartirlo. Si encuentras un error o tienes una idea, abre un issue o un pull request. Si la app te sirve y quieres ayudar a mantenerla, dentro de Ajustes hay una opción para apoyar con una donación voluntaria; la app funciona igual sin donar.
 
 ## Funciones
 
@@ -23,6 +28,7 @@ Todo vive en tu teléfono. La app ni siquiera tiene permiso de internet, así qu
 - **Estadísticas**: gasto por categoría, por día de la semana y por franja horaria, y tendencia mensual.
 - **Accesos rápidos** en el panel de ajustes rápidos del celular para anotar un gasto o un ingreso.
 - **Copia de seguridad en CSV** que abres en Excel o guardas donde prefieras.
+- **Tema de Halloween** (edición especial) con telarañas, arañas animadas y pegatinas.
 - **Detección de pagos por SMS** (opcional): si la activas, te sugiere anotar como gasto los mensajes de tu banco.
 
 ## Privacidad

@@ -1,5 +1,10 @@
 # Cambios
 
+## 1.9.0
+- Tema de Halloween: telarañas en las esquinas, arañas que pasean, murciélagos al cambiar de tema y pegatinas nuevas.
+- Sección Apariencia en Ajustes (oscuro, claro, automático y Halloween).
+- Ventana de apoyo al abrir la app, con opción de cerrarla.
+
 ## 1.8.1
 - Ya se puede donar con PayPal desde "Apoyar Bolsillo".
 

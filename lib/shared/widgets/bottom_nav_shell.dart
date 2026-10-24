@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../core/donation.dart';
+import '../../core/storage/local_store.dart';
+import '../../features/donation/donation_screen.dart';
 import '../../features/cards/cards_screen.dart';
 import '../../features/categories/categories_screen.dart';
 import '../../features/dashboard/dashboard_screen.dart';
@@ -20,6 +23,62 @@ class MainTabShell extends StatefulWidget {
 class _MainTabShellState extends State<MainTabShell> {
   final _pageController = PageController();
   int _index = 0;
+
+  // La ventana de apoyo sale una vez cada vez que se abre la app.
+  static bool _donationShown = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeAskForSupport());
+  }
+
+  Future<void> _maybeAskForSupport() async {
+    if (_donationShown || kDonationLinks.isEmpty) return;
+    _donationShown = true;
+    final hidden = await LocalStore.getString('apoyo_oculto');
+    if (hidden == '1' || !mounted) return;
+    final goDonate = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Row(
+          children: [
+            const Expanded(child: Text('Apoya Bolsillo')),
+            IconButton(
+              tooltip: 'Cerrar',
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              icon: const Icon(Icons.close_rounded),
+            ),
+          ],
+        ),
+        content: const Text(
+          'Bolsillo es una aplicación de código abierto. ¿Nos darías una '
+          'palmada en la espalda con una pequeña donación? Cualquier monto '
+          'ayuda y la app sigue siendo gratis.',
+        ),
+        actionsAlignment: MainAxisAlignment.spaceBetween,
+        actions: [
+          TextButton(
+            onPressed: () async {
+              await LocalStore.setString('apoyo_oculto', '1');
+              if (dialogContext.mounted) Navigator.of(dialogContext).pop(false);
+            },
+            child: const Text('No volver a mostrar'),
+          ),
+          FilledButton.icon(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            icon: const Icon(Icons.favorite_rounded),
+            label: const Text('Apoyar'),
+          ),
+        ],
+      ),
+    );
+    if (goDonate == true && mounted) {
+      await Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const DonationScreen()),
+      );
+    }
+  }
 
   // Cada pestaña conserva su estado (búsqueda, scroll) al deslizar.
   static const _screens = [
