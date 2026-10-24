@@ -8,6 +8,11 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../core/storage/local_store.dart';
 
+/// Colores de fondo con los que empiezan las tarjetas nuevas (grafito). El
+/// color y los efectos especiales vienen de los aspectos que se ganan.
+const kCardStart = 'FF2C2F3B';
+const kCardEnd = 'FF15171D';
+
 /// Stickers disponibles para decorar una tarjeta. Son emojis, así que no
 /// dependen de ninguna imagen con derechos de autor y se ven en cualquier
 /// celular.

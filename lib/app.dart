@@ -5,7 +5,9 @@ import 'package:go_router/go_router.dart';
 import 'core/platform/quick_action.dart';
 import 'core/theme/app_theme.dart';
 import 'features/onboarding/onboarding_screen.dart';
+import 'features/profile/profile_screen.dart';
 import 'features/rewards/rewards_state.dart';
+import 'features/rewards/skin_reminder.dart';
 import 'features/theme/halloween.dart';
 import 'features/theme/halloween_overlay.dart';
 import 'features/sms_detection/sms_confirm_sheet.dart';
@@ -16,6 +18,7 @@ import 'providers/app_providers.dart';
 import 'shared/widgets/bottom_nav_shell.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
+final _messengerKey = GlobalKey<ScaffoldMessengerState>();
 
 final _router = GoRouter(
   navigatorKey: navigatorKey,
@@ -66,7 +69,41 @@ class _BolsilloAppState extends ConsumerState<BolsilloApp>
     ref
         .read(usageProvider.notifier)
         .setForeground(state == AppLifecycleState.resumed);
-    if (state == AppLifecycleState.resumed) _checkQuickAction();
+    if (state == AppLifecycleState.resumed) {
+      SkinReminder.cancel();
+      _checkQuickAction();
+    } else if (state == AppLifecycleState.paused) {
+      // Si hay aspectos sin estrenar, deja programado un recordatorio.
+      SkinReminder.schedule([
+        for (final s in ref.read(unusedSkinsProvider)) s.name,
+      ]);
+    }
+  }
+
+  /// Aviso dentro de la app (aspecto nuevo, caja ganada…).
+  Future<void> _showNotice(String text) async {
+    for (var i = 0; i < 10; i++) {
+      final messenger = _messengerKey.currentState;
+      if (messenger != null) {
+        messenger
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              content: Text(text),
+              duration: const Duration(seconds: 6),
+              action: SnackBarAction(
+                label: 'Ver',
+                onPressed: () => navigatorKey.currentState?.push(
+                  MaterialPageRoute<void>(builder: (_) => const ProfileScreen()),
+                ),
+              ),
+            ),
+          );
+        return;
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+      if (!mounted) return;
+    }
   }
 
   /// Si el usuario tocó "Agregar gasto/ingreso" en el panel de ajustes
@@ -112,6 +149,9 @@ class _BolsilloAppState extends ConsumerState<BolsilloApp>
   Widget build(BuildContext context) {
     final settingsAsync = ref.watch(settingsStreamProvider);
     final halloween = ref.watch(halloweenProvider);
+    ref.listen<Notice?>(noticeProvider, (previous, next) {
+      if (next != null) _showNotice(next.text);
+    });
 
     return settingsAsync.when(
       data: (settings) {
@@ -135,6 +175,7 @@ class _BolsilloAppState extends ConsumerState<BolsilloApp>
 
         return MaterialApp.router(
           title: 'Bolsillo',
+          scaffoldMessengerKey: _messengerKey,
           debugShowCheckedModeBanner: false,
           themeMode: halloween ? ThemeMode.dark : themeMode,
           theme: AppTheme.light,

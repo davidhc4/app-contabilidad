@@ -4,12 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../core/platform/gallery_permission.dart';
-import '../../core/utils/icon_map.dart';
 import '../../core/utils/thousands_formatter.dart';
 import '../../data/local/database.dart';
 import '../../data/local/tables.dart';
 import '../../providers/app_providers.dart';
 import '../rewards/rewards_state.dart';
+import '../rewards/skin_widgets.dart';
 import '../rewards/skins.dart';
 import '../theme/halloween.dart';
 import '../../shared/widgets/bank_card_widget.dart';
@@ -25,19 +25,6 @@ Future<void> showCardFormSheet(BuildContext context, {CardItem? editing}) {
     builder: (_) => CardFormSheet(editing: editing),
   );
 }
-
-/// Paleta de gradientes predefinidos para elegir, al estilo de la paleta de
-/// colores de categorías.
-const _gradients = <List<String>>[
-  ['FF0A84FF', 'FF64D2FF'], // azul
-  ['FF30D158', 'FF63E6E2'], // verde
-  ['FFBF5AF2', 'FFFF375F'], // morado-rosa
-  ['FFFF9F0A', 'FFFF453A'], // naranja-rojo
-  ['FF1C1C1E', 'FF636366'], // negro/gris (estilo Nu)
-  ['FFFFD60A', 'FF30D158'], // amarillo-verde (estilo Lemon)
-  ['FFFF6FB5', 'FFFFB3D9'], // rosado pastel
-  ['FF3A7BD5', 'FF3A6073'], // azul oscuro
-];
 
 class CardFormSheet extends ConsumerStatefulWidget {
   final CardItem? editing;
@@ -59,6 +46,7 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
   String? _photoPath;
   String? _sticker;
   String? _skin;
+  String? _startSkin;
   // Foto elegida en esta sesión que todavía no se guardó (se borra si el
   // usuario la cambia o cierra sin guardar).
   String? _pendingPhoto;
@@ -70,7 +58,7 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
 
   List<String> _initialGradient() {
     final e = widget.editing;
-    if (e == null) return _gradients.first;
+    if (e == null) return [kCardStart, kCardEnd];
     return [e.colorStart, e.colorEnd];
   }
 
@@ -84,6 +72,7 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
       _photoPath = style.photoPath;
       _sticker = style.sticker;
       _skin = style.skin;
+      _startSkin = style.skin;
       _stickerSet = kStickersHalloween.contains(style.sticker)
           ? 2
           : (kStickersHombre.contains(style.sticker) ? 1 : 0);
@@ -191,6 +180,10 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
         ),
       );
       _saved = true;
+      final applied = _skin;
+      if (applied != null && applied != _startSkin && mounted) {
+        ref.read(skinStatsProvider.notifier).noteApplied(applied);
+      }
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
       messenger.showSnackBar(
@@ -202,6 +195,11 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final owned = ref.watch(rewardsProvider).owned;
+    final ownedSkins = [
+      for (final k in [...kSkins, ...kExtraSkins])
+        if (owned.contains(k.id)) k,
+    ];
     final isEditing = widget.editing != null;
     final halloween = ref.watch(halloweenProvider);
     final set = (_stickerSet == 2 && !halloween) ? 0 : _stickerSet;
@@ -297,59 +295,37 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
               onSelectionChanged: (s) => setState(() => _network = s.first),
             ),
             const SizedBox(height: 16),
-            Text('Color de fondo', style: labelStyle),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: _gradients.map((g) {
-                final selected = g[0] == _gradient[0] && g[1] == _gradient[1];
-                return GestureDetector(
-                  onTap: () => setState(() => _gradient = g),
-                  child: Container(
-                    width: 44,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [colorFromHex(g[0]), colorFromHex(g[1])],
-                      ),
-                      border: selected
-                          ? Border.all(color: Colors.white, width: 3)
-                          : null,
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 20),
             Text('Aspectos especiales', style: labelStyle),
             const SizedBox(height: 2),
             Text(
-              'Los ganas abriendo cajas en Ajustes → Recompensas.',
+              ownedSkins.isEmpty
+                  ? 'Todavía no tienes ninguno. Los ganas con las cajas que '
+                      'llegan por usar la app (Perfil → Inventario).'
+                  : 'Los ganas abriendo cajas. Toca uno para ponerlo.',
               style: hintStyle,
             ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: [
-                _SkinOption(
-                  skin: null,
-                  selected: _skin == null,
-                  onTap: () => setState(() => _skin = null),
-                ),
-                for (final k in [...kSkins, ...kExtraSkins])
-                  if (ref.watch(rewardsProvider).owned.contains(k.id))
-                    _SkinOption(
-                      skin: k,
-                      selected: _skin == k.id,
-                      onTap: () => setState(() => _skin = k.id),
+            if (ownedSkins.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 130,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    _SkinChoice(
+                      selected: _skin == null,
+                      onTap: () => setState(() => _skin = null),
+                      child: const _NoSkinTile(),
                     ),
-              ],
-            ),
+                    for (final k in ownedSkins)
+                      _SkinChoice(
+                        selected: _skin == k.id,
+                        onTap: () => setState(() => _skin = k.id),
+                        child: SkinTile(skin: k, width: 132),
+                      ),
+                  ],
+                ),
+              ),
+            ],
             const SizedBox(height: 20),
             Text('Foto de fondo', style: labelStyle),
             const SizedBox(height: 2),
@@ -487,71 +463,62 @@ String _short(Object e) {
   return text.length > 120 ? '${text.substring(0, 120)}…' : text;
 }
 
-class _SkinOption extends StatelessWidget {
-  final Skin? skin;
+/// Marco que resalta el aspecto elegido.
+class _SkinChoice extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
-  const _SkinOption({
-    required this.skin,
+  final Widget child;
+  const _SkinChoice({
     required this.selected,
     required this.onTap,
+    required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
-    final k = skin;
-    return GestureDetector(
-      onTap: onTap,
-      child: SizedBox(
-        width: 84,
-        child: Column(
-          children: [
-            Container(
-              width: 84,
-              height: 46,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                gradient: k == null || k.image
-                    ? null
-                    : LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [k.a, k.b],
-                      ),
-                color: k == null
-                    ? Theme.of(context).colorScheme.surfaceContainerHighest
-                    : (k.image ? Colors.black : null),
-                border: Border.all(
-                  color: selected
-                      ? Theme.of(context).colorScheme.primary
-                      : Colors.transparent,
-                  width: 3,
-                ),
-              ),
-              child: k == null
-                  ? const Icon(Icons.block_rounded, size: 20)
-                  : (k.image
-                      ? const Icon(Icons.image_rounded, color: Colors.white70)
-                      : null),
+    return Padding(
+      padding: const EdgeInsets.only(right: 10),
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          padding: const EdgeInsets.all(3),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: selected
+                  ? Theme.of(context).colorScheme.primary
+                  : Colors.transparent,
+              width: 3,
             ),
-            const SizedBox(height: 4),
-            Text(
-              k?.name ?? 'Ninguno',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
-            ),
-            if (k != null)
-              Text(
-                k.rarity.label,
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w700,
-                  color: k.rarity.color,
-                ),
-              ),
-          ],
+          ),
+          child: IgnorePointer(child: child),
         ),
+      ),
+    );
+  }
+}
+
+class _NoSkinTile extends StatelessWidget {
+  const _NoSkinTile();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 132,
+      height: 112,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+      ),
+      child: const Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.block_rounded, size: 26),
+          SizedBox(height: 6),
+          Text('Ninguno',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+        ],
       ),
     );
   }

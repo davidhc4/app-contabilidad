@@ -1,5 +1,16 @@
 # Cambios
 
+## 1.11.0
+- Perfil arriba a la izquierda en Resumen: foto, nombre y un inventario con las cajas acumuladas.
+- Las cajas ahora se acumulan: llegan a los 5 minutos de uso y luego a los 10, 20, 40, 80 y cada 100. El contador avanza en vivo.
+- Aspectos nuevos por rareza: halo (luz detrás de la tarjeta), brillo (tarjeta entera) y grafitis, de memes simples a neón que parpadea. El color se elige al ganarlos, ya no hay selector de color de fondo.
+- Aspectos especiales animados de Halloween: telaraña y murciélago.
+- Vista previa de todos los aspectos en Recompensas.
+- Aviso dentro de la app cuando ganas una caja o un aspecto, y un recordatorio local si nunca estrenas un aspecto.
+- La app registra cuántas veces y cuánto tiempo usas cada aspecto (solo en tu teléfono).
+- Halloween: las arañas entran desde fuera de la pantalla y el fondo lleva siluetas de calaveras, murciélagos, zombis y vampiros.
+- Ajustes: una sola sección de Apariencia.
+
 ## 1.10.1
 - Corrección interna: el contador de tiempo ya no redibuja toda la app cada segundo.
 

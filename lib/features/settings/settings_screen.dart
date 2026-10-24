@@ -17,6 +17,7 @@ import '../help/tutorial_screen.dart';
 import '../rewards/rewards_screen.dart';
 import '../theme/halloween.dart';
 import '../sms_detection/sms_permission_helper.dart';
+import '../profile/profile_screen.dart';
 import 'sms_senders_screen.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -32,76 +33,6 @@ class SettingsScreen extends ConsumerWidget {
         data: (settings) => ListView(
           padding: const EdgeInsets.symmetric(vertical: 16),
           children: [
-            const _SectionTitle('Apariencia'),
-            Card(
-              margin: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                children: [
-                  RadioListTile<String>(
-                    title: const Text('Oscuro'),
-                    value: 'dark',
-                    groupValue: settings.themeMode,
-                    onChanged: (v) => ref
-                        .read(settingsRepositoryProvider)
-                        .setThemeMode(v!),
-                  ),
-                  const Divider(height: 1),
-                  RadioListTile<String>(
-                    title: const Text('Claro'),
-                    value: 'light',
-                    groupValue: settings.themeMode,
-                    onChanged: (v) => ref
-                        .read(settingsRepositoryProvider)
-                        .setThemeMode(v!),
-                  ),
-                  const Divider(height: 1),
-                  RadioListTile<String>(
-                    title: const Text('Automático (sistema)'),
-                    value: 'system',
-                    groupValue: settings.themeMode,
-                    onChanged: (v) => ref
-                        .read(settingsRepositoryProvider)
-                        .setThemeMode(v!),
-                  ),
-                ],
-              ),
-            ),
-            const _SectionTitle('Detección de pagos por SMS'),
-            Card(
-              margin: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                children: [
-                  SwitchListTile(
-                    title: const Text('Detectar pagos automáticamente'),
-                    subtitle: const Text(
-                        'Al llegar un SMS de tu banco, te preguntamos si quieres añadir el gasto'),
-                    value: settings.smsDetectionEnabled,
-                    onChanged: (v) async {
-                      if (v) {
-                        final granted =
-                            await requestSmsPermissionWithGuidance(context);
-                        if (!granted) return;
-                      }
-                      ref
-                          .read(settingsRepositoryProvider)
-                          .setSmsDetectionEnabled(v);
-                    },
-                  ),
-                  const Divider(height: 1),
-                  ListTile(
-                    title: const Text('Bancos monitoreados'),
-                    subtitle: const Text(
-                        'Opcional: mejora la detección para un banco en particular'),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const SmsSendersScreen(),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
             const _SectionTitle('Apariencia'),
             Card(
               margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -155,16 +86,67 @@ class SettingsScreen extends ConsumerWidget {
             const SizedBox(height: 12),
             Card(
               margin: const EdgeInsets.symmetric(horizontal: 20),
-              child: ListTile(
-                leading: const Icon(Icons.card_giftcard_rounded),
-                title: const Text('Recompensas'),
-                subtitle: const Text(
-                    'Gana cajas con aspectos para tus tarjetas por el tiempo '
-                    'que usas la app.'),
-                trailing: const Icon(Icons.chevron_right_rounded),
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const RewardsScreen()),
-                ),
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.person_rounded),
+                    title: const Text('Perfil e inventario'),
+                    subtitle: const Text(
+                        'Tu foto, tu nombre y las cajas que has acumulado.'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const ProfileScreen()),
+                    ),
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.card_giftcard_rounded),
+                    title: const Text('Recompensas'),
+                    subtitle: const Text(
+                        'Gana cajas con aspectos para tus tarjetas por el '
+                        'tiempo que usas la app.'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const RewardsScreen()),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const _SectionTitle('Detección de pagos por SMS'),
+            Card(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                children: [
+                  SwitchListTile(
+                    title: const Text('Detectar pagos automáticamente'),
+                    subtitle: const Text(
+                        'Al llegar un SMS de tu banco, te preguntamos si quieres añadir el gasto'),
+                    value: settings.smsDetectionEnabled,
+                    onChanged: (v) async {
+                      if (v) {
+                        final granted =
+                            await requestSmsPermissionWithGuidance(context);
+                        if (!granted) return;
+                      }
+                      ref
+                          .read(settingsRepositoryProvider)
+                          .setSmsDetectionEnabled(v);
+                    },
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    title: const Text('Bancos monitoreados'),
+                    subtitle: const Text(
+                        'Opcional: mejora la detección para un banco en particular'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const SmsSendersScreen(),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             const _SectionTitle('Presupuesto'),

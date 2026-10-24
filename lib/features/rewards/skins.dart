@@ -30,60 +30,214 @@ extension RarityInfo on Rarity {
         Rarity.legendario => 0.5,
         Rarity.unico => 0,
       };
+
+  /// Qué tan fuerte es el efecto del aspecto, de 0 a 1.
+  double get intensity => switch (this) {
+        Rarity.comun => 0.22,
+        Rarity.pocoComun => 0.42,
+        Rarity.raro => 0.62,
+        Rarity.epico => 0.82,
+        Rarity.legendario => 1.0,
+        Rarity.unico => 1.0,
+      };
 }
 
-/// Aspecto (fondo especial) para las tarjetas.
+/// Tipos de aspecto.
+enum SkinFamily {
+  /// Luz que sale por detrás de la tarjeta.
+  halo,
+
+  /// La tarjeta entera brilla.
+  brillo,
+
+  /// Dibujos prediseñados pegados sobre la tarjeta.
+  grafiti,
+
+  /// Especiales de Halloween (no salen en cajas).
+  telarana,
+  murcielago,
+  imagen,
+}
+
+extension SkinFamilyInfo on SkinFamily {
+  String get label => switch (this) {
+        SkinFamily.halo => 'Halo',
+        SkinFamily.brillo => 'Brillo',
+        SkinFamily.grafiti => 'Grafiti',
+        SkinFamily.telarana => 'Telaraña',
+        SkinFamily.murcielago => 'Murciélago',
+        SkinFamily.imagen => 'Imagen',
+      };
+
+  String get description => switch (this) {
+        SkinFamily.halo => 'Una luz sale por detrás de la tarjeta. Cuanto más '
+            'rara, más fuerte y más fluida.',
+        SkinFamily.brillo => 'La tarjeta entera brilla, desde un resplandor '
+            'suave hasta una luz intensa.',
+        SkinFamily.grafiti => 'Diseños pegados sobre la tarjeta: de memes '
+            'simples a neón que se enciende y se apaga.',
+        SkinFamily.telarana => 'Fondo naranja con una telaraña que cambia '
+            'entre negro y blanco.',
+        SkinFamily.murcielago => 'Fondo naranja con un murciélago que cambia '
+            'entre negro y blanco.',
+        SkinFamily.imagen => 'Una imagen en lugar de un color.',
+      };
+}
+
+/// Colores que pueden tener los aspectos de las cajas.
+class FxColor {
+  final String id;
+  final String name;
+  final Color color;
+  const FxColor(this.id, this.name, this.color);
+}
+
+const kFxColors = <FxColor>[
+  FxColor('amarillo', 'Amarillo', Color(0xFFFFD60A)),
+  FxColor('verde', 'Verde', Color(0xFF30D158)),
+  FxColor('azul', 'Azul', Color(0xFF0A84FF)),
+  FxColor('rojo', 'Rojo', Color(0xFFFF453A)),
+  FxColor('morado', 'Morado', Color(0xFFBF5AF2)),
+  FxColor('naranja', 'Naranja', Color(0xFFFF9F0A)),
+  FxColor('rosa', 'Rosa', Color(0xFFFF6FB5)),
+  FxColor('turquesa', 'Turquesa', Color(0xFF40E0D0)),
+];
+
+/// Diseño de un grafiti. Cada rareza tiene sus propios diseños.
+class GrafitiDesign {
+  final String id;
+  final String name;
+  final Rarity rarity;
+  const GrafitiDesign(this.id, this.name, this.rarity);
+}
+
+const kGrafitiDesigns = <GrafitiDesign>[
+  // Comunes: simples y medio shitpost.
+  GrafitiDesign('xd', 'XD', Rarity.comun),
+  GrafitiDesign('sus', 'Sospechoso', Rarity.comun),
+  GrafitiDesign('idea', 'Ni idea', Rarity.comun),
+  // Poco comunes: formas sencillas.
+  GrafitiDesign('estrellas', 'Estrellas', Rarity.pocoComun),
+  GrafitiDesign('zigzag', 'Zigzag', Rarity.pocoComun),
+  GrafitiDesign('lunares', 'Lunares', Rarity.pocoComun),
+  // Raros: diseños serios y trabajados.
+  GrafitiDesign('ondas', 'Ondas', Rarity.raro),
+  GrafitiDesign('montes', 'Montañas', Rarity.raro),
+  GrafitiDesign('geo', 'Geométrico', Rarity.raro),
+  // Épicos: neón con partes rotas que parpadean.
+  GrafitiDesign('rayo_roto', 'Rayo roto', Rarity.epico),
+  GrafitiDesign('corona_rota', 'Corona rota', Rarity.epico),
+  GrafitiDesign('luna_rota', 'Luna rota', Rarity.epico),
+  // Legendarios: neón completo.
+  GrafitiDesign('rayo', 'Rayo neón', Rarity.legendario),
+  GrafitiDesign('corona', 'Corona neón', Rarity.legendario),
+  GrafitiDesign('luna', 'Luna neón', Rarity.legendario),
+];
+
+/// Aspecto para las tarjetas.
 class Skin {
   final String id;
   final String name;
   final Rarity rarity;
-  final Color a;
-  final Color b;
+  final SkinFamily family;
+  final Color color;
+  final String colorName;
+  final String? design;
 
-  /// Si es verdadero, la tarjeta muestra una imagen en vez de un degradado.
-  final bool image;
+  const Skin({
+    required this.id,
+    required this.name,
+    required this.rarity,
+    required this.family,
+    required this.color,
+    this.colorName = '',
+    this.design,
+  });
 
-  const Skin(this.id, this.name, this.rarity, this.a, this.b,
-      {this.image = false});
+  /// Los especiales no salen en cajas.
+  bool get special => rarity == Rarity.unico;
 }
 
-/// Aspecto con el que empieza todo el mundo.
-const kStartSkinId = 'ceniza';
+const _boxRarities = [
+  Rarity.comun,
+  Rarity.pocoComun,
+  Rarity.raro,
+  Rarity.epico,
+  Rarity.legendario,
+];
+
+List<Skin> _buildCatalog() {
+  final list = <Skin>[];
+  for (final family in [SkinFamily.halo, SkinFamily.brillo]) {
+    for (final rarity in _boxRarities) {
+      for (final c in kFxColors) {
+        list.add(Skin(
+          id: '${family.name}:${c.id}:${rarity.name}',
+          name: '${family.label} ${c.name.toLowerCase()}',
+          rarity: rarity,
+          family: family,
+          color: c.color,
+          colorName: c.name,
+        ));
+      }
+    }
+  }
+  for (final d in kGrafitiDesigns) {
+    for (final c in kFxColors) {
+      list.add(Skin(
+        id: 'graf:${d.id}:${c.id}',
+        name: '${d.name} ${c.name.toLowerCase()}',
+        rarity: d.rarity,
+        family: SkinFamily.grafiti,
+        color: c.color,
+        colorName: c.name,
+        design: d.id,
+      ));
+    }
+  }
+  return list;
+}
 
 /// Aspectos que pueden salir en las cajas.
-const kSkins = <Skin>[
-  Skin('ceniza', 'Gris Ceniza', Rarity.comun, Color(0xFF8E8E93), Color(0xFF636366)),
-  Skin('niebla', 'Azul Niebla', Rarity.comun, Color(0xFF7FA6D9), Color(0xFF4F6D9A)),
-  Skin('menta', 'Verde Menta', Rarity.comun, Color(0xFF7ED6B0), Color(0xFF3E9E7C)),
-  Skin('arena', 'Arena', Rarity.comun, Color(0xFFD9C3A0), Color(0xFFA58B64)),
-  Skin('coral', 'Coral', Rarity.pocoComun, Color(0xFFFF8A7A), Color(0xFFE5534B)),
-  Skin('lavanda', 'Lavanda', Rarity.pocoComun, Color(0xFFB79CED), Color(0xFF7B5EC2)),
-  Skin('turquesa', 'Turquesa', Rarity.pocoComun, Color(0xFF2EC4B6), Color(0xFF1B8A82)),
-  Skin('atardecer', 'Atardecer', Rarity.raro, Color(0xFFFF9966), Color(0xFFFF5E62)),
-  Skin('oceano', 'Océano Profundo', Rarity.raro, Color(0xFF2193B0), Color(0xFF0B3D91)),
-  Skin('bosque', 'Bosque Nocturno', Rarity.raro, Color(0xFF134E5E), Color(0xFF71B280)),
-  Skin('aurora', 'Aurora', Rarity.epico, Color(0xFF00C9FF), Color(0xFF92FE9D)),
-  Skin('galaxia', 'Galaxia', Rarity.epico, Color(0xFF4B1D8F), Color(0xFFE040FB)),
-  Skin('rubi', 'Rubí', Rarity.epico, Color(0xFF7F0020), Color(0xFFFF4D6D)),
-  Skin('oro', 'Oro Líquido', Rarity.legendario, Color(0xFFF7971E), Color(0xFFFFD200)),
-  Skin('neon', 'Neón Cósmico', Rarity.legendario, Color(0xFFFF00CC), Color(0xFF333399)),
-];
+final List<Skin> kSkins = _buildCatalog();
 
 /// Aspectos que no salen en las cajas.
 const kExtraSkins = <Skin>[
-  Skin('x1', 'Hilo de Seda', Rarity.unico, Color(0xFF1A1A22), Color(0xFF6B6B7A)),
-  Skin('x2', 'Veneno', Rarity.unico, Color(0xFF39FF14), Color(0xFF1B0B3B)),
-  Skin('x3', 'Sin título', Rarity.unico, Color(0xFF000000), Color(0xFF000000),
-      image: true),
+  Skin(
+    id: 'x1',
+    name: 'Hilo de Seda',
+    rarity: Rarity.unico,
+    family: SkinFamily.telarana,
+    color: Color(0xFFFF7A18),
+  ),
+  Skin(
+    id: 'x2',
+    name: 'Murciélago',
+    rarity: Rarity.unico,
+    family: SkinFamily.murcielago,
+    color: Color(0xFFFF7A18),
+  ),
+  Skin(
+    id: 'x3',
+    name: 'Sin título',
+    rarity: Rarity.unico,
+    family: SkinFamily.imagen,
+    color: Color(0xFF000000),
+  ),
 ];
 
-Skin? skinById(String? id) {
-  if (id == null) return null;
-  for (final s in kSkins) {
-    if (s.id == id) return s;
-  }
-  for (final s in kExtraSkins) {
-    if (s.id == id) return s;
-  }
-  return null;
-}
+final Map<String, Skin> _byId = {
+  for (final s in kSkins) s.id: s,
+  for (final s in kExtraSkins) s.id: s,
+};
+
+Skin? skinById(String? id) => id == null ? null : _byId[id];
+
+/// Aspectos de una familia en una rareza (para las vistas previas).
+List<Skin> skinsOf(SkinFamily family, {Rarity? rarity, String? colorId}) => [
+      for (final s in kSkins)
+        if (s.family == family &&
+            (rarity == null || s.rarity == rarity) &&
+            (colorId == null || s.id.contains(':$colorId')))
+          s,
+    ];

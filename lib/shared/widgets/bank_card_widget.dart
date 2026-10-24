@@ -8,6 +8,7 @@ import '../../data/local/database.dart';
 import '../../data/local/tables.dart';
 import '../../features/cards/account_balances.dart';
 import '../../features/cards/card_style.dart';
+import '../../features/rewards/skin_fx.dart';
 import '../../features/rewards/skins.dart';
 import '../../core/utils/formatters.dart';
 
@@ -53,6 +54,9 @@ class BankCardView extends StatelessWidget {
   /// Saldo a mostrar en la tarjeta (null = no mostrar).
   final double? balance;
 
+  /// Si es falso, los aspectos se muestran quietos (listas largas).
+  final bool animate;
+
   const BankCardView({
     super.key,
     required this.name,
@@ -63,6 +67,7 @@ class BankCardView extends StatelessWidget {
     this.style = CardStyle.empty,
     this.aspectRatio = 1.6,
     this.balance,
+    this.animate = true,
   });
 
   @override
@@ -71,15 +76,51 @@ class BankCardView extends StatelessWidget {
     final photoPath = style.photoPath;
     final hasPhoto = photoPath != null && File(photoPath).existsSync();
     final skin = skinById(style.skin);
-    if (skin != null && skin.image) {
+    if (skin != null && skin.family == SkinFamily.imagen) {
       return _PictureFace(
         name: name,
         aspectRatio: aspectRatio,
         radius: radius,
       );
     }
-    final start = skin?.a ?? colorFromHex(colorStart);
-    final end = skin?.b ?? colorFromHex(colorEnd);
+    final baseStart = colorFromHex(colorStart);
+    final baseEnd = colorFromHex(colorEnd);
+
+    return SkinFx(
+      skin: skin,
+      animate: animate,
+      radius: radius,
+      baseStart: baseStart,
+      baseEnd: baseEnd,
+      builder: (context, frame) => _face(
+        context,
+        frame,
+        radius,
+        baseStart,
+        baseEnd,
+        hasPhoto ? photoPath : null,
+      ),
+    );
+  }
+
+  Widget _face(
+    BuildContext context,
+    SkinFrame frame,
+    BorderRadius radius,
+    Color baseStart,
+    Color baseEnd,
+    String? photoPath,
+  ) {
+    final colors = frame.gradient ?? [baseStart, baseEnd];
+    final shadows = frame.shadows.isNotEmpty
+        ? frame.shadows
+        : [
+            BoxShadow(
+              color: baseEnd.withValues(alpha: 0.35),
+              blurRadius: 16,
+              offset: const Offset(0, 8),
+            ),
+          ];
 
     return AspectRatio(
       aspectRatio: aspectRatio,
@@ -89,22 +130,16 @@ class BankCardView extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [start, end],
+            colors: colors,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: end.withValues(alpha: 0.35),
-              blurRadius: 16,
-              offset: const Offset(0, 8),
-            ),
-          ],
+          boxShadow: shadows,
         ),
         child: ClipRRect(
           borderRadius: radius,
           child: Stack(
             fit: StackFit.expand,
             children: [
-              if (hasPhoto) ...[
+              if (photoPath != null) ...[
                 Image.file(
                   File(photoPath),
                   fit: BoxFit.cover,
@@ -122,6 +157,8 @@ class BankCardView extends StatelessWidget {
                   ),
                 ),
               ],
+              if (frame.underlay != null) frame.underlay!,
+              if (frame.overlay != null) frame.overlay!,
               if (style.sticker != null)
                 Align(
                   alignment: Alignment.centerRight,

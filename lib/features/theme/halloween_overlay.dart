@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../rewards/rewards_state.dart';
 import 'fx_state.dart';
 import 'halloween.dart';
+import 'silhouettes.dart';
 
 /// Capa que va encima de toda la app: telarañas con arañas que pasean
 /// (solo con el tema de Halloween) y murciélagos al cambiar de tema.
@@ -71,12 +72,8 @@ class _ThemeFxLayerState extends ConsumerState<ThemeFxLayer>
     HapticFeedback.selectionClick();
     final id = await fxTick();
     if (id == null || !mounted) return;
-    final isNew = await ref.read(rewardsProvider.notifier).grant(id);
-    if (isNew && mounted) {
-      ScaffoldMessenger.maybeOf(context)?.showSnackBar(
-        const SnackBar(content: Text('Algo cayó de la telaraña… 🕷️')),
-      );
-    }
+    // El aviso de "aspecto nuevo" sale solo desde las recompensas.
+    await ref.read(rewardsProvider.notifier).grant(id);
   }
 
   @override
@@ -94,6 +91,13 @@ class _ThemeFxLayerState extends ConsumerState<ThemeFxLayer>
       children: [
         widget.child,
         if (halloween) ...[
+          Positioned.fill(
+            child: IgnorePointer(
+              child: RepaintBoundary(
+                child: CustomPaint(painter: _SilhouettesPainter()),
+              ),
+            ),
+          ),
           Positioned.fill(
             child: IgnorePointer(
               child: CustomPaint(painter: _WebPainter(topRight: true)),
@@ -162,6 +166,44 @@ class _ThemeFxLayerState extends ConsumerState<ThemeFxLayer>
   }
 }
 
+/// Fondo del tema: siluetas apagadas de calaveras, murciélagos, zombis y
+/// vampiros repartidas por toda la pantalla (muy tenues para no estorbar).
+class _SilhouettesPainter extends CustomPainter {
+  static const _shapes = [kSkull, kBat, kZombie, kVampire, kBat, kZombie];
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rng = math.Random(31);
+    final paint = Paint()..color = const Color(0xFFBDB0D8).withValues(alpha: 0.06);
+    const rowHeight = 118.0;
+    const colWidth = 104.0;
+    var index = 0;
+    for (var row = 0; row * rowHeight < size.height + rowHeight; row++) {
+      final shift = row.isOdd ? colWidth / 2 : 0.0;
+      for (var col = -1; col * colWidth < size.width + colWidth; col++) {
+        final shape = _shapes[(index++ + row) % _shapes.length];
+        final scale = 0.62 + rng.nextDouble() * 0.38;
+        final box = (shape == kBat ? 52.0 : 62.0) * scale;
+        final center = Offset(
+          col * colWidth + shift + rng.nextDouble() * 22,
+          row * rowHeight + rng.nextDouble() * 22,
+        );
+        canvas.save();
+        canvas.translate(center.dx, center.dy);
+        canvas.rotate((rng.nextDouble() - 0.5) * 0.7);
+        canvas.drawPath(
+          shape.path(Rect.fromCenter(center: Offset.zero, width: box, height: box)),
+          paint,
+        );
+        canvas.restore();
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _SilhouettesPainter oldDelegate) => false;
+}
+
 /// Geometría de una telaraña en una esquina: el centro, el arco por el que
 /// caminan las arañas y su radio.
 class _WebGeo {
@@ -173,8 +215,8 @@ class _WebGeo {
 
   factory _WebGeo.of(Size size, bool topRight) {
     return topRight
-        ? _WebGeo(Offset(size.width, 0), math.pi * 0.97, math.pi * 0.53, 105)
-        : _WebGeo(Offset(0, size.height), -math.pi * 0.03, -math.pi * 0.47, 105);
+        ? _WebGeo(Offset(size.width, 0), math.pi * 1.14, math.pi * 0.40, 105)
+        : _WebGeo(Offset(0, size.height), math.pi * 0.10, -math.pi * 0.60, 105);
   }
 
   Offset at(double s, double off) {

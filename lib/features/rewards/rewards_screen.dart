@@ -4,13 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'rewards_state.dart';
+import 'skin_widgets.dart';
 import 'skins.dart';
 
 const _tile = 104.0;
 const _winIndex = 38;
 
-/// Recompensas: cuanto más tiempo pasas en la app, más cajas ganas. Cada
-/// caja da un aspecto al azar para tus tarjetas.
+/// Recompensas: cuanto más tiempo pasas en la app, más cajas ganas. Las cajas
+/// se acumulan y cada una da un aspecto al azar para tus tarjetas.
 class RewardsScreen extends ConsumerStatefulWidget {
   const RewardsScreen({super.key});
 
@@ -23,6 +24,15 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen> {
   final _rng = math.Random();
   late List<Skin> _strip = List.generate(30, (_) => pickSkin(_rng));
   bool _spinning = false;
+  String _previewColor = 'azul';
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) ref.read(rewardsProvider.notifier).markAllSeen();
+    });
+  }
 
   @override
   void dispose() {
@@ -30,14 +40,9 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen> {
     super.dispose();
   }
 
-  int _available(int seconds, int opened) =>
-      seconds ~/ kSecondsPerBox - opened;
-
   Future<void> _open() async {
     if (_spinning) return;
-    final seconds = ref.read(usageProvider);
-    final rewards = ref.read(rewardsProvider);
-    if (_available(seconds, rewards.boxesOpened) <= 0) return;
+    if (ref.read(availableBoxesProvider) <= 0) return;
 
     setState(() => _spinning = true);
     await ref.read(rewardsProvider.notifier).useBox();
@@ -63,7 +68,9 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen> {
         curve: Curves.easeOutQuart,
       );
     }
-    final isNew = await ref.read(rewardsProvider.notifier).grant(winner.id);
+    final isNew =
+        await ref.read(rewardsProvider.notifier).grant(winner.id, announce: false);
+    if (isNew) await ref.read(rewardsProvider.notifier).markAllSeen();
     if (!mounted) return;
     setState(() => _spinning = false);
     await showDialog<void>(
@@ -73,8 +80,20 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _SkinTile(skin: winner, width: 140),
-            const SizedBox(height: 12),
+            SkinPreview(skin: winner, width: 240),
+            const SizedBox(height: 10),
+            Text(
+              winner.name,
+              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
+            ),
+            Text(
+              '${winner.family.label} · ${winner.rarity.label}',
+              style: TextStyle(
+                fontWeight: FontWeight.w800,
+                color: winner.rarity.color,
+              ),
+            ),
+            const SizedBox(height: 10),
             Text(
               isNew
                   ? 'Nuevo aspecto para tus tarjetas. Lo eliges al '
@@ -94,18 +113,22 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen> {
     );
   }
 
+  String _clock(int seconds) {
+    final m = seconds ~/ 60;
+    final s = seconds % 60;
+    return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final progress = ref.watch(boxProgressProvider);
     final seconds = ref.watch(usageProvider);
+    final available = ref.watch(availableBoxesProvider);
     final rewards = ref.watch(rewardsProvider);
-    final available = _available(seconds, rewards.boxesOpened);
-    final intoBox = (seconds % kSecondsPerBox) / kSecondsPerBox;
-    final minutes = seconds ~/ 60;
+    final stats = ref.watch(skinStatsProvider);
     final owned = [
-      for (final s in kSkins)
-        if (rewards.owned.contains(s.id)) s,
-      for (final s in kExtraSkins)
+      for (final s in [...kSkins, ...kExtraSkins])
         if (rewards.owned.contains(s.id)) s,
     ];
     final rarities = <Rarity>[
@@ -113,6 +136,31 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen> {
         if (r.weight > 0) r,
     ];
     final totalWeight = rarities.fold<double>(0, (a, r) => a + r.weight);
+    final nextMinutes = progress.interval ~/ 60;
+
+    Widget skinRow(List<Skin> skins) => SizedBox(
+          height: 130,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: skins.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 10),
+            itemBuilder: (context, i) {
+              final skin = skins[i];
+              final has = rewards.owned.contains(skin.id);
+              return SkinTile(
+                skin: skin,
+                width: 132,
+                owned: has,
+                onTap: () => showSkinDetails(
+                  context,
+                  skin,
+                  owned: has,
+                  stat: stats[skin.id],
+                ),
+              );
+            },
+          ),
+        );
 
     return Scaffold(
       appBar: AppBar(title: const Text('Recompensas')),
@@ -125,27 +173,49 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Tiempo en la app: $minutes min',
-                      style: theme.textTheme.titleMedium
-                          ?.copyWith(fontWeight: FontWeight.w700)),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Cada 10 minutos dentro de la app ganas una caja con un '
-                    'aspecto para tus tarjetas. Los minutos se acumulan, '
-                    'aunque entres solo un momento.',
-                    style: theme.textTheme.bodySmall,
+                  Row(
+                    children: [
+                      const Icon(Icons.inventory_2_rounded),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          available == 1
+                              ? '1 caja sin abrir'
+                              : '$available cajas sin abrir',
+                          style: theme.textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w800),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 12),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: LinearProgressIndicator(value: intoBox, minHeight: 10),
+                    child: LinearProgressIndicator(
+                      value: progress.fraction,
+                      minHeight: 10,
+                    ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Próxima caja en ${_clock(progress.remaining)}',
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                      Text(
+                        '$nextMinutes min en total',
+                        style: theme.textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
                   Text(
-                    available > 0
-                        ? 'Cajas disponibles: $available'
-                        : 'Te falta ${((1 - intoBox) * kSecondsPerBox / 60).ceil()} min para la próxima caja',
-                    style: const TextStyle(fontWeight: FontWeight.w600),
+                    'Tiempo en la app: ${formatSeconds(seconds)}. Ganas cajas '
+                    'a los 5 minutos y luego a los 10, 20, 40, 80 y después '
+                    'cada 100. Se acumulan hasta que las abras.',
+                    style: theme.textTheme.bodySmall,
                   ),
                 ],
               ),
@@ -165,7 +235,11 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen> {
                   itemCount: _strip.length,
                   itemBuilder: (context, i) => Padding(
                     padding: const EdgeInsets.all(4),
-                    child: _SkinTile(skin: _strip[i], width: _tile - 8),
+                    child: SkinTile(
+                      skin: _strip[i],
+                      width: _tile - 8,
+                      animate: false,
+                    ),
                   ),
                 ),
                 IgnorePointer(
@@ -204,75 +278,79 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen> {
                 ),
             ],
           ),
-          const SizedBox(height: 20),
-          Text('Tus aspectos (${owned.length})',
-              style: theme.textTheme.titleSmall),
-          const SizedBox(height: 8),
+          const SizedBox(height: 24),
+          Text('Todos los aspectos', style: theme.textTheme.titleMedium),
+          const SizedBox(height: 2),
+          Text(
+            'Mira cómo se ve cada uno. Los que tienen candado todavía no los '
+            'has ganado.',
+            style: theme.textTheme.bodySmall,
+          ),
+          const SizedBox(height: 12),
           Wrap(
             spacing: 10,
             runSpacing: 10,
             children: [
-              for (final s in owned) _SkinTile(skin: s, width: 100),
+              for (final c in kFxColors)
+                GestureDetector(
+                  onTap: () => setState(() => _previewColor = c.id),
+                  child: Container(
+                    width: 34,
+                    height: 34,
+                    decoration: BoxDecoration(
+                      color: c.color,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: _previewColor == c.id
+                            ? Colors.white
+                            : Colors.transparent,
+                        width: 3,
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SkinTile extends StatelessWidget {
-  final Skin skin;
-  final double width;
-  const _SkinTile({required this.skin, required this.width});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      padding: const EdgeInsets.all(6),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: skin.rarity.color, width: 2),
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            height: 44,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              color: skin.image ? Colors.black : null,
-              gradient: skin.image
-                  ? null
-                  : LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [skin.a, skin.b],
+          const SizedBox(height: 14),
+          Text('Halo · luz detrás de la tarjeta',
+              style: theme.textTheme.titleSmall),
+          const SizedBox(height: 8),
+          skinRow(skinsOf(SkinFamily.halo, colorId: _previewColor)),
+          const SizedBox(height: 16),
+          Text('Brillo · la tarjeta entera', style: theme.textTheme.titleSmall),
+          const SizedBox(height: 8),
+          skinRow(skinsOf(SkinFamily.brillo, colorId: _previewColor)),
+          const SizedBox(height: 16),
+          Text('Grafitis · de memes a neón', style: theme.textTheme.titleSmall),
+          const SizedBox(height: 8),
+          skinRow(skinsOf(SkinFamily.grafiti, colorId: _previewColor)),
+          const SizedBox(height: 24),
+          Text('Tus aspectos (${owned.length})',
+              style: theme.textTheme.titleMedium),
+          const SizedBox(height: 8),
+          if (owned.isEmpty)
+            Text(
+              'Todavía no tienes ninguno. Abre tu primera caja para empezar.',
+              style: theme.textTheme.bodySmall,
+            )
+          else
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: [
+                for (final s in owned)
+                  SkinTile(
+                    skin: s,
+                    width: 132,
+                    onTap: () => showSkinDetails(
+                      context,
+                      s,
+                      owned: true,
+                      stat: stats[s.id],
                     ),
+                  ),
+              ],
             ),
-            child: skin.image
-                ? const Center(
-                    child: Icon(Icons.image_rounded, color: Colors.white70),
-                  )
-                : null,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            skin.name,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
-          ),
-          Text(
-            skin.rarity.label,
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w800,
-              color: skin.rarity.color,
-            ),
-          ),
         ],
       ),
     );

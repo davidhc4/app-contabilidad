@@ -11,6 +11,8 @@ import '../../providers/app_providers.dart';
 import '../../shared/widgets/soft_fab.dart';
 import '../budget/budget_dialog.dart';
 import '../cards/transfer_sheet.dart';
+import '../profile/profile_screen.dart';
+import '../profile/profile_state.dart';
 import '../savings/savings_section.dart';
 import '../transactions/transaction_form_sheet.dart';
 
@@ -29,7 +31,8 @@ class DashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Resumen'),
+        titleSpacing: 16,
+        title: const _ProfileButton(),
         actions: [
           IconButton(
             tooltip: 'Mes anterior',
@@ -499,6 +502,48 @@ class _AddMenuFab extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Arriba a la izquierda: la foto y el nombre de tu perfil. Al tocarlo se
+/// abre el perfil con tu inventario.
+class _ProfileButton extends ConsumerWidget {
+  const _ProfileButton();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final name = ref.watch(profileProvider).name;
+    return InkWell(
+      borderRadius: BorderRadius.circular(24),
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const ProfileScreen()),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const ProfileAvatar(size: 36, badge: true),
+          const SizedBox(width: 10),
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  name.isEmpty ? 'Mi perfil' : name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
+                ),
+                Text(
+                  'Resumen',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
