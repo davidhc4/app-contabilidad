@@ -40,7 +40,7 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
   late final _digitsController =
       TextEditingController(text: widget.editing?.lastFourDigits ?? '');
   late String _network = widget.editing?.network ?? CardNetwork.visa;
-  late List<String> _gradient = _initialGradient();
+  late final List<String> _gradient = _initialGradient();
 
   late final _balanceController = TextEditingController();
   String? _photoPath;
