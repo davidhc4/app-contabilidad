@@ -36,6 +36,12 @@ class _ThemeFxLayerState extends ConsumerState<ThemeFxLayer>
   bool _topRight = true;
   bool _batsUp = true;
 
+  // Las telarañas y siluetas se desvanecen al apagar el tema, así que siguen
+  // en pantalla un momento después de desactivarlo.
+  bool _fxShown = false;
+  bool _fxVisible = false;
+  Timer? _fxHide;
+
   @override
   void initState() {
     super.initState();
@@ -45,6 +51,7 @@ class _ThemeFxLayerState extends ConsumerState<ThemeFxLayer>
   @override
   void dispose() {
     _timer?.cancel();
+    _fxHide?.cancel();
     _bats.dispose();
     _spiders.dispose();
     super.dispose();
@@ -84,13 +91,38 @@ class _ThemeFxLayerState extends ConsumerState<ThemeFxLayer>
       _bats.forward(from: 0);
     });
     final halloween = ref.watch(halloweenProvider);
+    if (halloween) {
+      _fxHide?.cancel();
+      _fxShown = true;
+      if (!_fxVisible) {
+        // Entra en el siguiente cuadro para que se vea el desvanecimiento.
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && ref.read(halloweenProvider)) {
+            setState(() => _fxVisible = true);
+          }
+        });
+      }
+    } else if (_fxShown && !(_fxHide?.isActive ?? false)) {
+      _fxVisible = false;
+      _fxHide = Timer(const Duration(milliseconds: 900), () {
+        if (mounted) setState(() => _fxShown = false);
+      });
+    }
 
     return Stack(
       textDirection: TextDirection.ltr,
       fit: StackFit.expand,
       children: [
         widget.child,
-        if (halloween) ...[
+        if (_fxShown)
+          Positioned.fill(
+            child: AnimatedOpacity(
+              opacity: _fxVisible ? 1 : 0,
+              duration: const Duration(milliseconds: 800),
+              curve: Curves.easeInOut,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
           Positioned.fill(
             child: IgnorePointer(
               child: RepaintBoundary(
@@ -108,6 +140,11 @@ class _ThemeFxLayerState extends ConsumerState<ThemeFxLayer>
               child: CustomPaint(painter: _WebPainter(topRight: false)),
             ),
           ),
+                ],
+              ),
+            ),
+          ),
+        if (halloween) ...[
           Positioned.fill(
             child: LayoutBuilder(
               builder: (context, c) {

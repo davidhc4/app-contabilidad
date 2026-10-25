@@ -1,5 +1,8 @@
 # Cambios
 
+## 1.11.1
+- Las telarañas y siluetas de Halloween aparecen y desaparecen con un desvanecimiento suave.
+
 ## 1.11.0
 - Perfil arriba a la izquierda en Resumen: foto, nombre y un inventario con las cajas acumuladas.
 - Las cajas ahora se acumulan: llegan a los 5 minutos de uso y luego a los 10, 20, 40, 80 y cada 100. El contador avanza en vivo.
