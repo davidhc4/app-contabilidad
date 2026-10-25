@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'rewards_state.dart';
@@ -25,10 +26,60 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen> {
   late List<Skin> _strip = List.generate(30, (_) => pickSkin(_rng));
   bool _spinning = false;
   String _previewColor = 'azul';
+  int _lastTick = -1;
+  double _flash = 0;
+  Color _flashColor = Colors.white;
+
+  /// Un "clic" (sonido y vibración) cada vez que una casilla pasa por la
+  /// línea, como en las cajas de los juegos.
+  void _onScroll() {
+    if (!_spinning || !_controller.hasClients) return;
+    final index =
+        ((_controller.offset + _controller.position.viewportDimension / 2) /
+                _tile)
+            .floor();
+    if (index != _lastTick) {
+      _lastTick = index;
+      HapticFeedback.selectionClick();
+      SystemSound.play(SystemSoundType.click);
+    }
+  }
+
+  Duration _spinTime(Rarity r) => switch (r) {
+        Rarity.comun || Rarity.pocoComun => const Duration(seconds: 5),
+        Rarity.raro => const Duration(milliseconds: 6200),
+        Rarity.epico => const Duration(seconds: 7),
+        _ => const Duration(seconds: 9),
+      };
+
+  /// Destello de pantalla y vibración según la rareza del premio.
+  Future<void> _finale(Rarity r) async {
+    if (r == Rarity.comun || r == Rarity.pocoComun) {
+      HapticFeedback.lightImpact();
+      return;
+    }
+    setState(() {
+      _flashColor = r.color;
+      _flash = 1;
+    });
+    await Future<void>.delayed(const Duration(milliseconds: 80));
+    if (mounted) setState(() => _flash = 0);
+    final hits = switch (r) {
+      Rarity.raro => 1,
+      Rarity.epico => 2,
+      _ => 5,
+    };
+    for (var i = 0; i < hits; i++) {
+      HapticFeedback.heavyImpact();
+      SystemSound.play(SystemSoundType.alert);
+      await Future<void>.delayed(const Duration(milliseconds: 140));
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+    _controller.addListener(_onScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) ref.read(rewardsProvider.notifier).markAllSeen();
     });
@@ -44,6 +95,7 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen> {
     if (_spinning) return;
     if (ref.read(availableBoxesProvider) <= 0) return;
 
+    _lastTick = -1;
     setState(() => _spinning = true);
     await ref.read(rewardsProvider.notifier).useBox();
     final winner = pickSkin(_rng);
@@ -64,7 +116,7 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen> {
           (_rng.nextDouble() - 0.5) * _tile * 0.6;
       await _controller.animateTo(
         target,
-        duration: const Duration(seconds: 5),
+        duration: _spinTime(winner.rarity),
         curve: Curves.easeOutQuart,
       );
     }
@@ -73,6 +125,8 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen> {
     if (isNew) await ref.read(rewardsProvider.notifier).markAllSeen();
     if (!mounted) return;
     setState(() => _spinning = false);
+    await _finale(winner.rarity);
+    if (!mounted) return;
     await showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -80,8 +134,31 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SkinPreview(skin: winner, width: 240),
-            const SizedBox(height: 10),
+            TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0.6, end: 1),
+              duration: const Duration(milliseconds: 650),
+              curve: Curves.elasticOut,
+              builder: (context, scale, child) => Transform.scale(
+                scale: scale,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(22),
+                    boxShadow: [
+                      BoxShadow(
+                        color: winner.rarity.color.withValues(
+                          alpha: 0.25 + 0.5 * winner.rarity.intensity,
+                        ),
+                        blurRadius: 12 + 34 * winner.rarity.intensity,
+                        spreadRadius: 2 + 6 * winner.rarity.intensity,
+                      ),
+                    ],
+                  ),
+                  child: child,
+                ),
+              ),
+              child: SkinPreview(skin: winner, width: 240),
+            ),
+            const SizedBox(height: 14),
             Text(
               winner.name,
               style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
@@ -128,7 +205,7 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen> {
     final rewards = ref.watch(rewardsProvider);
     final stats = ref.watch(skinStatsProvider);
     final owned = [
-      for (final s in [...kSkins, ...kExtraSkins])
+      for (final s in kAllSkins)
         if (rewards.owned.contains(s.id)) s,
     ];
     final rarities = <Rarity>[
@@ -164,7 +241,37 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Recompensas')),
-      body: ListView(
+      body: Stack(
+        children: [
+          Positioned.fill(child: _content(theme, progress, seconds, available, rewards, stats, owned, rarities, totalWeight, nextMinutes, skinRow)),
+          Positioned.fill(
+            child: IgnorePointer(
+              child: AnimatedOpacity(
+                opacity: _flash,
+                duration: Duration(milliseconds: _flash > 0 ? 40 : 700),
+                child: ColoredBox(color: _flashColor.withValues(alpha: 0.55)),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _content(
+    ThemeData theme,
+    BoxProgress progress,
+    int seconds,
+    int available,
+    RewardsState rewards,
+    Map<String, SkinStat> stats,
+    List<Skin> owned,
+    List<Rarity> rarities,
+    double totalWeight,
+    int nextMinutes,
+    Widget Function(List<Skin>) skinRow,
+  ) {
+    return ListView(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
         children: [
           Card(
@@ -325,7 +432,7 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen> {
           const SizedBox(height: 8),
           skinRow(skinsOf(SkinFamily.grafiti, colorId: _previewColor)),
           const SizedBox(height: 24),
-          Text('Tus aspectos (${owned.length})',
+          Text('Tus aspectos (${owned.length}/${kAllSkins.length})',
               style: theme.textTheme.titleMedium),
           const SizedBox(height: 8),
           if (owned.isEmpty)
@@ -352,7 +459,6 @@ class _RewardsScreenState extends ConsumerState<RewardsScreen> {
               ],
             ),
         ],
-      ),
     );
   }
 }

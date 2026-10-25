@@ -1,14 +1,20 @@
 import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../core/platform/gallery_permission.dart';
 import '../rewards/rewards_screen.dart';
 import '../rewards/rewards_state.dart';
 import '../rewards/skin_widgets.dart';
 import '../rewards/skins.dart';
+import 'friends.dart';
 import 'profile_state.dart';
 
 /// Foto (o inicial) del perfil. Con [badge] muestra un puntito si hay cajas
@@ -127,6 +133,65 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
   }
 
+  final _shotKey = GlobalKey();
+
+  /// Convierte la parte de arriba del perfil en una imagen y abre el menú de
+  /// compartir (WhatsApp, Instagram, etc.).
+  Future<void> _shareProfile() async {
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final boundary =
+          _shotKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      final image = await boundary.toImage(pixelRatio: 3);
+      final data = await image.toByteData(format: ui.ImageByteFormat.png);
+      if (data == null) return;
+      final dir = await getTemporaryDirectory();
+      final file = File(p.join(dir.path, 'mi_perfil_bolsillo.png'));
+      await file.writeAsBytes(data.buffer.asUint8List(), flush: true);
+      await Share.shareXFiles(
+        [XFile(file.path, mimeType: 'image/png')],
+        text: 'Mi colección en Bolsillo, la app de gastos gratis y de código abierto.',
+      );
+    } catch (_) {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('No se pudo crear la imagen')),
+      );
+    }
+  }
+
+  Future<void> _redeem() async {
+    final controller = TextEditingController();
+    final code = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Canjear código'),
+        content: TextField(
+          controller: controller,
+          minLines: 2,
+          maxLines: 4,
+          decoration: const InputDecoration(
+            hintText: 'Pega aquí tu código de aspecto único (BLS.…)',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(controller.text),
+            child: const Text('Canjear'),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (code == null || !mounted) return;
+    final message = await ref.read(rewardsProvider.notifier).redeem(code);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
+
   Future<void> _editTexts() async {
     final profile = ref.read(profileProvider);
     final name = TextEditingController(text: profile.name);
@@ -188,7 +253,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final stats = ref.watch(skinStatsProvider);
     final unused = ref.watch(unusedSkinsProvider);
     final owned = [
-      for (final s in [...kSkins, ...kExtraSkins])
+      for (final s in kAllSkins)
         if (rewards.owned.contains(s.id)) s,
     ];
     final fresh = rewards.owned.difference(rewards.seen);
@@ -219,6 +284,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
         children: [
+          RepaintBoundary(
+            key: _shotKey,
+            child: ColoredBox(
+              color: theme.scaffoldBackgroundColor,
+              child: Column(
+                children: [
           Center(
             child: Stack(
               children: [
@@ -246,13 +317,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ],
             ),
           ),
-          if (profile.photoPath != null)
-            Center(
-              child: TextButton(
-                onPressed: () => ref.read(profileProvider.notifier).clearPhoto(),
-                child: const Text('Quitar foto'),
-              ),
-            ),
           const SizedBox(height: 8),
           InkWell(
             borderRadius: BorderRadius.circular(12),
@@ -298,6 +362,78 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               stat(Icons.auto_awesome_outlined, '${owned.length}', 'Aspectos'),
             ],
           ),
+          const SizedBox(height: 14),
+          Card(
+            margin: EdgeInsets.zero,
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Colección',
+                          style: TextStyle(fontWeight: FontWeight.w800)),
+                      Text(
+                        '${owned.length}/${kAllSkins.length}',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w800, fontSize: 18),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: LinearProgressIndicator(
+                      value: owned.length / kAllSkins.length,
+                      minHeight: 10,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    owned.length == kAllSkins.length
+                        ? '¡Los tienes todos!'
+                        : 'Te faltan ${kAllSkins.length - owned.length} aspectos.',
+                    style: theme.textTheme.bodySmall,
+                  ),
+                ],
+              ),
+            ),
+          ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: _shareProfile,
+                  icon: const Icon(Icons.ios_share_rounded),
+                  label: const Text('Compartir perfil'),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const FriendsScreen()),
+                  ),
+                  icon: const Icon(Icons.leaderboard_rounded),
+                  label: const Text('Amigos'),
+                ),
+              ),
+            ],
+          ),
+          if (profile.photoPath != null)
+            Center(
+              child: TextButton(
+                onPressed: () => ref.read(profileProvider.notifier).clearPhoto(),
+                child: const Text('Quitar foto'),
+              ),
+            ),
           const SizedBox(height: 24),
           Text('Inventario',
               style: theme.textTheme.titleLarge
@@ -399,9 +535,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
           ],
           const SizedBox(height: 20),
-          Text('Tus aspectos (${owned.length})',
-              style: theme.textTheme.titleMedium
-                  ?.copyWith(fontWeight: FontWeight.w700)),
+          Row(
+            children: [
+              Expanded(
+                child: Text('Tus aspectos (${owned.length})',
+                    style: theme.textTheme.titleMedium
+                        ?.copyWith(fontWeight: FontWeight.w700)),
+              ),
+              TextButton.icon(
+                onPressed: _redeem,
+                icon: const Icon(Icons.redeem_rounded, size: 18),
+                label: const Text('Canjear código'),
+              ),
+            ],
+          ),
           const SizedBox(height: 8),
           if (owned.isEmpty)
             Text(
@@ -425,6 +572,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           s,
                           owned: true,
                           stat: stats[s.id],
+                          serial: rewards.serials[s.id],
                         ),
                       ),
                       if (fresh.contains(s.id))

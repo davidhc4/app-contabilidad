@@ -122,6 +122,7 @@ Future<void> showSkinDetails(
   Skin skin, {
   required bool owned,
   SkinStat? stat,
+  int? serial,
 }) {
   return showDialog<void>(
     context: context,
@@ -143,8 +144,16 @@ Future<void> showSkinDetails(
           const SizedBox(height: 6),
           Text(skin.family.description),
           const SizedBox(height: 10),
+          if (serial != null) ...[
+            Text('Aspecto único Nº $serial',
+                style: const TextStyle(fontWeight: FontWeight.w800)),
+            const SizedBox(height: 4),
+          ],
           if (!owned)
-            const Text('Aún no lo tienes. Sale al abrir cajas.')
+            Text(skin.special
+                ? 'Es un aspecto único: solo se consigue con un código del '
+                    'creador de la app.'
+                : 'Aún no lo tienes. Sale al abrir cajas.')
           else if (stat == null || stat.uses == 0)
             const Text('Todavía no lo has usado en ninguna tarjeta.')
           else

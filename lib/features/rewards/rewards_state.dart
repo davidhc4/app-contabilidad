@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/storage/local_store.dart';
 import '../cards/card_style.dart';
+import 'signed_items.dart';
 import 'skins.dart';
 
 const _usageKey = 'uso_segundos';
@@ -13,6 +14,7 @@ const _spinsKey = 'cajas_abiertas';
 const _skinsKey = 'aspectos_ok';
 const _seenKey = 'aspectos_vistos';
 const _statsKey = 'aspectos_uso';
+const _serialsKey = 'aspectos_serie';
 
 /// Minutos que hay que pasar en la app para ganar la caja número [n]
 /// (empezando en 0): 5, 10, 20, 40, 80 y luego siempre 100.
@@ -139,17 +141,27 @@ class RewardsState {
   final Set<String> owned;
   final Set<String> seen;
   final int boxesOpened;
+
+  /// Número de serie de los aspectos únicos que se canjearon con código.
+  final Map<String, int> serials;
   const RewardsState({
     required this.owned,
     required this.boxesOpened,
     required this.seen,
+    this.serials = const {},
   });
 
-  RewardsState copyWith({Set<String>? owned, Set<String>? seen, int? boxesOpened}) =>
+  RewardsState copyWith({
+    Set<String>? owned,
+    Set<String>? seen,
+    int? boxesOpened,
+    Map<String, int>? serials,
+  }) =>
       RewardsState(
         owned: owned ?? this.owned,
         seen: seen ?? this.seen,
         boxesOpened: boxesOpened ?? this.boxesOpened,
+        serials: serials ?? this.serials,
       );
 }
 
@@ -173,10 +185,23 @@ class RewardsNotifier extends Notifier<RewardsState> {
         .toSet();
     final seen = _ids(await LocalStore.getString(_seenKey));
     final opened = int.tryParse(await LocalStore.getString(_spinsKey) ?? '') ?? 0;
+    var serials = <String, int>{};
+    try {
+      final raw = await LocalStore.getString(_serialsKey);
+      if (raw != null) {
+        serials = {
+          for (final e in (jsonDecode(raw) as Map<String, dynamic>).entries)
+            e.key: (e.value as num).toInt(),
+        };
+      }
+    } catch (_) {
+      // Si el archivo está dañado se ignora.
+    }
     state = RewardsState(
       owned: {...owned, ...state.owned},
       seen: {...seen, ...state.seen},
       boxesOpened: math.max(opened, state.boxesOpened),
+      serials: {...serials, ...state.serials},
     );
     final fresh = state.owned.difference(state.seen);
     if (fresh.isNotEmpty) {
@@ -219,6 +244,24 @@ class RewardsNotifier extends Notifier<RewardsState> {
       );
     }
     return true;
+  }
+
+  /// Canjea un código de aspecto único. Devuelve un mensaje para mostrar.
+  Future<String> redeem(String code) async {
+    final signed = verifyCode(code);
+    if (signed == null) {
+      return 'Ese código no es válido. Revisa que esté completo y sin espacios.';
+    }
+    final skin = skinById(signed.itemId)!;
+    if (state.owned.contains(signed.itemId)) {
+      return 'Ya tienes "${skin.name}".';
+    }
+    state = state.copyWith(
+      serials: {...state.serials, signed.itemId: signed.serial},
+    );
+    await LocalStore.setString(_serialsKey, jsonEncode(state.serials));
+    await grant(signed.itemId);
+    return '¡Canjeado! "${skin.name}" (único Nº ${signed.serial}) ya es tuyo.';
   }
 
   /// Marca como vistos los aspectos (al entrar al perfil o a recompensas).

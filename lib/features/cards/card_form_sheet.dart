@@ -197,7 +197,7 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
   Widget build(BuildContext context) {
     final owned = ref.watch(rewardsProvider).owned;
     final ownedSkins = [
-      for (final k in [...kSkins, ...kExtraSkins])
+      for (final k in kAllSkins)
         if (owned.contains(k.id)) k,
     ];
     final isEditing = widget.editing != null;

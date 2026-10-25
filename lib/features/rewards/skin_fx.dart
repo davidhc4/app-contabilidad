@@ -85,7 +85,9 @@ class _SkinFxState extends State<SkinFx> with SingleTickerProviderStateMixin {
       case SkinFamily.brillo:
         return const Duration(milliseconds: 5200);
       case SkinFamily.grafiti:
-        final neon = skin.rarity == Rarity.epico || skin.rarity == Rarity.legendario;
+        final neon = skin.rarity != Rarity.comun &&
+            skin.rarity != Rarity.pocoComun &&
+            skin.rarity != Rarity.raro;
         return neon ? const Duration(milliseconds: 3600) : null;
       case SkinFamily.telarana:
       case SkinFamily.murcielago:
@@ -195,13 +197,15 @@ SkinFrame skinFrame(
       );
 
     case SkinFamily.grafiti:
-      final neon = skin.rarity == Rarity.epico || skin.rarity == Rarity.legendario;
+      final neon = skin.rarity != Rarity.comun &&
+          skin.rarity != Rarity.pocoComun &&
+          skin.rarity != Rarity.raro;
       return SkinFrame(
         shadows: neon
             ? [
                 BoxShadow(
                   color: c.withValues(
-                    alpha: skin.rarity == Rarity.legendario ? 0.28 : 0.12,
+                    alpha: skin.rarity == Rarity.epico ? 0.12 : 0.28,
                   ),
                   blurRadius: 22,
                 ),

@@ -1,6 +1,8 @@
 import 'dart:math' as math;
 
+import 'package:app_contabilidad/features/profile/friends.dart';
 import 'package:app_contabilidad/features/rewards/rewards_state.dart';
+import 'package:app_contabilidad/features/rewards/signed_items.dart';
 import 'package:app_contabilidad/features/rewards/skins.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -51,6 +53,35 @@ void main() {
       for (final r in Rarity.values.where((r) => r.weight > 0)) {
         expect(kSkins.any((s) => s.rarity == r), isTrue, reason: r.label);
       }
+    });
+  });
+
+  group('códigos de aspectos únicos', () {
+    const good =
+        'BLS.u_fundador.1.FfJaMknmY0uOwk3K-uOqTZv7-bLuA4c7Z57DugHJf0tEdJc0c6qN4EIS4J8_5wphS8md_IG5VEZRU7J8Jas5AA';
+
+    test('acepta un código firmado por el creador', () {
+      final code = verifyCode(good);
+      expect(code?.itemId, 'u_fundador');
+      expect(code?.serial, 1);
+    });
+
+    test('rechaza códigos alterados o inventados', () {
+      expect(verifyCode(good.replaceFirst('.1.', '.2.')), isNull);
+      expect(verifyCode(good.replaceFirst('u_fundador', 'u_solar')), isNull);
+      expect(verifyCode('BLS.u_fundador.1.AAAA'), isNull);
+      expect(verifyCode('hola'), isNull);
+    });
+  });
+
+  group('ranking de amigos', () {
+    test('el código de perfil se puede leer de nuevo', () {
+      final code = buildProfileCode('Ana', 3600, 12);
+      final friend = parseProfileCode('Mira mi progreso: $code gracias');
+      expect(friend?.name, 'Ana');
+      expect(friend?.seconds, 3600);
+      expect(friend?.items, 12);
+      expect(parseProfileCode('BLP1.basura'), isNull);
     });
   });
 }

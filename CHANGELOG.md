@@ -1,5 +1,12 @@
 # Cambios
 
+## 1.12.0
+- Colección: tu perfil muestra cuántos aspectos tienes del total (por ejemplo 4/208) y cuántos te faltan.
+- Compartir tu perfil como imagen.
+- Ranking entre amigos sin internet: cada quien comparte su código y los demás lo añaden.
+- Aspectos únicos: se canjean con un código firmado por el creador de la app; los códigos no se pueden falsificar.
+- Cajas más emocionantes: clic y vibración mientras gira, giro más largo para rarezas altas, destello y vibración al revelar.
+
 ## 1.11.1
 - Las telarañas y siluetas de Halloween aparecen y desaparecen con un desvanecimiento suave.
 

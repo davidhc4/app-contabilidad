@@ -226,10 +226,58 @@ const kExtraSkins = <Skin>[
   ),
 ];
 
-final Map<String, Skin> _byId = {
-  for (final s in kSkins) s.id: s,
-  for (final s in kExtraSkins) s.id: s,
-};
+/// Aspectos únicos: solo se consiguen con un código firmado que entrega el
+/// creador de la app (ver signed_items.dart). Hay muy pocos.
+const kSignedSkins = <Skin>[
+  Skin(
+    id: 'u_fundador',
+    name: 'Fundador',
+    rarity: Rarity.unico,
+    family: SkinFamily.grafiti,
+    color: Color(0xFFFFD700),
+    colorName: 'Oro',
+    design: 'corona',
+  ),
+  Skin(
+    id: 'u_eclipse',
+    name: 'Eclipse',
+    rarity: Rarity.unico,
+    family: SkinFamily.grafiti,
+    color: Color(0xFFD0B8FF),
+    colorName: 'Lila',
+    design: 'luna',
+  ),
+  Skin(
+    id: 'u_tormenta',
+    name: 'Tormenta',
+    rarity: Rarity.unico,
+    family: SkinFamily.grafiti,
+    color: Color(0xFF40E0FF),
+    colorName: 'Celeste',
+    design: 'rayo',
+  ),
+  Skin(
+    id: 'u_solar',
+    name: 'Solar',
+    rarity: Rarity.unico,
+    family: SkinFamily.halo,
+    color: Color(0xFFFFA000),
+    colorName: 'Ámbar',
+  ),
+  Skin(
+    id: 'u_aurora',
+    name: 'Aurora',
+    rarity: Rarity.unico,
+    family: SkinFamily.brillo,
+    color: Color(0xFF7CFFB2),
+    colorName: 'Menta',
+  ),
+];
+
+/// Todos los aspectos que existen (para la colección).
+final List<Skin> kAllSkins = [...kSkins, ...kExtraSkins, ...kSignedSkins];
+
+final Map<String, Skin> _byId = {for (final s in kAllSkins) s.id: s};
 
 Skin? skinById(String? id) => id == null ? null : _byId[id];
 
