@@ -155,6 +155,9 @@ class _ChristmasFxState extends ConsumerState<ChristmasFx>
   }
 }
 
+/// Trineo de Papá Noel tirado por dos renos, dibujado a mano para que se vea
+/// igual en cualquier celular (sin depender de los emojis del sistema). Mira
+/// hacia la izquierda, que es hacia donde se mueve.
 class _Sleigh extends StatelessWidget {
   final double width;
   const _Sleigh({required this.width});
@@ -163,39 +166,128 @@ class _Sleigh extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: width,
-      height: 60,
-      child: Stack(
-        children: [
-          const Positioned(
-            left: 0,
-            top: 8,
-            child: Text('🦌🦌', style: TextStyle(fontSize: 34)),
-          ),
-          const Positioned(
-            left: 72,
-            top: 8,
-            child: Text('🛷', style: TextStyle(fontSize: 38)),
-          ),
-          const Positioned(
-            left: 84,
-            top: -4,
-            child: Text('🎅', style: TextStyle(fontSize: 26)),
-          ),
-          Positioned(
-            left: 118,
-            top: 14,
-            child: Text(
-              '✨✨✨',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.white.withValues(alpha: 0.8),
-              ),
-            ),
-          ),
-        ],
-      ),
+      height: width * 0.35,
+      child: CustomPaint(painter: _SleighPainter()),
     );
   }
+}
+
+class _SleighPainter extends CustomPainter {
+  static const _brown = Color(0xFF9A6A3A);
+  static const _darkBrown = Color(0xFF6E4A28);
+  static const _red = Color(0xFFD12B38);
+  static const _gold = Color(0xFFF2C14E);
+  static const _white = Color(0xFFF5F5F5);
+  static const _peach = Color(0xFFF2C9A0);
+  static const _belt = Color(0xFF3C281E);
+  static const _rein = Color(0xFF7A5230);
+  static const _spark = Color(0xFFFFF3B0);
+
+  Paint _fill(Color c) => Paint()
+    ..color = c
+    ..isAntiAlias = true;
+
+  Paint _stroke(Color c, double w) => Paint()
+    ..color = c
+    ..strokeWidth = w
+    ..strokeCap = StrokeCap.round
+    ..strokeJoin = StrokeJoin.round
+    ..style = PaintingStyle.stroke;
+
+  void _oval(Canvas c, double cx, double cy, double rx, double ry, Color color) {
+    c.drawOval(Rect.fromCenter(center: Offset(cx, cy), width: rx * 2, height: ry * 2), _fill(color));
+  }
+
+  void _poly(Canvas c, List<Offset> pts, Color color) {
+    final path = Path()..moveTo(pts.first.dx, pts.first.dy);
+    for (final p in pts.skip(1)) {
+      path.lineTo(p.dx, p.dy);
+    }
+    path.close();
+    c.drawPath(path, _fill(color));
+  }
+
+  void _reindeer(Canvas c, double cx) {
+    final leg = _stroke(_darkBrown, 3);
+    for (final dx in const [[-6.0, -8.0], [-1.0, -1.0], [6.0, 8.0], [11.0, 12.0]]) {
+      c.drawLine(Offset(cx + dx[0], 40), Offset(cx + dx[1], 56), leg);
+    }
+    _oval(c, cx, 34, 15, 8, _brown);
+    _oval(c, cx + 9, 31, 9, 8, _brown);
+    _poly(c, [Offset(cx + 14, 28), Offset(cx + 18, 26), Offset(cx + 15, 33)], _brown);
+    _poly(c, [Offset(cx - 10, 30), Offset(cx - 4, 30), Offset(cx - 14, 18), Offset(cx - 18, 20)], _brown);
+    _oval(c, cx - 17, 19, 5, 4, _brown);
+    _oval(c, cx - 22, 21, 3, 2.5, _darkBrown);
+    final antler = _stroke(_darkBrown, 2);
+    c.drawLine(Offset(cx - 17, 15), Offset(cx - 19, 7), antler);
+    c.drawLine(Offset(cx - 19, 10), Offset(cx - 23, 8), antler);
+    c.drawLine(Offset(cx - 19, 8), Offset(cx - 16, 5), antler);
+    c.drawLine(Offset(cx - 14, 15), Offset(cx - 12, 7), antler);
+    c.drawLine(Offset(cx - 13, 10), Offset(cx - 9, 9), antler);
+  }
+
+  void _star4(Canvas c, double cx, double cy, double r, double alpha) {
+    final p = _stroke(_spark.withValues(alpha: alpha), 1.4);
+    c.drawLine(Offset(cx - r, cy), Offset(cx + r, cy), p);
+    c.drawLine(Offset(cx, cy - r), Offset(cx, cy + r), p);
+  }
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final s = size.width / 200;
+    canvas.save();
+    canvas.scale(s);
+
+    _reindeer(canvas, 34);
+    _reindeer(canvas, 76);
+
+    final rein = _stroke(_rein, 1.6);
+    canvas.drawLine(const Offset(104, 36), const Offset(50, 24), rein);
+    canvas.drawLine(const Offset(104, 38), const Offset(90, 26), rein);
+
+    // Patín dorado.
+    final runner = Path()
+      ..moveTo(97, 50)
+      ..lineTo(106, 58)
+      ..lineTo(166, 58)
+      ..lineTo(173, 50);
+    canvas.drawPath(runner, _stroke(_gold, 4));
+    canvas.drawCircle(const Offset(97, 50), 3, _stroke(_gold, 2));
+    canvas.drawCircle(const Offset(173, 50), 3, _stroke(_gold, 2));
+
+    // Cuerpo del trineo y proa.
+    _poly(canvas, const [
+      Offset(106, 54), Offset(166, 54), Offset(166, 28),
+      Offset(156, 28), Offset(156, 40), Offset(106, 40),
+    ], _red);
+    _poly(canvas, const [
+      Offset(106, 40), Offset(99, 38), Offset(96, 30),
+      Offset(99, 25), Offset(104, 27), Offset(106, 33),
+    ], _red);
+
+    // Papá Noel.
+    _oval(canvas, 140, 33, 9, 10, _red);
+    canvas.drawLine(const Offset(131, 33), const Offset(149, 33), _stroke(_belt, 2));
+    canvas.drawLine(const Offset(131, 30), const Offset(126, 22), _stroke(_red, 4));
+    _oval(canvas, 132, 24, 5, 5, _peach);
+    _poly(canvas, const [
+      Offset(127, 24), Offset(137, 24), Offset(134, 32),
+      Offset(132, 33), Offset(130, 32),
+    ], _white);
+    _poly(canvas, const [Offset(127, 20), Offset(137, 19), Offset(130, 8)], _red);
+    canvas.drawRect(const Rect.fromLTRB(126, 18, 138, 21), _fill(_white));
+    canvas.drawCircle(const Offset(129, 8), 2.5, _fill(_white));
+
+    // Estela de destellos.
+    _star4(canvas, 178, 30, 5, 0.95);
+    _star4(canvas, 188, 24, 4, 0.75);
+    _star4(canvas, 185, 40, 3, 0.55);
+
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _SleighPainter oldDelegate) => false;
 }
 
 class _XmasPainter extends CustomPainter {

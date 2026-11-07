@@ -1,5 +1,8 @@
 # Cambios
 
+## 1.13.3
+- Trineo de Navidad rediseñado: ahora es un dibujo propio (dos renos, trineo rojo con patín dorado y Papá Noel) que se ve igual en cualquier celular, en vez de emojis sueltos.
+
 ## 1.13.2
 - Arreglado: con el tema de Navidad, la pantalla se oscurecía por completo durante unos segundos cada vez que iba a cruzar el trineo. Era un error de dibujado; ahora el trineo cruza sin tapar la pantalla.
 
