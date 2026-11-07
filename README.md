@@ -28,7 +28,7 @@ Bolsillo es software libre bajo la licencia [MIT](LICENSE): puedes leer todo el 
 - **Estadísticas**: gasto por categoría, por día de la semana y por franja horaria, y tendencia mensual.
 - **Accesos rápidos** en el panel de ajustes rápidos del celular para anotar un gasto o un ingreso.
 - **Copia de seguridad en CSV** que abres en Excel o guardas donde prefieras.
-- **Tema de Halloween** (edición especial) con telarañas, arañas animadas y pegatinas.
+- **Temas de temporada** (hoy, Navidad) con nieve, luces y pegatinas.
 - **Detección de pagos por SMS** (opcional): si la activas, te sugiere anotar como gasto los mensajes de tu banco.
 
 ## Privacidad

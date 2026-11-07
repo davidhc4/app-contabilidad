@@ -11,7 +11,6 @@ import '../../providers/app_providers.dart';
 import '../rewards/rewards_state.dart';
 import '../rewards/skin_widgets.dart';
 import '../rewards/skins.dart';
-import '../theme/halloween.dart';
 import '../theme/navidad.dart';
 import '../../shared/widgets/bank_card_widget.dart';
 import 'card_style.dart';
@@ -53,7 +52,7 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
   String? _pendingPhoto;
   bool _saved = false;
   late final CardStylesNotifier _styles;
-  // 0 = mujer, 1 = hombre, 2 = Halloween, 3 = Navidad
+  // 0 = mujer, 1 = hombre, 2 = Navidad
   int _stickerSet = 0;
   bool _saving = false;
 
@@ -75,10 +74,8 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
       _skin = style.skin;
       _startSkin = style.skin;
       _stickerSet = kStickersNavidad.contains(style.sticker)
-          ? 3
-          : kStickersHalloween.contains(style.sticker)
-              ? 2
-              : (kStickersHombre.contains(style.sticker) ? 1 : 0);
+          ? 2
+          : (kStickersHombre.contains(style.sticker) ? 1 : 0);
       final initial = style.initialBalance;
       if (initial != null && initial > 0) {
         _balanceController.text = formatThousands(initial.round().toString());
@@ -204,14 +201,10 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
         if (owned.contains(k.id)) k,
     ];
     final isEditing = widget.editing != null;
-    final halloween = ref.watch(halloweenProvider);
     final navidad = ref.watch(navidadProvider);
-    final set = ((_stickerSet == 2 && !halloween) || (_stickerSet == 3 && !navidad))
-        ? 0
-        : _stickerSet;
+    final set = (_stickerSet == 2 && !navidad) ? 0 : _stickerSet;
     final stickers = switch (set) {
-      3 => kStickersNavidad,
-      2 => kStickersHalloween,
+      2 => kStickersNavidad,
       1 => kStickersHombre,
       _ => kStickersMujer,
     };
@@ -387,15 +380,9 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
                   label: Text('Hombre'),
                   icon: Icon(Icons.male_rounded),
                 ),
-                if (halloween)
-                  const ButtonSegment(
-                    value: 2,
-                    label: Text('Halloween'),
-                    icon: Icon(Icons.pest_control_rounded),
-                  ),
                 if (navidad)
                   const ButtonSegment(
-                    value: 3,
+                    value: 2,
                     label: Text('Navidad'),
                     icon: Icon(Icons.park_rounded),
                   ),

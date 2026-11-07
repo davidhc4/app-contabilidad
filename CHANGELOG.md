@@ -1,5 +1,9 @@
 # Cambios
 
+## 1.13.1
+- Se quitó el tema de Halloween (interruptor, decoración y pegatinas). Los aspectos de Halloween que ya ganaste se quedan en tu colección.
+- Se quitó "Perfil e inventario" de Ajustes: el perfil se abre desde Resumen, arriba a la izquierda.
+
 ## 1.13.0
 - Tema de Navidad (Ajustes → Apariencia): nieve que cae, luces que titilan, acebo en las esquinas, siluetas navideñas de fondo y un trineo que cruza el cielo.
 - Pegatinas navideñas para las tarjetas.
