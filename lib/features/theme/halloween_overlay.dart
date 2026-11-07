@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../rewards/rewards_state.dart';
+import 'christmas_overlay.dart';
 import 'fx_state.dart';
 import 'halloween.dart';
 import 'silhouettes.dart';
@@ -114,6 +115,7 @@ class _ThemeFxLayerState extends ConsumerState<ThemeFxLayer>
       fit: StackFit.expand,
       children: [
         widget.child,
+        const ChristmasFx(),
         if (_fxShown)
           Positioned.fill(
             child: AnimatedOpacity(

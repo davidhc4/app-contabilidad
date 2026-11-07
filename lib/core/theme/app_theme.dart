@@ -65,6 +65,29 @@ class AppTheme {
     );
   }
 
+  /// Tema de Navidad: verde pino muy oscuro con acento rojo.
+  static ThemeData get navidad {
+    const accent = Color(0xFFE5484D);
+    const surface = Color(0xFF12261C);
+    final base = ThemeData(
+      brightness: Brightness.dark,
+      useMaterial3: true,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: accent,
+        brightness: Brightness.dark,
+        surface: surface,
+      ),
+      scaffoldBackgroundColor: const Color(0xFF08140E),
+    );
+    final t = _apply(base, isDark: true, accent: accent);
+    return t.copyWith(
+      cardTheme: t.cardTheme.copyWith(color: surface),
+      bottomSheetTheme: t.bottomSheetTheme.copyWith(backgroundColor: surface),
+      inputDecorationTheme:
+          t.inputDecorationTheme.copyWith(fillColor: const Color(0xFF1C3829)),
+    );
+  }
+
   static ThemeData get light {
     final base = ThemeData(
       brightness: Brightness.light,

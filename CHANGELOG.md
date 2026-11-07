@@ -1,5 +1,11 @@
 # Cambios
 
+## 1.13.0
+- Tema de Navidad (Ajustes → Apariencia): nieve que cae, luces que titilan, acebo en las esquinas, siluetas navideñas de fondo y un trineo que cruza el cielo.
+- Pegatinas navideñas para las tarjetas.
+- Dos aspectos especiales de Navidad: Nochebuena y Estrella de Belén.
+- Al activar Navidad se apaga Halloween, y al revés.
+
 ## 1.12.0
 - Colección: tu perfil muestra cuántos aspectos tienes del total (por ejemplo 4/208) y cuántos te faltan.
 - Compartir tu perfil como imagen.

@@ -9,6 +9,7 @@ import 'features/profile/profile_screen.dart';
 import 'features/rewards/rewards_state.dart';
 import 'features/rewards/skin_reminder.dart';
 import 'features/theme/halloween.dart';
+import 'features/theme/navidad.dart';
 import 'features/theme/halloween_overlay.dart';
 import 'features/sms_detection/sms_confirm_sheet.dart';
 import 'features/sms_detection/sms_listener_service.dart';
@@ -149,6 +150,7 @@ class _BolsilloAppState extends ConsumerState<BolsilloApp>
   Widget build(BuildContext context) {
     final settingsAsync = ref.watch(settingsStreamProvider);
     final halloween = ref.watch(halloweenProvider);
+    final navidad = ref.watch(navidadProvider);
     ref.listen<Notice?>(noticeProvider, (previous, next) {
       if (next != null) _showNotice(next.text);
     });
@@ -177,9 +179,11 @@ class _BolsilloAppState extends ConsumerState<BolsilloApp>
           title: 'Bolsillo',
           scaffoldMessengerKey: _messengerKey,
           debugShowCheckedModeBanner: false,
-          themeMode: halloween ? ThemeMode.dark : themeMode,
+          themeMode: (halloween || navidad) ? ThemeMode.dark : themeMode,
           theme: AppTheme.light,
-          darkTheme: halloween ? AppTheme.halloween : AppTheme.dark,
+          darkTheme: halloween
+              ? AppTheme.halloween
+              : (navidad ? AppTheme.navidad : AppTheme.dark),
           routerConfig: _router,
           builder: (context, child) =>
               ThemeFxLayer(child: child ?? const SizedBox.shrink()),

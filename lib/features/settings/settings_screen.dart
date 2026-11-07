@@ -16,6 +16,7 @@ import '../donation/donation_screen.dart';
 import '../help/tutorial_screen.dart';
 import '../rewards/rewards_screen.dart';
 import '../theme/halloween.dart';
+import '../theme/navidad.dart';
 import '../sms_detection/sms_permission_helper.dart';
 import '../profile/profile_screen.dart';
 import 'sms_senders_screen.dart';
@@ -56,8 +57,10 @@ class SettingsScreen extends ConsumerWidget {
                   const Divider(height: 1),
                   SwitchListTile(
                     value: ref.watch(halloweenProvider),
-                    onChanged: (v) =>
-                        ref.read(halloweenProvider.notifier).set(v),
+                    onChanged: (v) {
+                      if (v) ref.read(navidadProvider.notifier).set(false);
+                      ref.read(halloweenProvider.notifier).set(v);
+                    },
                     secondary: const Icon(Icons.pest_control_rounded),
                     title: ShaderMask(
                       shaderCallback: (rect) => const LinearGradient(
@@ -79,6 +82,34 @@ class SettingsScreen extends ConsumerWidget {
                         'Edición especial: telarañas, arañas que pasean, '
                         'murciélagos y pegatinas de Halloween para tus '
                         'tarjetas.'),
+                  ),
+                  const Divider(height: 1),
+                  SwitchListTile(
+                    value: ref.watch(navidadProvider),
+                    onChanged: (v) {
+                      if (v) ref.read(halloweenProvider.notifier).set(false);
+                      ref.read(navidadProvider.notifier).set(v);
+                    },
+                    secondary: const Icon(Icons.park_rounded),
+                    title: ShaderMask(
+                      shaderCallback: (rect) => const LinearGradient(
+                        colors: [
+                          Color(0xFFFF6B6B),
+                          Color(0xFFFFD43B),
+                          Color(0xFF5BE38A),
+                        ],
+                      ).createShader(rect),
+                      child: const Text(
+                        'Navidad 🎄',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    subtitle: const Text(
+                        'Edición especial: nieve, luces que titilan, un '
+                        'trineo que cruza el cielo y pegatinas navideñas.'),
                   ),
                 ],
               ),

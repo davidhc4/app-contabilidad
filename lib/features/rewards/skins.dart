@@ -57,6 +57,10 @@ enum SkinFamily {
   telarana,
   murcielago,
   imagen,
+
+  /// Especiales de Navidad (no salen en cajas).
+  nochebuena,
+  estrella,
 }
 
 extension SkinFamilyInfo on SkinFamily {
@@ -67,6 +71,8 @@ extension SkinFamilyInfo on SkinFamily {
         SkinFamily.telarana => 'Telaraña',
         SkinFamily.murcielago => 'Murciélago',
         SkinFamily.imagen => 'Imagen',
+        SkinFamily.nochebuena => 'Nochebuena',
+        SkinFamily.estrella => 'Estrella',
       };
 
   String get description => switch (this) {
@@ -81,6 +87,10 @@ extension SkinFamilyInfo on SkinFamily {
         SkinFamily.murcielago => 'Fondo naranja con un murciélago que cambia '
             'entre negro y blanco.',
         SkinFamily.imagen => 'Una imagen en lugar de un color.',
+        SkinFamily.nochebuena => 'Rojo y verde de Navidad con nieve cayendo y '
+            'luces que titilan.',
+        SkinFamily.estrella => 'Una estrella dorada de neón que late entre '
+            'destellos.',
       };
 }
 
@@ -223,6 +233,20 @@ const kExtraSkins = <Skin>[
     rarity: Rarity.unico,
     family: SkinFamily.imagen,
     color: Color(0xFF000000),
+  ),
+  Skin(
+    id: 'x4',
+    name: 'Nochebuena',
+    rarity: Rarity.unico,
+    family: SkinFamily.nochebuena,
+    color: Color(0xFFB3202A),
+  ),
+  Skin(
+    id: 'x5',
+    name: 'Estrella de Belén',
+    rarity: Rarity.unico,
+    family: SkinFamily.estrella,
+    color: Color(0xFFFFD43B),
   ),
 ];
 

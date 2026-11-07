@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../theme/silhouettes.dart';
+import '../theme/xmas_paint.dart';
 import 'skins.dart';
 
 const _twoPi = math.pi * 2;
@@ -92,6 +93,10 @@ class _SkinFxState extends State<SkinFx> with SingleTickerProviderStateMixin {
       case SkinFamily.telarana:
       case SkinFamily.murcielago:
         return const Duration(milliseconds: 4000);
+      case SkinFamily.nochebuena:
+        return const Duration(seconds: 12);
+      case SkinFamily.estrella:
+        return const Duration(milliseconds: 3600);
       case SkinFamily.imagen:
         return null;
     }
@@ -245,9 +250,75 @@ SkinFrame skinFrame(
         ),
       );
 
+    case SkinFamily.nochebuena:
+      return SkinFrame(
+        gradient: const [Color(0xFFB3202A), Color(0xFF0F4D2E)],
+        shadows: [
+          BoxShadow(
+            color: const Color(0xFF1F8A4C).withValues(alpha: 0.25 + 0.2 * wave),
+            blurRadius: 20,
+          ),
+          BoxShadow(
+            color: const Color(0xFFB3202A).withValues(alpha: 0.2 + 0.15 * wave),
+            blurRadius: 24,
+            offset: const Offset(0, 6),
+          ),
+        ],
+        underlay: IgnorePointer(
+          child: CustomPaint(painter: _NochebuenaPainter(t)),
+        ),
+      );
+
+    case SkinFamily.estrella:
+      return SkinFrame(
+        gradient: const [Color(0xFF0B1B3A), Color(0xFF1B0F3A)],
+        shadows: [
+          BoxShadow(
+            color: const Color(0xFFFFD43B).withValues(alpha: 0.2 + 0.2 * wave),
+            blurRadius: 24,
+          ),
+        ],
+        underlay: IgnorePointer(
+          child: CustomPaint(painter: _EstrellaPainter(t)),
+        ),
+      );
+
     case SkinFamily.imagen:
       return const SkinFrame();
   }
+}
+
+class _NochebuenaPainter extends CustomPainter {
+  final double t;
+  _NochebuenaPainter(this.t);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    paintSnow(canvas, size, t, count: 34, maxRadius: 2.6, alpha: 0.85, seed: 11);
+    paintLights(canvas, size.width, 4, t);
+  }
+
+  @override
+  bool shouldRepaint(covariant _NochebuenaPainter old) => old.t != t;
+}
+
+class _EstrellaPainter extends CustomPainter {
+  final double t;
+  _EstrellaPainter(this.t);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    paintSparkles(canvas, size, t, count: 16, seed: 5);
+    paintNeonStar(
+      canvas,
+      Offset(size.width * 0.74, size.height * 0.5),
+      size.height * 0.34,
+      t,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _EstrellaPainter old) => old.t != t;
 }
 
 /// Negro y blanco que se mezclan suavemente.
