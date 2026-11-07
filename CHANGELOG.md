@@ -1,5 +1,8 @@
 # Cambios
 
+## 1.13.2
+- Arreglado: con el tema de Navidad, la pantalla se oscurecía por completo durante unos segundos cada vez que iba a cruzar el trineo. Era un error de dibujado; ahora el trineo cruza sin tapar la pantalla.
+
 ## 1.13.1
 - Se quitó el tema de Halloween (interruptor, decoración y pegatinas). Los aspectos de Halloween que ya ganaste se quedan en tu colección.
 - Se quitó "Perfil e inventario" de Ajustes: el perfil se abre desde Resumen, arriba a la izquierda.

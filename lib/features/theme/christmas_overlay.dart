@@ -130,14 +130,20 @@ class _ChristmasFxState extends ConsumerState<ChristmasFx>
                   // Va de derecha a izquierda, con un vaivén suave.
                   final x = c.maxWidth + 20 - v * (c.maxWidth + width + 40);
                   final y = c.maxHeight * _lane + math.sin(v * math.pi * 4) * 14;
-                  return Positioned(
-                    left: x,
-                    top: y,
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: _poke,
-                      child: const _Sleigh(width: width),
-                    ),
+                  // El trineo debe ir dentro de un Stack para poder colocarlo
+                  // con Positioned sin romper el dibujado.
+                  return Stack(
+                    children: [
+                      Positioned(
+                        left: x,
+                        top: y,
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: _poke,
+                          child: const _Sleigh(width: width),
+                        ),
+                      ),
+                    ],
                   );
                 },
               ),
