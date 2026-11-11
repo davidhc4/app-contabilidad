@@ -1,5 +1,8 @@
 # Cambios
 
+## 1.14.0
+- Sello de autor: en Ajustes → Acerca de aparece la insignia de la D con el nombre y la versión de la app. Es la misma marca para todas las apps de David.
+
 ## 1.13.3
 - Trineo de Navidad rediseñado: ahora es un dibujo propio (dos renos, trineo rojo con patín dorado y Papá Noel) que se ve igual en cualquier celular, en vez de emojis sueltos.
 
