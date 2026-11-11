@@ -8,6 +8,12 @@ on:
 permissions:
   contents: write
 
+# Las compilaciones se hacen de una en una para que dos ramas no intenten
+# publicar la misma versión al mismo tiempo.
+concurrency:
+  group: publicar-apk
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
