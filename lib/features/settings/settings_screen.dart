@@ -226,25 +226,26 @@ class SettingsScreen extends ConsumerWidget {
             const _SectionTitle('Acerca de'),
             Card(
               margin: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                children: [
-                  const ListTile(
-                    title: Text(kAppName),
-                    subtitle: Text('Versión $kAppVersion'),
-                  ),
-                  const Divider(height: 1),
-                  ListTile(
-                    leading: const MakerMark(size: 40),
-                    title: const Text(
-                      'Desarrollada por David',
-                      style: TextStyle(fontWeight: FontWeight.w700),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 16),
+                child: Column(
+                  children: [
+                    const MakerMark(size: 64),
+                    const SizedBox(height: 12),
+                    Text(
+                      kAppName,
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleLarge
+                          ?.copyWith(fontWeight: FontWeight.w800),
                     ),
-                    subtitle: Text(
-                      'Sello de autor',
+                    const SizedBox(height: 2),
+                    Text(
+                      'Versión $kAppVersion',
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],

@@ -1,5 +1,8 @@
 # Cambios
 
+## 1.14.2
+- Acerca de: queda solo el sello de autor, el nombre de la app y la versión.
+
 ## 1.14.1
 - Sello de autor más sobrio: una D clara sobre insignia oscura, sin adornos. Aparece en Ajustes → Acerca de como "Desarrollada por David". El ícono de la app no cambia.
 
