@@ -1,5 +1,10 @@
 # Cambios
 
+## 1.15.0
+- Actualizaciones desde la app: en Ajustes → Actualizaciones, "Buscar actualizaciones" consulta la última versión publicada en GitHub, la descarga (con barra de progreso) y abre el instalador de Android. Tus datos se conservan.
+- La app ahora tiene permiso de internet, pero solo lo usa cuando tocas ese botón y solo para conectarse a GitHub. No envía ningún dato tuyo.
+- El APK descargado se comprueba (tamaño y huella SHA-256) antes de instalar.
+
 ## 1.14.2
 - Acerca de: queda solo el sello de autor, el nombre de la app y la versión.
 

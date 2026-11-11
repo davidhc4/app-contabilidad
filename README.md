@@ -6,14 +6,14 @@
 
 <p align="center">
   Control de gastos personal para Android.<br>
-  Gratis, <b>código abierto</b>, sin anuncios, sin cuentas y sin internet.
+  Gratis, <b>código abierto</b>, sin anuncios y sin cuentas. Tus datos nunca salen del teléfono.
 </p>
 
 ---
 
 Bolsillo te ayuda a ver en qué se va tu dinero. Anotas lo que entra y lo que sale, defines cuánto quieres gastar al mes y la app te dice cuánto te sobra y cuánto tendrías ahorrado si lo mantienes.
 
-Todo vive en tu teléfono. La app ni siquiera tiene permiso de internet, así que sus datos no pueden salir de tu celular a menos que tú los compartas.
+Todo vive en tu teléfono. La app no envía tus datos a ningún servidor: solo se conecta a internet cuando tú tocas "Buscar actualizaciones", y lo único que hace es consultar y descargar la versión nueva desde este repositorio.
 
 ## Código abierto
 
@@ -29,11 +29,14 @@ Bolsillo es software libre bajo la licencia [MIT](LICENSE): puedes leer todo el 
 - **Accesos rápidos** en el panel de ajustes rápidos del celular para anotar un gasto o un ingreso.
 - **Copia de seguridad en CSV** que abres en Excel o guardas donde prefieras.
 - **Temas de temporada** (hoy, Navidad) con nieve, luces y pegatinas.
+- **Actualización desde la app**: en Ajustes buscas la última versión publicada aquí, la descargas y la instalas sin perder tus datos.
 - **Detección de pagos por SMS** (opcional): si la activas, te sugiere anotar como gasto los mensajes de tu banco.
 
 ## Privacidad
 
-- Sin permiso de internet, sin rastreadores, sin publicidad y sin registro.
+- Sin rastreadores, sin publicidad y sin registro.
+- Internet solo se usa cuando tocas "Buscar actualizaciones": la app consulta los [Releases](../../releases) de este repositorio en GitHub y descarga el APK. No se envía ningún dato tuyo, y nada se conecta por su cuenta.
+- Antes de instalar, la app comprueba que el APK descargado coincide con la huella SHA-256 que publica GitHub; además Android solo acepta la actualización si está firmada con la misma llave que la app instalada.
 - Los datos se guardan en una base de datos local y no se incluyen en las copias de seguridad automáticas de Android.
 - Los permisos de SMS y de fotos se piden solo cuando usas esas funciones, y la app funciona sin ellos.
 

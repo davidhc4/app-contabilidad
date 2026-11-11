@@ -17,6 +17,7 @@ import '../donation/donation_screen.dart';
 import '../help/tutorial_screen.dart';
 import '../rewards/rewards_screen.dart';
 import '../theme/navidad.dart';
+import '../updates/update_section.dart';
 import '../sms_detection/sms_permission_helper.dart';
 import 'sms_senders_screen.dart';
 
@@ -222,6 +223,11 @@ class SettingsScreen extends ConsumerWidget {
                   MaterialPageRoute(builder: (_) => const DonationScreen()),
                 ),
               ),
+            ),
+            const _SectionTitle('Actualizaciones'),
+            const Card(
+              margin: EdgeInsets.symmetric(horizontal: 20),
+              child: UpdateSection(),
             ),
             const _SectionTitle('Acerca de'),
             Card(

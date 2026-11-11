@@ -68,4 +68,6 @@ flutter {
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.3")
+    // FileProvider: para pasarle al instalador el APK de una actualización.
+    implementation("androidx.core:core:1.13.1")
 }

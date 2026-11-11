@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Carpeta de la caché donde se guarda el APK de una actualización para
+     pasárselo al instalador de Android. -->
+<paths>
+    <cache-path name="updates" path="updates/" />
+</paths>

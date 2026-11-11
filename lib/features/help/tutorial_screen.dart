@@ -153,6 +153,16 @@ class _TutorialScreenState extends State<TutorialScreen> {
           '• Borrar todos los datos: elimina todos tus movimientos. No se '
           'puede deshacer, así que primero guarda una copia.',
     ),
+    _Topic(
+      icon: Icons.system_update_rounded,
+      title: 'Actualizar la app',
+      body: 'En Ajustes → Actualizaciones toca "Buscar actualizaciones". Si '
+          'hay una versión nueva, toca "Descargar e instalar" y acepta en la '
+          'pantalla de Android. Tus datos se conservan.\n'
+          'La primera vez, Android te pide permitir que Bolsillo instale '
+          'apps: actívalo y vuelve atrás.\n'
+          'La app solo usa internet cuando tocas ese botón.',
+    ),
   ];
 
   @override
