@@ -226,51 +226,25 @@ class SettingsScreen extends ConsumerWidget {
             const _SectionTitle('Acerca de'),
             Card(
               margin: const EdgeInsets.symmetric(horizontal: 20),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 16),
-                child: Column(
-                  children: [
-                    const MakerMark(size: 68),
-                    const SizedBox(height: 12),
-                    Text(
-                      kAppName,
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleLarge
-                          ?.copyWith(fontWeight: FontWeight.w800),
+              child: Column(
+                children: [
+                  const ListTile(
+                    title: Text(kAppName),
+                    subtitle: Text('Versión $kAppVersion'),
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const MakerMark(size: 40),
+                    title: const Text(
+                      'Desarrollada por David',
+                      style: TextStyle(fontWeight: FontWeight.w700),
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'Versión $kAppVersion',
+                    subtitle: Text(
+                      'Sello de autor',
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
-                    const SizedBox(height: 14),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 7),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF8AB4FF).withValues(alpha: 0.14),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: const Color(0xFF8AB4FF).withValues(alpha: 0.4),
-                        ),
-                      ),
-                      child: const Text(
-                        'Una app de David',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.3,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      'El sello de la D identifica todas mis apps.',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ],

@@ -1,5 +1,8 @@
 # Cambios
 
+## 1.14.1
+- Sello de autor más sobrio: una D clara sobre insignia oscura, sin adornos. Aparece en Ajustes → Acerca de como "Desarrollada por David". El ícono de la app no cambia.
+
 ## 1.14.0
 - Sello de autor: en Ajustes → Acerca de aparece la insignia de la D con el nombre y la versión de la app. Es la misma marca para todas las apps de David.
 
