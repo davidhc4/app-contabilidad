@@ -13,7 +13,7 @@ servidor.
 
 ## Responsable
 
-La app la desarrolla y mantiene **Juan David Chávez Garavito**, de forma independiente.
+La app la desarrolla y mantiene **David (Desarrollador de la app)**, de forma independiente.
 
 ## Qué información maneja la app
 
