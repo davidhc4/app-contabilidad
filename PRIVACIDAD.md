@@ -74,28 +74,22 @@ modificarlo y publicar una copia. Para que no te engañen:
 
 - **Descarga la app solo desde el repositorio oficial:**
   `https://github.com/davidhc4/app-contabilidad` (sección _Releases_).
-- Cada versión publica el tamaño y la **huella SHA-256** de su archivo APK.
-  Son los mismos datos que la app comprueba al actualizarse sola.
-- Todas las versiones oficiales están **firmadas con la misma llave**. La
-  huella SHA-256 del certificado de firma es:
+- Cada versión oficial está **firmada digitalmente** con una llave privada que
+  solo tiene el desarrollador y que nunca se publica.
+- Una copia hecha por otra persona tendría una firma distinta, y Android **no
+  la aceptará** como actualización de la app oficial.
 
-  ```
-  AE:C0:B1:8C:CB:BB:DE:CC:90:19:BA:31:BB:CF:84:FF:70:82:C6:8F:81:0F:B7:BC:21:E6:C6:43:0B:6F:EB:E2
-  ```
-
-  Una copia hecha por otra persona tendría una firma distinta, y Android no la
-  aceptará como actualización de la app oficial.
-
-Si ves "Bolsillo" en otro sitio que no sea ese repositorio, o con una firma
-distinta, no es la versión oficial.
+Si ves "Bolsillo" en otro sitio que no sea ese repositorio, no es la versión
+oficial.
 
 ## Normas de uso
 
 - Bolsillo es software libre bajo la licencia [MIT](LICENSE). Puedes leer,
   usar, modificar y compartir el código.
-- Si publicas una versión modificada, hazlo con **otro nombre y otra imagen**,
-  y no la presentes como la app oficial de David ni uses su sello de autor para
-  hacerla pasar por original.
+- Si publicas una versión modificada, hazlo con **otro nombre y otra imagen
+  propios**. El nombre "Bolsillo" y su identidad (ícono y diseño) son de su
+  autor; no los uses para hacer pasar otra app como esta. La licencia MIT te
+  permite usar el código, pero te pide conservar el crédito al autor original.
 - La app se ofrece "tal cual", sin garantías. Haz tus copias de seguridad
   (opción "Compartir copia en CSV"): el desarrollador no puede recuperar datos
   perdidos, porque nunca los tiene.

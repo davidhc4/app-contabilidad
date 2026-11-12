@@ -17,13 +17,7 @@ Si encuentras una vulnerabilidad, no la publiques en un issue. Usa la pestaña *
 
 ## Cómo saber que tu copia es la oficial
 
-Descarga la app solo desde los [Releases](../../releases) de este repositorio. Todas las versiones oficiales están firmadas con la misma llave; la huella SHA-256 del certificado es:
-
-```
-AE:C0:B1:8C:CB:BB:DE:CC:90:19:BA:31:BB:CF:84:FF:70:82:C6:8F:81:0F:B7:BC:21:E6:C6:43:0B:6F:EB:E2
-```
-
-Una copia hecha por otra persona tendría una firma distinta, y Android no la aceptará como actualización de la app oficial. Más detalles en la [política de privacidad y normas](PRIVACIDAD.md).
+Descarga la app solo desde los [Releases](../../releases) de este repositorio. Cada versión oficial está firmada con una llave privada que solo tiene el desarrollador y que nunca se publica. Una copia hecha por otra persona tendría una firma distinta, y Android no la aceptará como actualización de la app oficial. Más detalles en la [política de privacidad y normas](PRIVACIDAD.md).
 
 ## Versiones con soporte
 

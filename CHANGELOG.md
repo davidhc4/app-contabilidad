@@ -1,5 +1,8 @@
 # Cambios
 
+## 1.16.1
+- La página de privacidad se simplificó: se explica que la app está firmada y que solo debes descargarla del repositorio oficial, sin publicar datos técnicos de la firma. La parte de normas se centra en que no se use el nombre ni la identidad de la app para copias.
+
 ## 1.16.0
 - Se quitó la detección de pagos por SMS y, con ella, los permisos de SMS y de ubicación. La app queda más simple y lista para publicarse en las tiendas.
 - Nueva página de privacidad y normas (archivo PRIVACIDAD.md), que se abre desde Ajustes → Privacidad y normas.
