@@ -10,8 +10,6 @@ import 'features/rewards/rewards_state.dart';
 import 'features/rewards/skin_reminder.dart';
 import 'features/theme/navidad.dart';
 import 'features/theme/theme_fx_layer.dart';
-import 'features/sms_detection/sms_confirm_sheet.dart';
-import 'features/sms_detection/sms_listener_service.dart';
 import 'features/transactions/transaction_form_sheet.dart';
 import 'data/local/tables.dart';
 import 'providers/app_providers.dart';
@@ -44,9 +42,7 @@ class BolsilloApp extends ConsumerStatefulWidget {
 
 class _BolsilloAppState extends ConsumerState<BolsilloApp>
     with WidgetsBindingObserver {
-  SmsListenerService? _smsService;
   bool _redirectedToOnboarding = false;
-  bool _isListening = false;
 
   @override
   void initState() {
@@ -54,7 +50,6 @@ class _BolsilloAppState extends ConsumerState<BolsilloApp>
     WidgetsBinding.instance.addObserver(this);
     // Empieza a contar el tiempo dentro de la app (recompensas).
     ref.read(usageProvider);
-    _initSms();
     _checkQuickAction();
   }
 
@@ -126,25 +121,6 @@ class _BolsilloAppState extends ConsumerState<BolsilloApp>
     }
   }
 
-  Future<void> _initSms() async {
-    final service = SmsListenerService(ref.read(smsSenderRepositoryProvider));
-    await service.init();
-    service.onPaymentDetected = (payment) {
-      final context = navigatorKey.currentContext;
-      if (context != null) {
-        showSmsPaymentConfirmSheet(context, payment);
-      }
-    };
-    service.onNotificationTapped = (payment) {
-      final context = navigatorKey.currentContext;
-      if (context != null) {
-        showSmsPaymentConfirmSheet(context, payment);
-      }
-    };
-    _smsService = service;
-    if (mounted) setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
     final settingsAsync = ref.watch(settingsStreamProvider);
@@ -160,11 +136,6 @@ class _BolsilloAppState extends ConsumerState<BolsilloApp>
           WidgetsBinding.instance.addPostFrameCallback((_) {
             _router.go('/onboarding');
           });
-        }
-
-        if (settings.smsDetectionEnabled && _smsService != null && !_isListening) {
-          _isListening = true;
-          _smsService!.startListening();
         }
 
         final themeMode = switch (settings.themeMode) {

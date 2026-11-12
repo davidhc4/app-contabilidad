@@ -1,11 +1,16 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <!-- Internet: solo se usa cuando la persona toca "Buscar actualizaciones"
          (consulta y descarga desde los Releases de GitHub). -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Una librería (la de SMS) declara estos permisos de ubicación por su
+         cuenta, pero la app no usa la ubicación, así que se quitan. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"
+        tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"
+        tools:node="remove" />
     <!-- Para abrir el instalador de Android con la actualización descargada. -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-    <uses-permission android:name="android.permission.RECEIVE_SMS" />
-    <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission

@@ -4,7 +4,6 @@ import '../data/local/database.dart';
 import '../data/repositories/card_repository.dart';
 import '../data/repositories/category_repository.dart';
 import '../data/repositories/settings_repository.dart';
-import '../data/repositories/sms_sender_repository.dart';
 import '../data/repositories/statistics_models.dart';
 import '../data/repositories/transaction_repository.dart';
 
@@ -30,9 +29,6 @@ final settingsRepositoryProvider = Provider<SettingsRepository>((ref) {
   return SettingsRepository(ref.watch(databaseProvider));
 });
 
-final smsSenderRepositoryProvider = Provider<SmsSenderRepository>((ref) {
-  return SmsSenderRepository(ref.watch(databaseProvider));
-});
 
 final settingsStreamProvider = StreamProvider((ref) {
   return ref.watch(settingsRepositoryProvider).watch();

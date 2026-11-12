@@ -137,13 +137,6 @@ class _TutorialScreenState extends State<TutorialScreen> {
           'directo en el formulario.',
     ),
     _Topic(
-      icon: Icons.sms_outlined,
-      title: 'Detección de pagos por SMS',
-      body: 'Si lo activas en Ajustes, cuando te llegue un SMS de tu banco '
-          'con un pago, la app te pregunta si quieres anotarlo como gasto. '
-          'Es opcional y necesita el permiso de SMS.',
-    ),
-    _Topic(
       icon: Icons.ios_share_rounded,
       title: 'Tus datos: copia, importar y borrar',
       body: '• Compartir copia en CSV: crea un archivo que se abre en Excel '

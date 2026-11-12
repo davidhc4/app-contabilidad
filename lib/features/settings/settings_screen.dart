@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/app_version.dart';
 import '../../core/theme/app_theme.dart';
@@ -18,8 +19,24 @@ import '../help/tutorial_screen.dart';
 import '../rewards/rewards_screen.dart';
 import '../theme/navidad.dart';
 import '../updates/update_section.dart';
-import '../sms_detection/sms_permission_helper.dart';
-import 'sms_senders_screen.dart';
+
+
+const _policyUrl =
+    'https://github.com/davidhc4/app-contabilidad/blob/main/PRIVACIDAD.md';
+
+/// Abre la página de privacidad y normas en el navegador.
+Future<void> _openPolicy(BuildContext context) async {
+  final messenger = ScaffoldMessenger.of(context);
+  final ok = await launchUrl(
+    Uri.parse(_policyUrl),
+    mode: LaunchMode.externalApplication,
+  );
+  if (!ok) {
+    messenger.showSnackBar(
+      const SnackBar(content: Text('No se pudo abrir la página.')),
+    );
+  }
+}
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -96,42 +113,6 @@ class SettingsScreen extends ConsumerWidget {
                     trailing: const Icon(Icons.chevron_right_rounded),
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute(builder: (_) => const RewardsScreen()),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const _SectionTitle('Detección de pagos por SMS'),
-            Card(
-              margin: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                children: [
-                  SwitchListTile(
-                    title: const Text('Detectar pagos automáticamente'),
-                    subtitle: const Text(
-                        'Al llegar un SMS de tu banco, te preguntamos si quieres añadir el gasto'),
-                    value: settings.smsDetectionEnabled,
-                    onChanged: (v) async {
-                      if (v) {
-                        final granted =
-                            await requestSmsPermissionWithGuidance(context);
-                        if (!granted) return;
-                      }
-                      ref
-                          .read(settingsRepositoryProvider)
-                          .setSmsDetectionEnabled(v);
-                    },
-                  ),
-                  const Divider(height: 1),
-                  ListTile(
-                    title: const Text('Bancos monitoreados'),
-                    subtitle: const Text(
-                        'Opcional: mejora la detección para un banco en particular'),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const SmsSendersScreen(),
-                      ),
                     ),
                   ),
                 ],
@@ -228,6 +209,19 @@ class SettingsScreen extends ConsumerWidget {
             const Card(
               margin: EdgeInsets.symmetric(horizontal: 20),
               child: UpdateSection(),
+            ),
+            const _SectionTitle('Privacidad y normas'),
+            Card(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              child: ListTile(
+                leading: const Icon(Icons.shield_outlined),
+                title: const Text('Privacidad y normas'),
+                subtitle: const Text(
+                    'Qué hace la app con tus datos y cómo verificar que es la '
+                    'versión oficial.'),
+                trailing: const Icon(Icons.open_in_new_rounded),
+                onTap: () => _openPolicy(context),
+              ),
             ),
             const _SectionTitle('Acerca de'),
             Card(

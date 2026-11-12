@@ -1,5 +1,10 @@
 # Cambios
 
+## 1.16.0
+- Se quitó la detección de pagos por SMS y, con ella, los permisos de SMS y de ubicación. La app queda más simple y lista para publicarse en las tiendas.
+- Nueva página de privacidad y normas (archivo PRIVACIDAD.md), que se abre desde Ajustes → Privacidad y normas.
+- Se publica la huella de la firma oficial para que cualquiera verifique que su copia es la de verdad.
+
 ## 1.15.0
 - Actualizaciones desde la app: en Ajustes → Actualizaciones, "Buscar actualizaciones" consulta la última versión publicada en GitHub, la descarga (con barra de progreso) y abre el instalador de Android. Tus datos se conservan.
 - La app ahora tiene permiso de internet, pero solo lo usa cuando tocas ese botón y solo para conectarse a GitHub. No envía ningún dato tuyo.

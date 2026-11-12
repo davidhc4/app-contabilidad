@@ -30,7 +30,6 @@ Bolsillo es software libre bajo la licencia [MIT](LICENSE): puedes leer todo el 
 - **Copia de seguridad en CSV** que abres en Excel o guardas donde prefieras.
 - **Temas de temporada** (hoy, Navidad) con nieve, luces y pegatinas.
 - **Actualización desde la app**: en Ajustes buscas la última versión publicada aquí, la descargas y la instalas sin perder tus datos.
-- **Detección de pagos por SMS** (opcional): si la activas, te sugiere anotar como gasto los mensajes de tu banco.
 
 ## Privacidad
 
@@ -38,9 +37,9 @@ Bolsillo es software libre bajo la licencia [MIT](LICENSE): puedes leer todo el 
 - Internet solo se usa cuando tocas "Buscar actualizaciones": la app consulta los [Releases](../../releases) de este repositorio en GitHub y descarga el APK. No se envía ningún dato tuyo, y nada se conecta por su cuenta.
 - Antes de instalar, la app comprueba que el APK descargado coincide con la huella SHA-256 que publica GitHub; además Android solo acepta la actualización si está firmada con la misma llave que la app instalada.
 - Los datos se guardan en una base de datos local y no se incluyen en las copias de seguridad automáticas de Android.
-- Los permisos de SMS y de fotos se piden solo cuando usas esas funciones, y la app funciona sin ellos.
+- El permiso de fotos se pide solo cuando eliges una imagen para una tarjeta o tu perfil, y la app funciona sin él.
 
-Si encuentras un problema de seguridad, lee [SECURITY.md](SECURITY.md).
+Puedes leer la [política de privacidad y normas](PRIVACIDAD.md) completa, y también se abre desde Ajustes → Privacidad y normas. Si encuentras un problema de seguridad, lee [SECURITY.md](SECURITY.md).
 
 ## Instalar
 

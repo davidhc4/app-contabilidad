@@ -11,8 +11,19 @@ Si encuentras una vulnerabilidad, no la publiques en un issue. Usa la pestaña *
 - La única conexión a internet ocurre cuando tocas "Buscar actualizaciones" en Ajustes: consulta la última versión en los Releases de este repositorio (api.github.com) y, si aceptas, descarga el APK desde github.com. No se conecta por su cuenta.
 - El APK descargado se verifica con la huella SHA-256 que publica GitHub, y Android rechaza cualquier actualización que no esté firmada con la misma llave que la app instalada.
 - No pide correo, contraseñas ni ninguna cuenta.
+- No lee SMS ni usa la ubicación.
 - Los datos están excluidos de las copias de seguridad de Android (`allowBackup=false`).
 - La única forma de que los datos salgan del teléfono es la opción "Compartir copia en CSV", que tú inicias.
+
+## Cómo saber que tu copia es la oficial
+
+Descarga la app solo desde los [Releases](../../releases) de este repositorio. Todas las versiones oficiales están firmadas con la misma llave; la huella SHA-256 del certificado es:
+
+```
+AE:C0:B1:8C:CB:BB:DE:CC:90:19:BA:31:BB:CF:84:FF:70:82:C6:8F:81:0F:B7:BC:21:E6:C6:43:0B:6F:EB:E2
+```
+
+Una copia hecha por otra persona tendría una firma distinta, y Android no la aceptará como actualización de la app oficial. Más detalles en la [política de privacidad y normas](PRIVACIDAD.md).
 
 ## Versiones con soporte
 

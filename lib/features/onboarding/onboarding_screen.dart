@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../providers/app_providers.dart';
-import '../sms_detection/sms_permission_helper.dart';
 
 class OnboardingScreen extends ConsumerWidget {
   const OnboardingScreen({super.key});
@@ -38,10 +37,8 @@ class OnboardingScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'Registra tus ingresos y gastos, y si quieres, deja que la '
-                'app detecte automáticamente los pagos con tarjeta desde '
-                'tus SMS bancarios — siempre te pedirá confirmar antes de '
-                'guardar nada.',
+                'Registra tus ingresos y gastos, organiza tus tarjetas y '
+                'mira cuánto puedes ahorrar. Todo se queda en tu teléfono.',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: Theme.of(context).colorScheme.outline,
                     ),
@@ -49,26 +46,13 @@ class OnboardingScreen extends ConsumerWidget {
               const Spacer(),
               FilledButton.tonal(
                 onPressed: () async {
-                  final granted = await requestSmsPermissionWithGuidance(context);
-                  final repo = ref.read(settingsRepositoryProvider);
-                  if (granted) {
-                    await repo.setSmsDetectionEnabled(true);
-                  }
-                  await repo.setOnboardingDone();
+                  await ref.read(settingsRepositoryProvider).setOnboardingDone();
                   if (context.mounted) context.go('/home');
                 },
                 style: FilledButton.styleFrom(
                   minimumSize: const Size.fromHeight(52),
                 ),
-                child: const Text('Activar detección de SMS'),
-              ),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: () async {
-                  await ref.read(settingsRepositoryProvider).setOnboardingDone();
-                  if (context.mounted) context.go('/home');
-                },
-                child: const Text('Prefiero registrar todo manualmente'),
+                child: const Text('Empezar'),
               ),
             ],
           ),
