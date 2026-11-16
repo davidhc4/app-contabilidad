@@ -1,5 +1,8 @@
 # Cambios
 
+## 1.19.2
+- Ajuste interno de pruebas para el nuevo tiempo de las cajas.
+
 ## 1.19.1
 - Corrige la compilación del ajuste de saldo del efectivo.
 

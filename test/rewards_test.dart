@@ -14,9 +14,9 @@ void main() {
       expect(boxProgress(300).earned, 1);
     });
 
-    test('los tramos son 5, 10, 20, 40, 80 y luego 100 minutos', () {
-      expect([for (var n = 0; n < 8; n++) boxIntervalMinutes(n)],
-          [5, 10, 20, 40, 80, 100, 100, 100]);
+    test('los tramos son 5, 10 y luego 20 minutos como máximo', () {
+      expect([for (var n = 0; n < 6; n++) boxIntervalMinutes(n)],
+          [5, 10, 20, 20, 20, 20]);
       // 5 + 10 + 20 = 35 minutos para tener 3 cajas.
       expect(boxProgress(35 * 60).earned, 3);
       expect(boxProgress(35 * 60 - 1).earned, 2);
