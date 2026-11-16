@@ -10,6 +10,9 @@ import '../../core/theme/app_theme.dart';
 import '../../core/utils/formatters.dart';
 import '../../providers/app_providers.dart';
 import '../../shared/widgets/maker_mark.dart';
+import '../categories/categories_screen.dart';
+import '../statistics/statistics_screen.dart';
+import '../tools/interest_simulator_screen.dart';
 import '../../shared/widgets/progress_dialog.dart';
 import '../budget/budget_dialog.dart';
 import '../data_export/export_data.dart';
@@ -113,6 +116,48 @@ class SettingsScreen extends ConsumerWidget {
                     trailing: const Icon(Icons.chevron_right_rounded),
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute(builder: (_) => const RewardsScreen()),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const _SectionTitle('Herramientas'),
+            Card(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.insights_rounded),
+                    title: const Text('Gráficas'),
+                    subtitle:
+                        const Text('Tus ingresos y gastos en gráficas.'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (_) => const StatisticsScreen()),
+                    ),
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.category_rounded),
+                    title: const Text('Categorías'),
+                    subtitle: const Text('Crea y organiza tus categorías.'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (_) => const CategoriesScreen()),
+                    ),
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.calculate_rounded),
+                    title: const Text('Simulador de intereses'),
+                    subtitle: const Text(
+                        'Estima cuánto crece tu dinero en un CDT o ahorro.'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (_) => const InterestSimulatorScreen()),
                     ),
                   ),
                 ],

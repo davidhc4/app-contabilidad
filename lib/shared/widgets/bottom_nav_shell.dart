@@ -4,10 +4,9 @@ import '../../core/donation.dart';
 import '../../core/storage/local_store.dart';
 import '../../features/donation/donation_screen.dart';
 import '../../features/cards/cards_screen.dart';
-import '../../features/categories/categories_screen.dart';
 import '../../features/dashboard/dashboard_screen.dart';
+import '../../features/debts/debts_screen.dart';
 import '../../features/settings/settings_screen.dart';
-import '../../features/statistics/statistics_screen.dart';
 import '../../features/transactions/transactions_screen.dart';
 import 'soft_nav_bar.dart';
 
@@ -84,9 +83,8 @@ class _MainTabShellState extends State<MainTabShell> {
   static const _screens = [
     _KeepAlive(child: DashboardScreen()),
     _KeepAlive(child: CardsScreen()),
-    _KeepAlive(child: StatisticsScreen()),
     _KeepAlive(child: TransactionsScreen()),
-    _KeepAlive(child: CategoriesScreen()),
+    _KeepAlive(child: DebtsScreen()),
     _KeepAlive(child: SettingsScreen()),
   ];
 
@@ -102,19 +100,14 @@ class _MainTabShellState extends State<MainTabShell> {
       label: 'Tarjetas',
     ),
     SoftNavItem(
-      icon: Icons.insights_outlined,
-      selectedIcon: Icons.insights_rounded,
-      label: 'Gráficas',
-    ),
-    SoftNavItem(
       icon: Icons.receipt_long_outlined,
       selectedIcon: Icons.receipt_long_rounded,
       label: 'Historial',
     ),
     SoftNavItem(
-      icon: Icons.category_outlined,
-      selectedIcon: Icons.category_rounded,
-      label: 'Categorías',
+      icon: Icons.handshake_outlined,
+      selectedIcon: Icons.handshake_rounded,
+      label: 'Deudas',
     ),
     SoftNavItem(
       icon: Icons.settings_outlined,

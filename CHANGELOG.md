@@ -1,5 +1,10 @@
 # Cambios
 
+## 1.18.0
+- Nueva sección **Deudas**: lleva lo que te deben y lo que debes, con la persona, la fecha y hora, y un interés opcional (porcentaje o monto fijo, por día, mes o año). Cada deuda muestra el capital, el interés acumulado y el total al día de hoy.
+- Nuevo **Simulador de intereses** (en Ajustes): estima cuánto crece tu dinero en un CDT o en un ahorro que paga intereses.
+- La barra de abajo queda más limpia: Resumen, Tarjetas, Historial, Deudas y Ajustes. Las Gráficas y las Categorías se movieron a Ajustes.
+
 ## 1.17.0
 - Al cambiar el saldo de una tarjeta (editándola en Tarjetas), ahora se crea un movimiento visible llamado "Modificación de saldo" con la diferencia, en vez de cambiar el número en silencio. No cuenta como ingreso ni como gasto.
 - Al editar una tarjeta, el campo del saldo muestra el saldo actual real (incluido si es negativo) y explica qué pasa si lo cambias.
