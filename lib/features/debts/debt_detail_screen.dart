@@ -27,17 +27,18 @@ class DebtDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    Debt? debt;
+    Debt? found;
     for (final d in ref.watch(debtsProvider)) {
       if (d.id == debtId) {
-        debt = d;
+        found = d;
         break;
       }
     }
 
-    if (debt == null) {
+    if (found == null) {
       return const Scaffold(body: Center(child: Text('Esta deuda ya no existe.')));
     }
+    final debt = found;
 
     final color = debt.paid
         ? theme.disabledColor

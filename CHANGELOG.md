@@ -1,5 +1,8 @@
 # Cambios
 
+## 1.18.1
+- Corrige un error que impedía compilar la pantalla de detalle de una deuda.
+
 ## 1.18.0
 - Nueva sección **Deudas**: lleva lo que te deben y lo que debes, con la persona, la fecha y hora, y un interés opcional (porcentaje o monto fijo, por día, mes o año). Cada deuda muestra el capital, el interés acumulado y el total al día de hoy.
 - Nuevo **Simulador de intereses** (en Ajustes): estima cuánto crece tu dinero en un CDT o en un ahorro que paga intereses.
