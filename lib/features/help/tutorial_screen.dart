@@ -25,10 +25,12 @@ class _TutorialScreenState extends State<TutorialScreen> {
     _Topic(
       icon: Icons.swipe_rounded,
       title: 'Cómo moverte por la app',
-      body: 'Abajo tienes 6 secciones: Resumen, Tarjetas, Gráficas, '
-          'Historial, Categorías y Ajustes. Puedes tocar una para ir a ella '
-          'o simplemente deslizar el dedo hacia los lados sobre la pantalla '
-          'para pasar a la anterior o a la siguiente.',
+      body: 'Abajo tienes 5 secciones: Resumen, Tarjetas, Historial, '
+          'Deudas y Ajustes. Puedes tocar una para ir a ella o deslizar el '
+          'dedo hacia los lados sobre la pantalla para pasar a la anterior o '
+          'a la siguiente.\n\n'
+          'Las Gráficas, las Categorías y el Simulador de intereses están '
+          'dentro de Ajustes → Herramientas.',
     ),
     _Topic(
       icon: Icons.add_circle_outline_rounded,
@@ -76,6 +78,9 @@ class _TutorialScreenState extends State<TutorialScreen> {
           'elige un sticker, de mujer o de hombre.\n'
           '• "Eliminar": borra la tarjeta. Sus movimientos NO se borran, '
           'quedan sin tarjeta.\n'
+          '• En "Dinero que ya tiene" pones el saldo real de la tarjeta. Si '
+          'lo cambias después, se crea un movimiento de "Modificación de '
+          'saldo" con la diferencia.\n'
           '• Toca una tarjeta para ver sus movimientos y cuánto has '
           'gastado con ella este mes.',
     ),
@@ -100,9 +105,24 @@ class _TutorialScreenState extends State<TutorialScreen> {
           'una, arrástrala hacia la izquierda en el Historial.',
     ),
     _Topic(
+      icon: Icons.handshake_rounded,
+      title: 'Deudas',
+      body: 'En la pestaña Deudas llevas lo que te deben y lo que debes.\n\n'
+          '1. Toca "Nueva deuda".\n'
+          '2. Elige "Me deben" o "Yo debo", y escribe la persona y el '
+          'monto.\n'
+          '3. Si hay interés, elígelo: un porcentaje o un monto fijo, y cada '
+          'cuánto corre (día, mes o año).\n'
+          '4. Puedes cambiar la fecha y hora de inicio y dejar una nota.\n\n'
+          'Al abrir una deuda ves el capital, el interés acumulado y el '
+          'total de hoy. Puedes marcarla como pagada, editarla o borrarla. '
+          'Arriba se resume cuánto te deben y cuánto debes.',
+    ),
+    _Topic(
       icon: Icons.insights_rounded,
       title: 'Gráficas',
-      body: 'Muestra en qué se va tu dinero: gráficas por categoría y por '
+      body: 'Están en Ajustes → Herramientas → Gráficas. '
+          'Muestran en qué se va tu dinero: por categoría y por '
           'día, para el período que elijas (semana, mes, año…). Sirve para '
           'descubrir qué gastos puedes recortar.',
     ),
@@ -119,10 +139,25 @@ class _TutorialScreenState extends State<TutorialScreen> {
     _Topic(
       icon: Icons.category_rounded,
       title: 'Categorías',
-      body: 'Son los grupos en los que clasificas cada movimiento '
-          '(Comida, Transporte, Salario…). Cambia entre Gastos e Ingresos '
-          'arriba y toca "Nueva categoría" para crear las tuyas, con el '
-          'ícono y el color que prefieras.',
+      body: 'Están en Ajustes → Herramientas → Categorías. Son los grupos '
+          'en los que clasificas cada movimiento (Comida, Transporte, '
+          'Salario…). Cambia entre Gastos e Ingresos arriba y toca "Nueva '
+          'categoría" para crear las tuyas, con el ícono y el color que '
+          'prefieras.',
+    ),
+    _Topic(
+      icon: Icons.calculate_rounded,
+      title: 'Simulador de intereses',
+      body: 'En Ajustes → Herramientas → Simulador de intereses estimas '
+          'cuánto crece tu dinero:\n\n'
+          '• CDT: pon el monto, la tasa efectiva anual (E.A.), el plazo y '
+          'la retención en la fuente. Te muestra el rendimiento y el total '
+          'a recibir.\n'
+          '• Ahorro (tipo cajitas): pon un monto inicial, un aporte mensual '
+          'opcional, la tasa E.A. y el tiempo. Te muestra los intereses '
+          'ganados y el saldo final.\n\n'
+          'Es solo una estimación educativa, no una oferta ni asesoría '
+          'financiera.',
     ),
     _Topic(
       icon: Icons.bolt_rounded,

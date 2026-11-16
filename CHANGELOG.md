@@ -1,5 +1,8 @@
 # Cambios
 
+## 1.18.2
+- Se actualizó la ayuda ("Cómo usar la app"): se agregaron Deudas y el Simulador de intereses, se indica que Gráficas y Categorías están en Ajustes, y se explica el movimiento de "Modificación de saldo".
+
 ## 1.18.1
 - Corrige un error que impedía compilar la pantalla de detalle de una deuda.
 
