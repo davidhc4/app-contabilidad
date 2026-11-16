@@ -1,5 +1,8 @@
 # Cambios
 
+## 1.19.1
+- Corrige la compilación del ajuste de saldo del efectivo.
+
 ## 1.19.0
 - El "Efectivo" ahora es una cuenta más: se llama "Efectivo" (antes "sin tarjeta") y puedes ajustar su saldo con el lápiz en "¿Dónde está tu dinero?", igual que una tarjeta (se crea un movimiento de "Modificación de saldo").
 - Al anotar un gasto o ingreso, la opción ahora dice "Efectivo" en vez de "Sin tarjeta".

@@ -5,6 +5,7 @@ import '../../core/utils/formatters.dart';
 import '../../core/utils/thousands_formatter.dart';
 import '../../providers/app_providers.dart';
 import 'account_balances.dart';
+import 'card_style.dart';
 
 /// Ajusta el saldo del efectivo (la cuenta "Efectivo"). Igual que con las
 /// tarjetas, si el saldo cambia se crea un movimiento de "Modificación de
