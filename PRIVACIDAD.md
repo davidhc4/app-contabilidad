@@ -66,7 +66,7 @@ y no envía nada a internet (salvo buscar actualizaciones), no recopila
 información de nadie, menor o adulto. Si un menor la usa, recomendamos el
 acompañamiento de un adulto para lo relacionado con el manejo de dinero.
 
-## Cómo saber que tu Bolsillo es el oficial
+## Cómo saber que tu app **Bolsillo** es el oficial
 
 Como la app es de código abierto, cualquiera puede ver el código. Eso es bueno,
 pero también significa que alguien malintencionado podría tomar el código,
