@@ -1,5 +1,10 @@
 # Cambios
 
+## 1.19.0
+- El "Efectivo" ahora es una cuenta más: se llama "Efectivo" (antes "sin tarjeta") y puedes ajustar su saldo con el lápiz en "¿Dónde está tu dinero?", igual que una tarjeta (se crea un movimiento de "Modificación de saldo").
+- Al anotar un gasto o ingreso, la opción ahora dice "Efectivo" en vez de "Sin tarjeta".
+- Las cajas de recompensas ahora caen como máximo cada 20 minutos (antes el tiempo crecía hasta 100).
+
 ## 1.18.2
 - Se actualizó la ayuda ("Cómo usar la app"): se agregaron Deudas y el Simulador de intereses, se indica que Gráficas y Categorías están en Ajustes, y se explica el movimiento de "Modificación de saldo".
 

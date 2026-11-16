@@ -8,6 +8,7 @@ import '../../shared/widgets/confirm_dialog.dart';
 import '../../shared/widgets/soft_fab.dart';
 import '../../core/utils/formatters.dart';
 import 'account_balances.dart';
+import 'cash_balance.dart';
 import 'card_style.dart';
 import 'transfer_sheet.dart';
 import 'card_detail_screen.dart';
@@ -136,13 +137,14 @@ class _BalancesSummary extends ConsumerWidget {
     final movements = ref.watch(accountMovementsProvider);
     final styles = ref.watch(cardStylesProvider);
 
-    final rows = <MapEntry<String, double>>[
-      MapEntry('Efectivo / sin tarjeta', cardBalance(null, movements, styles)),
+    final cashBalance = cardBalance(null, movements, styles);
+    final cardRows = <MapEntry<String, double>>[
       for (final c in cards)
         MapEntry('${c.name} ••${c.lastFourDigits}',
             cardBalance(c.id, movements, styles)),
     ];
-    final total = rows.fold<double>(0, (sum, r) => sum + r.value);
+    final total =
+        cashBalance + cardRows.fold<double>(0, (sum, r) => sum + r.value);
 
     return Card(
       child: Padding(
@@ -160,7 +162,32 @@ class _BalancesSummary extends ConsumerWidget {
               style: theme.textTheme.bodySmall,
             ),
             const SizedBox(height: 12),
-            for (final r in rows)
+            // Efectivo: se puede ajustar su saldo, igual que una tarjeta.
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 3),
+              child: Row(
+                children: [
+                  const Expanded(child: Text('Efectivo')),
+                  Text(
+                    Formatters.money(cashBalance),
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: cashBalance < 0 ? theme.colorScheme.error : null,
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () => showCashBalanceDialog(context, ref),
+                    borderRadius: BorderRadius.circular(20),
+                    child: Padding(
+                      padding: const EdgeInsets.all(5),
+                      child: Icon(Icons.edit_rounded,
+                          size: 16, color: theme.colorScheme.primary),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            for (final r in cardRows)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 3),
                 child: Row(

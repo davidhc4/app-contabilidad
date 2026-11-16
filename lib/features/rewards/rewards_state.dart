@@ -18,7 +18,11 @@ const _serialsKey = 'aspectos_serie';
 
 /// Minutos que hay que pasar en la app para ganar la caja número [n]
 /// (empezando en 0): 5, 10, 20, 40, 80 y luego siempre 100.
-int boxIntervalMinutes(int n) => n >= 5 ? 100 : 5 << n;
+int boxIntervalMinutes(int n) => switch (n) {
+      0 => 5,
+      1 => 10,
+      _ => 20,
+    };
 
 /// Cuántas cajas se han ganado en total y cómo va la siguiente.
 class BoxProgress {

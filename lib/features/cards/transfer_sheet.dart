@@ -176,7 +176,7 @@ class _TransferSheetState extends ConsumerState<TransferSheet> {
     final movements = ref.watch(accountMovementsProvider);
 
     final accounts = <_Account>[
-      _Account(_cashId, 'Efectivo / sin tarjeta',
+      _Account(_cashId, 'Efectivo',
           cardBalance(null, movements, styles), Icons.payments_rounded),
       for (final c in cards)
         _Account(

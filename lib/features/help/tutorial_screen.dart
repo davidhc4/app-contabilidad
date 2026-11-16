@@ -81,6 +81,9 @@ class _TutorialScreenState extends State<TutorialScreen> {
           '• En "Dinero que ya tiene" pones el saldo real de la tarjeta. Si '
           'lo cambias después, se crea un movimiento de "Modificación de '
           'saldo" con la diferencia.\n'
+          '• El "Efectivo" también es una cuenta: aparece en "¿Dónde está tu '
+          'dinero?" y puedes ajustar su saldo tocando el lápiz, igual que una '
+          'tarjeta.\n'
           '• Toca una tarjeta para ver sus movimientos y cuánto has '
           'gastado con ella este mes.',
     ),

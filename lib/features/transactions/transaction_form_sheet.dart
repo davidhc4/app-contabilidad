@@ -274,7 +274,7 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
                     runSpacing: 10,
                     children: [
                       ChoiceChip(
-                        label: const Text('Sin tarjeta'),
+                        label: const Text('Efectivo'),
                         selected: _cardId == null,
                         onSelected: (_) => setState(() => _cardId = null),
                       ),
