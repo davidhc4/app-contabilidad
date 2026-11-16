@@ -13,8 +13,8 @@ Map<String?, double> movementBalances(List<TransactionWithCategory> txs) {
   for (final item in txs) {
     final tx = item.transaction;
     final delta = switch (tx.type) {
-      TxType.income || TxType.transferIn => tx.amount,
-      TxType.expense || TxType.transferOut => -tx.amount,
+      TxType.income || TxType.transferIn || TxType.adjustmentIn => tx.amount,
+      TxType.expense || TxType.transferOut || TxType.adjustmentOut => -tx.amount,
       _ => 0.0,
     };
     result.update(tx.cardId, (v) => v + delta, ifAbsent: () => delta);

@@ -193,6 +193,46 @@ class TransactionRepository {
         .go();
   }
 
+  /// Registra una "Modificación de saldo": ajusta el saldo de una tarjeta en
+  /// [delta] (positivo sube, negativo baja) dejando un movimiento visible que
+  /// no cuenta como ingreso ni como gasto.
+  Future<void> addAdjustment({
+    String? id,
+    required String? cardId,
+    required double delta,
+    DateTime? date,
+    String description = 'Modificación de saldo',
+  }) async {
+    final categoryId = await _adjustmentCategoryId();
+    await db.into(db.transactions).insert(TransactionsCompanion.insert(
+          id: id ?? _uuid.v4(),
+          type: delta >= 0 ? TxType.adjustmentIn : TxType.adjustmentOut,
+          amount: delta.abs(),
+          categoryId: categoryId,
+          description: Value(description),
+          date: date ?? DateTime.now(),
+          source: const Value(TxSource.adjustment),
+          cardId: Value(cardId),
+        ));
+  }
+
+  Future<String> _adjustmentCategoryId() async {
+    final existing = await (db.select(db.categories)
+          ..where((c) => c.type.equals(TxType.adjustment)))
+        .get();
+    if (existing.isNotEmpty) return existing.first.id;
+    final id = _uuid.v4();
+    await db.into(db.categories).insert(CategoriesCompanion.insert(
+          id: id,
+          name: 'Modificación de saldo',
+          type: TxType.adjustment,
+          icon: 'tune',
+          color: 'FF0A84FF',
+          isArchived: const Value(true),
+        ));
+    return id;
+  }
+
   Future<String> _transferCategoryId() async {
     final existing = await (db.select(db.categories)
           ..where((c) => c.type.equals(TxType.transfer)))

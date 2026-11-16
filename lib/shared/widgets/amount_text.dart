@@ -21,7 +21,9 @@ class AmountText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isTransfer = TxType.isTransfer(type);
-    final isIncome = type == TxType.income || type == TxType.transferIn;
+    final isIncome = type == TxType.income ||
+        type == TxType.transferIn ||
+        type == TxType.adjustmentIn;
     final color = isTransfer
         ? AppColors.seed
         : (isIncome ? AppColors.income : AppColors.expense);

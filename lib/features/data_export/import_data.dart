@@ -167,6 +167,22 @@ Future<ImportResult> importCsvFile(WidgetRef ref, File file) async {
       ins.add(r);
       continue;
     }
+    if (r.type == 'Modificación (entra)' || r.type == 'Modificación (sale)') {
+      if (r.id.isNotEmpty && knownIds.contains(r.id)) {
+        skipped++;
+        continue;
+      }
+      await txRepo.addAdjustment(
+        id: r.id.isEmpty ? null : r.id,
+        cardId: await cardIdFor(r.card),
+        delta: r.type == 'Modificación (entra)' ? r.amount : -r.amount,
+        date: r.date,
+        description:
+            r.description.isEmpty ? 'Modificación de saldo' : r.description,
+      );
+      added++;
+      continue;
+    }
     if (r.id.isNotEmpty && knownIds.contains(r.id)) {
       skipped++;
       continue;

@@ -34,6 +34,8 @@ Future<List<List<Object>>> buildExportRows(WidgetRef ref) async {
           TxType.income => 'Ingreso',
           TxType.transferOut => 'Transferencia (sale)',
           TxType.transferIn => 'Transferencia (entra)',
+          TxType.adjustmentIn => 'Modificación (entra)',
+          TxType.adjustmentOut => 'Modificación (sale)',
           _ => 'Gasto',
         },
         item.category.name,
@@ -43,6 +45,7 @@ Future<List<List<Object>>> buildExportRows(WidgetRef ref) async {
         switch (item.transaction.source) {
           TxSource.sms => 'SMS',
           TxSource.transfer => 'Transferencia',
+          TxSource.adjustment => 'Ajuste',
           _ => 'Manual',
         },
         item.transaction.id,

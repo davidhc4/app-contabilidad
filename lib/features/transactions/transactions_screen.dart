@@ -106,6 +106,8 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                   itemBuilder: (context, i) {
                     final item = filtered[i];
                     final isTransfer = TxType.isTransfer(item.transaction.type);
+                    final isAdjustment =
+                        TxType.isAdjustment(item.transaction.type);
                     return Dismissible(
                       key: ValueKey(item.transaction.id),
                       background: Container(
@@ -148,6 +150,17 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                                     'Para cambiar una transferencia, '
                                     'elimínala (arrástrala a la izquierda) '
                                     'y créala de nuevo.',
+                                  ),
+                                ),
+                              );
+                              return;
+                            }
+                            if (isAdjustment) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Para cambiar el saldo de una tarjeta, '
+                                    'edítala en la pestaña Tarjetas.',
                                   ),
                                 ),
                               );

@@ -15,8 +15,19 @@ class TxType {
   /// Tipo de la categoría oculta "Transferencia".
   static const transfer = 'transfer';
 
+  /// Modificación manual del saldo de una tarjeta: no cuenta como ingreso ni
+  /// gasto, pero sí ajusta el saldo y queda como un movimiento visible.
+  static const adjustmentIn = 'adjustment_in';
+  static const adjustmentOut = 'adjustment_out';
+
+  /// Tipo de la categoría oculta "Modificación de saldo".
+  static const adjustment = 'adjustment';
+
   static bool isTransfer(String type) =>
       type == transferOut || type == transferIn;
+
+  static bool isAdjustment(String type) =>
+      type == adjustmentIn || type == adjustmentOut;
 }
 
 /// Origen de la transacción: creada a mano o confirmada desde un SMS.
@@ -25,6 +36,7 @@ class TxSource {
   static const manual = 'manual';
   static const sms = 'sms';
   static const transfer = 'transfer';
+  static const adjustment = 'ajuste';
 }
 
 /// Red de la tarjeta, solo para mostrar el logo/texto correspondiente.

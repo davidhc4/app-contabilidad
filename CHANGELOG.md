@@ -1,5 +1,10 @@
 # Cambios
 
+## 1.17.0
+- Al cambiar el saldo de una tarjeta (editándola en Tarjetas), ahora se crea un movimiento visible llamado "Modificación de saldo" con la diferencia, en vez de cambiar el número en silencio. No cuenta como ingreso ni como gasto.
+- Al editar una tarjeta, el campo del saldo muestra el saldo actual real (incluido si es negativo) y explica qué pasa si lo cambias.
+- La política de privacidad y normas ahora también está en inglés (PRIVACY.md).
+
 ## 1.16.1
 - La página de privacidad se simplificó: se explica que la app está firmada y que solo debes descargarla del repositorio oficial, sin publicar datos técnicos de la firma. La parte de normas se centra en que no se use el nombre ni la identidad de la app para copias.
 

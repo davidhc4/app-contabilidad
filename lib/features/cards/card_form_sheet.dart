@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../core/platform/gallery_permission.dart';
+import '../../core/utils/formatters.dart';
 import '../../core/utils/thousands_formatter.dart';
 import '../../data/local/database.dart';
 import '../../data/local/tables.dart';
@@ -13,6 +14,7 @@ import '../rewards/skin_widgets.dart';
 import '../rewards/skins.dart';
 import '../theme/navidad.dart';
 import '../../shared/widgets/bank_card_widget.dart';
+import 'account_balances.dart';
 import 'card_style.dart';
 
 /// Crear una tarjeta nueva, o editar/personalizar una existente si se pasa
@@ -76,10 +78,6 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
       _stickerSet = kStickersNavidad.contains(style.sticker)
           ? 2
           : (kStickersHombre.contains(style.sticker) ? 1 : 0);
-      final initial = style.initialBalance;
-      if (initial != null && initial > 0) {
-        _balanceController.text = formatThousands(initial.round().toString());
-      }
     }
   }
 
@@ -176,9 +174,31 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
           photoPath: _photoPath,
           sticker: _sticker,
           skin: _skin,
-          initialBalance: parseThousands(_balanceController.text)?.toDouble(),
+          // Al crear, el campo es el saldo inicial. Al editar, el saldo no se
+          // toca aquí: si cambió, se registra como un movimiento más abajo.
+          initialBalance: editing == null
+              ? parseThousands(_balanceController.text)?.toDouble()
+              : ref.read(cardStylesProvider)[cardId]?.initialBalance,
         ),
       );
+      // Al editar: si se escribió un saldo distinto al actual, se guarda un
+      // movimiento de "Modificación de saldo" con la diferencia.
+      if (editing != null) {
+        final target = parseThousands(_balanceController.text)?.toDouble();
+        if (target != null) {
+          final current = cardBalance(
+            cardId,
+            ref.read(accountMovementsProvider),
+            ref.read(cardStylesProvider),
+          );
+          final delta = target - current;
+          if (delta.abs() >= 1) {
+            await ref
+                .read(transactionRepositoryProvider)
+                .addAdjustment(cardId: cardId, delta: delta);
+          }
+        }
+      }
       _saved = true;
       final applied = _skin;
       if (applied != null && applied != _startSkin && mounted) {
@@ -201,6 +221,16 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
         if (owned.contains(k.id)) k,
     ];
     final isEditing = widget.editing != null;
+    final editing = widget.editing;
+    // Saldo actual de la tarjeta (solo en edición), para mostrarlo y para
+    // calcular la diferencia si se cambia.
+    final double? currentBalance = editing == null
+        ? null
+        : cardBalance(
+            editing.id,
+            ref.watch(accountMovementsProvider),
+            ref.watch(cardStylesProvider),
+          );
     final navidad = ref.watch(navidadProvider);
     final set = (_stickerSet == 2 && !navidad) ? 0 : _stickerSet;
     final stickers = switch (set) {
@@ -243,7 +273,7 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
               colorEnd: _gradient[1],
               style: CardStyle(photoPath: _photoPath, sticker: _sticker, skin: _skin),
               balance: parseThousands(_balanceController.text)?.toDouble() ??
-                  (widget.editing == null ? 0.0 : null),
+                  (editing == null ? 0.0 : currentBalance),
             ),
             const SizedBox(height: 16),
             TextField(
@@ -273,12 +303,18 @@ class _CardFormSheetState extends ConsumerState<CardFormSheet> {
               onChanged: (_) => setState(() {}),
               keyboardType: TextInputType.number,
               inputFormatters: const [ThousandsInputFormatter()],
-              decoration: const InputDecoration(
-                labelText: 'Dinero que ya tiene (opcional)',
+              decoration: InputDecoration(
+                labelText: editing == null
+                    ? 'Dinero que ya tiene (opcional)'
+                    : 'Ajustar saldo de la tarjeta',
                 prefixText: r'$ ',
-                helperText: 'Para que el saldo de la tarjeta sea el real. '
-                    'Déjalo vacío si empieza en cero.',
-                helperMaxLines: 2,
+                helperText: editing == null
+                    ? 'Para que el saldo de la tarjeta sea el real. '
+                        'Déjalo vacío si empieza en cero.'
+                    : 'Saldo actual: ${Formatters.money(currentBalance ?? 0)}. '
+                        'Si escribes otro valor, se crea un movimiento de '
+                        '"Modificación de saldo" con la diferencia.',
+                helperMaxLines: 3,
               ),
             ),
             const SizedBox(height: 16),

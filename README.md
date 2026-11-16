@@ -39,7 +39,7 @@ Bolsillo es software libre bajo la licencia [MIT](LICENSE): puedes leer todo el 
 - Los datos se guardan en una base de datos local y no se incluyen en las copias de seguridad automáticas de Android.
 - El permiso de fotos se pide solo cuando eliges una imagen para una tarjeta o tu perfil, y la app funciona sin él.
 
-Puedes leer la [política de privacidad y normas](PRIVACIDAD.md) completa, y también se abre desde Ajustes → Privacidad y normas. Si encuentras un problema de seguridad, lee [SECURITY.md](SECURITY.md).
+Puedes leer la política de privacidad y normas completa en [español](PRIVACIDAD.md) o [inglés](PRIVACY.md), y también se abre desde Ajustes → Privacidad y normas. Si encuentras un problema de seguridad, lee [SECURITY.md](SECURITY.md).
 
 ## Instalar
 

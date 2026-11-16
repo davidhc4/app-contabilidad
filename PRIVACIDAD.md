@@ -1,6 +1,8 @@
 # Privacidad y normas de Bolsillo
 
-_Última actualización: 12 de noviembre de 2026_
+_English version: [PRIVACY.md](PRIVACY.md)_
+
+_Última actualización: 15 de noviembre de 2026_
 
 Bolsillo es una app gratuita y de código abierto para llevar el control de tus
 gastos. Esta página explica, en palabras sencillas, qué hace la app con tu
