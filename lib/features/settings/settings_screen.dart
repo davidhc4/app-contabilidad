@@ -11,6 +11,7 @@ import '../../core/utils/formatters.dart';
 import '../../providers/app_providers.dart';
 import '../../shared/widgets/maker_mark.dart';
 import '../categories/categories_screen.dart';
+import '../notifications/notification_settings.dart';
 import '../statistics/statistics_screen.dart';
 import '../tools/interest_simulator_screen.dart';
 import '../../shared/widgets/progress_dialog.dart';
@@ -121,6 +122,8 @@ class SettingsScreen extends ConsumerWidget {
                 ],
               ),
             ),
+            const _SectionTitle('Detección de pagos'),
+            const PaymentDetectionCard(),
             const _SectionTitle('Herramientas'),
             Card(
               margin: const EdgeInsets.symmetric(horizontal: 20),

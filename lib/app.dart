@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'core/platform/quick_action.dart';
 import 'core/theme/app_theme.dart';
+import 'core/utils/formatters.dart';
+import 'features/notifications/notification_detection.dart';
 import 'features/onboarding/onboarding_screen.dart';
 import 'features/profile/profile_screen.dart';
 import 'features/rewards/rewards_state.dart';
@@ -43,6 +47,9 @@ class BolsilloApp extends ConsumerStatefulWidget {
 class _BolsilloAppState extends ConsumerState<BolsilloApp>
     with WidgetsBindingObserver {
   bool _redirectedToOnboarding = false;
+  Timer? _notifTimer;
+  bool _showingCandidate = false;
+  final List<PaymentCandidate> _pendingCandidates = [];
 
   @override
   void initState() {
@@ -51,11 +58,18 @@ class _BolsilloAppState extends ConsumerState<BolsilloApp>
     // Empieza a contar el tiempo dentro de la app (recompensas).
     ref.read(usageProvider);
     _checkQuickAction();
+    // Revisa cada tanto si llegaron notificaciones de pagos (solo si está
+    // activado). Es una consulta local al teléfono, muy barata.
+    _notifTimer = Timer.periodic(
+      const Duration(seconds: 6),
+      (_) => _drainPaymentNotifications(),
+    );
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _notifTimer?.cancel();
     super.dispose();
   }
 
@@ -67,6 +81,7 @@ class _BolsilloAppState extends ConsumerState<BolsilloApp>
     if (state == AppLifecycleState.resumed) {
       SkinReminder.cancel();
       _checkQuickAction();
+      _drainPaymentNotifications();
     } else if (state == AppLifecycleState.paused) {
       // Si hay aspectos sin estrenar, deja programado un recordatorio.
       SkinReminder.schedule([
@@ -99,6 +114,62 @@ class _BolsilloAppState extends ConsumerState<BolsilloApp>
       await Future<void>.delayed(const Duration(milliseconds: 300));
       if (!mounted) return;
     }
+  }
+
+  /// Revisa los pagos detectados en notificaciones y los ofrece para anotar,
+  /// uno por uno.
+  Future<void> _drainPaymentNotifications() async {
+    if (!mounted || !ref.read(notifEnabledProvider)) return;
+    final found = await drainCandidates();
+    if (!mounted || found.isEmpty) return;
+    _pendingCandidates.addAll(found);
+    _processNextCandidate();
+  }
+
+  void _processNextCandidate() {
+    if (_showingCandidate || _pendingCandidates.isEmpty || !mounted) return;
+    final context = navigatorKey.currentContext;
+    if (context == null || !context.mounted) return;
+    final candidate = _pendingCandidates.removeAt(0);
+    _showingCandidate = true;
+    showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(
+          candidate.isIncome
+              ? 'Posible ingreso de ${Formatters.money(candidate.amount)}'
+              : 'Posible gasto de ${Formatters.money(candidate.amount)}',
+        ),
+        content: Text(
+          '${candidate.description}\n\n¿Quieres anotarlo?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Descartar'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('Anotar'),
+          ),
+        ],
+      ),
+    ).then((anotar) {
+      _showingCandidate = false;
+      if (anotar == true) {
+        final ctx = navigatorKey.currentContext;
+        if (ctx != null && ctx.mounted) {
+          showTransactionForm(
+            ctx,
+            type: candidate.type,
+            prefillAmount: candidate.amount,
+            prefillDescription: candidate.description,
+          ).then((_) => _processNextCandidate());
+          return;
+        }
+      }
+      _processNextCandidate();
+    });
   }
 
   /// Si el usuario tocó "Agregar gasto/ingreso" en el panel de ajustes

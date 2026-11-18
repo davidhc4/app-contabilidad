@@ -1,5 +1,8 @@
 # Cambios
 
+## 1.20.0
+- Detección de pagos por notificaciones (opcional): cuando tu banco o billetera (Nequi, Nu, Bancolombia…) te avise de un pago, la app te pregunta si quieres anotarlo, con el monto ya puesto. Se activa en Ajustes → Detección de pagos. Todo ocurre en el teléfono: no lee tu correo ni envía nada a internet.
+
 ## 1.19.2
 - Ajuste interno de pruebas para el nuevo tiempo de las cajas.
 

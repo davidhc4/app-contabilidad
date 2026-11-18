@@ -48,6 +48,12 @@ aunque no los concedas:
 - **Fotos**: solo si eliges una foto de tu galería para personalizar una
   tarjeta o tu perfil. La foto se copia a la carpeta privada de la app y no
   sale de tu teléfono.
+- **Acceso a las notificaciones** (opcional): solo si activas "Detectar pagos
+  por notificaciones". Sirve para que, cuando tu banco o billetera te muestre
+  una notificación de un pago, la app te pregunte si quieres anotarlo. La app
+  solo mira las notificaciones que parecen un pago, todo ocurre en tu
+  teléfono, no las guarda ni las envía a ningún lado, y puedes apagarlo cuando
+  quieras. Está desactivado hasta que tú lo enciendas.
 
 La app **no** usa ubicación, cámara, micrófono, contactos ni lectura de SMS.
 

@@ -48,6 +48,12 @@ it works even if you don't grant them:
 - **Photos**: only if you pick a photo from your gallery to customize a card or
   your profile. The photo is copied to the app's private folder and never
   leaves your phone.
+- **Notification access** (optional): only if you turn on "Detect payments from
+  notifications". It lets the app ask whether to record a payment when your
+  bank or wallet shows you a notification about it. The app only looks at
+  notifications that look like a payment, everything happens on your phone, it
+  does not store or send them anywhere, and you can turn it off anytime. It is
+  off until you enable it.
 
 The app does **not** use location, camera, microphone, contacts, or SMS
 reading.

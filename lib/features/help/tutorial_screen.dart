@@ -175,6 +175,21 @@ class _TutorialScreenState extends State<TutorialScreen> {
           'directo en el formulario.',
     ),
     _Topic(
+      icon: Icons.notifications_active_outlined,
+      title: 'Detectar pagos por notificaciones',
+      body: 'En Ajustes → Detección de pagos puedes activar que la app '
+          'detecte tus pagos solos.\n\n'
+          '1. Enciende "Detectar pagos por notificaciones".\n'
+          '2. Android te pedirá dar acceso a las notificaciones: busca '
+          '"Bolsillo" en esa lista y actívalo.\n'
+          '3. Desde ahí, cuando tu banco o billetera (Nequi, Nu, '
+          'Bancolombia…) te avise de un pago, la app te preguntará si '
+          'quieres anotarlo, con el monto ya puesto.\n\n'
+          'Todo ocurre en tu teléfono: la app no lee tu correo ni envía '
+          'nada a internet, y puedes apagarlo cuando quieras. Si tu banco no '
+          'se detecta, avísame para ajustarlo.',
+    ),
+    _Topic(
       icon: Icons.ios_share_rounded,
       title: 'Tus datos: copia, importar y borrar',
       body: '• Compartir copia en CSV: crea un archivo que se abre en Excel '
