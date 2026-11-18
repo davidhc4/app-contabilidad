@@ -28,6 +28,11 @@ class DonationLink {
           .replaceAll('{currency}', currency));
 }
 
+/// Datos para apoyar por Nequi / QR (cualquier banco colombiano).
+const kNequiName = 'Juan Chávez';
+const kNequiNumber = '3134758119';
+const kNequiQrAsset = 'assets/img/qr_nequi.png';
+
 /// Formas de donar disponibles. Mientras esté vacía, la pantalla muestra
 /// que pronto habrá opciones.
 const kDonationLinks = <DonationLink>[

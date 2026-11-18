@@ -1,5 +1,8 @@
 # Cambios
 
+## 1.21.0
+- Apoyar la app ahora tiene dos modos: PayPal y Nequi/QR. El modo Nequi muestra el QR para escanear desde cualquier banco colombiano y el número para transferir, con botón de copiar.
+
 ## 1.20.0
 - Detección de pagos por notificaciones (opcional): cuando tu banco o billetera (Nequi, Nu, Bancolombia…) te avise de un pago, la app te pregunta si quieres anotarlo, con el monto ya puesto. Se activa en Ajustes → Detección de pagos. Todo ocurre en el teléfono: no lee tu correo ni envía nada a internet.
 
